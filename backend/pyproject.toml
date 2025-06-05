@@ -1,0 +1,20 @@
+[project]
+name = "Cardholder_pwa"
+version = "0.0.1"
+description = "This app allows you to store your discount cards in one place."
+authors = [
+    {name = "Eugene Savin", email = "evgeny.savin.ad@gmail.com"}
+]
+dependencies = [
+    "fastapi[standard]",
+    "uvicorn[standard]",
+    "sqlalchemy",
+    "passlib[bcrypt]",
+    "python-jose[cryptography]",
+    "pydantic[email]",
+    "python-multipart"
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.11"
+urls = {Homepage = "https://github.com/Quenary/cardholder_pwa"}
