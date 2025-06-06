@@ -17,6 +17,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # В реальном приложении - хранить в Redis или БД
 refresh_token_store = {}
 
+
 def get_db():
     db = database.SessionLocal()
     try:
@@ -24,11 +25,14 @@ def get_db():
     finally:
         db.close()
 
+
 def verify_password(plain, hashed):
     return pwd_context.verify(plain, hashed)
 
+
 def get_password_hash(password):
     return pwd_context.hash(password)
+
 
 def authenticate_user(db, username: str, password: str):
     user = db.query(models.User).filter(models.User.username == username).first()
@@ -36,11 +40,15 @@ def authenticate_user(db, username: str, password: str):
         return None
     return user
 
+
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    expire = datetime.utcnow() + (
+        expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
 
 def create_refresh_token(username: str):
     expire = datetime.utcnow() + timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
@@ -48,6 +56,15 @@ def create_refresh_token(username: str):
     token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     refresh_token_store[token] = username
     return token
+
+
+def rotate_refresh_token(old_token: str):
+    username = validate_refresh_token(old_token)
+    # Удаляем старый токен
+    refresh_token_store.pop(old_token, None)
+    # Создаем новый
+    return create_refresh_token(username)
+
 
 def validate_refresh_token(token: str):
     try:
@@ -61,7 +78,10 @@ def validate_refresh_token(token: str):
     except JWTError:
         raise HTTPException(status_code=403, detail="Invalid token")
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+
+async def get_current_user(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+):
     credentials_exception = HTTPException(status_code=401, detail="Invalid token")
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -74,3 +94,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
     if not user:
         raise credentials_exception
     return user
+
+
+def revoke_refresh_token(token: str):
+    if token in refresh_token_store:
+        refresh_token_store.pop(token)
+    else:
+        raise HTTPException(status_code=404, detail="Token not found")

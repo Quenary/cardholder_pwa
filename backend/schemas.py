@@ -2,6 +2,12 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 
 
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+    expires_in: int
+    refresh_token: str
+
 class CardBase(BaseModel):
     code: str
     code_type: str

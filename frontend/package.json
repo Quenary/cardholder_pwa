@@ -11,13 +11,17 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^19.0.0",
+    "@angular/cdk": "^19.2.18",
     "@angular/common": "^19.0.0",
     "@angular/compiler": "^19.0.0",
     "@angular/core": "^19.0.0",
     "@angular/forms": "^19.0.0",
+    "@angular/material": "^19.2.18",
     "@angular/platform-browser": "^19.0.0",
     "@angular/platform-browser-dynamic": "^19.0.0",
     "@angular/router": "^19.0.0",
+    "@ngrx/effects": "^19.2.1",
+    "@ngrx/store": "^19.2.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
