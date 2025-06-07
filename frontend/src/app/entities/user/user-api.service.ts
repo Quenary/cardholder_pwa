@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { IOAuth2PasswordRequestForm } from '../auth/auth-interface';
 import { Observable } from 'rxjs';
-import { IUser } from './user-interface';
+import { IUsrCreate, IUser } from './user-interface';
 import { environment } from '@env/environment';
 
 @Injectable({
@@ -11,7 +10,7 @@ import { environment } from '@env/environment';
 export class UserApiService {
   constructor(private httpClient: HttpClient) {}
 
-  create(body: IOAuth2PasswordRequestForm): Observable<IUser> {
+  create(body: IUsrCreate): Observable<IUser> {
     return this.httpClient.post<IUser>(`${environment.api}/user`, body);
   }
 

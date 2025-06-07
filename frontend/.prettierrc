@@ -1,0 +1,17 @@
+{
+    "tabWidth": 2,
+    "useTabs": false,
+    "htmlWhitespaceSensitivity": "strict",
+    "angularIndentChains": true,
+    "bracketSameLine": true,
+    "overrides": [
+        {
+            "files": "*.html",
+            "options": {
+                "parser": "angular"
+            }
+        }
+    ],
+    "singleAttributePerLine": true,
+    "singleQuote": true
+}

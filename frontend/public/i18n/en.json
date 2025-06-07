@@ -1,0 +1,31 @@
+{
+    "GENERAL": {
+        "TITLE": "Cardholder",
+        "YES": "Yes",
+        "NO": "No",
+        "CLOSE": "Close",
+        "REQUEST_ERROR": "Request error"
+    },
+    "NAV": {
+        "CARD": "Карты",
+        "USER": "Пользователь",
+        "EXIT": "Выход"
+    },
+    "AUTH": {
+        "WELCOME": "Welcome",
+        "USERNAME": "Username",
+        "PASSWORD": "Password",
+        "SIGNIN": "Sign in",
+        "SIGNUP": "Don't have an account?"
+    },
+    "REGISTER": {
+        "NEW_ACCOUNT": "New account",
+        "USERNAME": "Username",
+        "EMAIL": "E-mail",
+        "PASSWORD": "Password",
+        "CONFIRM_PASSWORD": "Confirm password",
+        "PASSWORD_HINT": "Upper and lower case letter, a number and a special symbol",
+        "SIGNUP": "Sign up",
+        "SIGNIN": "Already have an account?"
+    }
+}

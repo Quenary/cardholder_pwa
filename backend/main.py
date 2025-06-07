@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 import models, database, auth, schemas
 
-app = FastAPI()
+app = FastAPI(root_path='/api')
 models.Base.metadata.create_all(bind=database.engine)
 ACCESS_TOKEN_EXPIRE_SECONDS = auth.ACCESS_TOKEN_EXPIRE_MINUTES * 60
 
@@ -12,6 +12,7 @@ ACCESS_TOKEN_EXPIRE_SECONDS = auth.ACCESS_TOKEN_EXPIRE_MINUTES * 60
 def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(auth.get_db)
 ):
+    print(form_data)
     user = auth.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect credentials")

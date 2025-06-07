@@ -1,1 +1,39 @@
-<p>auth works!</p>
+<form
+  class="auth-form"
+  [formGroup]="form"
+  (submit)="onSubmit()">
+  <h1>{{ 'AUTH.WELCOME' | translate }}</h1>
+  <mat-form-field class="auth-form-field">
+    <mat-label aria-required="true">{{
+      'AUTH.USERNAME' | translate
+    }}</mat-label>
+    <input
+      matInput
+      type="text"
+      id="username"
+      formControlName="username" />
+  </mat-form-field>
+  <mat-form-field class="auth-form-field">
+    <mat-label aria-required="true">{{
+      'AUTH.PASSWORD' | translate
+    }}</mat-label>
+    <input
+      matInput
+      type="password"
+      id="password"
+      formControlName="password" />
+  </mat-form-field>
+  <button
+    mat-flat-button
+    type="submit">
+    <mat-icon>login</mat-icon>
+    {{ 'AUTH.SIGNIN' | translate }}
+  </button>
+  <button
+    mat-button
+    routerLink="/register"
+    type="button">
+    <mat-icon>person_add</mat-icon>
+    {{ 'AUTH.SIGNUP' | translate }}
+  </button>
+</form>

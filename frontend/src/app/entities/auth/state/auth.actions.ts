@@ -8,6 +8,7 @@ import {
 export const AuthActions = createActionGroup({
   source: '[AUTH]',
   events: {
+    init: props<{ tokenResponse: ITokenResponse }>(),
     token: props<{ body: IOAuth2PasswordRequestForm }>(),
     'token success': props<{ tokenResponse: ITokenResponse }>(),
     'token error': props<{ error: HttpErrorResponse }>(),

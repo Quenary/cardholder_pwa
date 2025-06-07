@@ -11,37 +11,39 @@ export class AuthApiService {
   constructor(private httpClient: HttpClient) {}
 
   token(body: IOAuth2PasswordRequestForm): Observable<ITokenResponse> {
+    const formData = new FormData();
+    formData.append('grant_type', body.grant_type);
+    formData.append('username', body.username);
+    formData.append('password', body.password);
     return this.httpClient.post<ITokenResponse>(
       `${environment.api}/token`,
-      body
+      formData
     );
   }
 
-  tokenRefresh(refreshToken: string): Observable<ITokenResponse> {
+  tokenRefresh(refresh_token: string): Observable<ITokenResponse> {
     return this.httpClient.post<ITokenResponse>(
       `${environment.api}/token/refresh`,
       {},
       {
         params: {
-          refreshToken,
+          refresh_token,
         },
       }
     );
   }
 
-  logout(refreshToken: string): Observable<string> {
+  logout(refresh_token: string): Observable<string> {
     return this.httpClient.post(
       `${environment.api}/logout`,
       {},
       {
         params: {
-          refreshToken,
+          refresh_token,
         },
         observe: 'body',
         responseType: 'text',
       }
     );
   }
-
-  
 }
