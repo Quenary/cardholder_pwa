@@ -1,8 +1,8 @@
 <form
-  class="register-form"
+  class="register-form flex-form"
   [formGroup]="form"
   (submit)="onSubmit()">
-  <h1>{{ 'REGISTER.NEW_ACCOUNT' | translate }}</h1>
+  <h1 class="register-form-header">{{ 'REGISTER.NEW_ACCOUNT' | translate }}</h1>
   <mat-form-field class="register-form-field">
     <mat-label aria-required="true">{{
       'REGISTER.USERNAME' | translate
@@ -55,23 +55,27 @@
       >{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}
     </mat-icon>
   </mat-form-field>
-  <button
-    mat-flat-button
-    type="submit"
-    [disabled]="isLoading">
-    {{ 'REGISTER.SIGNUP' | translate }}
-    <mat-icon>person_add</mat-icon>
-    @if (isLoading) {
-    <mat-icon iconPositionEnd
-      ><mat-spinner [diameter]="15"></mat-spinner
-    ></mat-icon>
-    }
-  </button>
-  <button
-    mat-button
-    routerLink="/auth"
-    type="button">
-    <mat-icon>login</mat-icon>
-    {{ 'REGISTER.SIGNIN' | translate }}
-  </button>
+
+  <section class="register-form-buttons">
+    <button
+      mat-flat-button
+      type="submit"
+      [disabled]="isLoading">
+      {{ 'REGISTER.SIGNUP' | translate }}
+      <mat-icon>person_add</mat-icon>
+      @if (isLoading) {
+      <mat-icon iconPositionEnd
+        ><mat-spinner [diameter]="15"></mat-spinner
+      ></mat-icon>
+      }
+    </button>
+    <button
+      mat-button
+      routerLink="/auth"
+      type="button"
+      [disabled]="isLoading">
+      <mat-icon>login</mat-icon>
+      {{ 'REGISTER.SIGNIN' | translate }}
+    </button>
+  </section>
 </form>

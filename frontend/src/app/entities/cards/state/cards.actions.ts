@@ -25,5 +25,7 @@ export const CardsActions = createActionGroup({
     'delete success': emptyProps(),
     'delete error': props<{ error: HttpErrorResponse }>(),
     'set form': props<{ form: ICardBase }>(),
+    'save card': emptyProps(),
+    'exit card': emptyProps(),
   },
 });

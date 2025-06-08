@@ -1,15 +1,19 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { CardsActions } from './cards.actions';
-import { catchError, map, of, switchMap, tap } from 'rxjs';
+import { catchError, map, of, switchMap, tap, withLatestFrom } from 'rxjs';
 import { CardApiService } from '../cards-api.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { IAppState } from 'src/app/app.state';
+import { selectCardsActive } from './cards.selectors';
 
 @Injectable()
 export class CardsEffects {
   private readonly actions$ = inject(Actions);
+  private readonly store = inject(Store<IAppState>);
   private readonly cardsApiService = inject(CardApiService);
   private readonly matStackBar = inject(MatSnackBar);
   private readonly translateService = inject(TranslateService);
@@ -22,6 +26,32 @@ export class CardsEffects {
         this.cardsApiService.list().pipe(
           map((list) => CardsActions.listSuccess({ list })),
           catchError((error) => of(CardsActions.listError({ error })))
+        )
+      )
+    )
+  );
+
+  read$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CardsActions.read),
+      switchMap((action) =>
+        this.cardsApiService.read(action.id).pipe(
+          map((info) => CardsActions.readSuccess({ info })),
+          catchError((error) => of(CardsActions.readError({ error })))
+        )
+      )
+    )
+  );
+
+  saveCard$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CardsActions.saveCard),
+      withLatestFrom(this.store.select(selectCardsActive)),
+      switchMap(([action, active]) =>
+        of(
+          !!active.info
+            ? CardsActions.update({ id: active.info.id, body: active.form })
+            : CardsActions.create({ body: active.form })
         )
       )
     )

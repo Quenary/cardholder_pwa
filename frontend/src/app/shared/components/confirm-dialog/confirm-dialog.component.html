@@ -1,0 +1,19 @@
+<h2 mat-dialog-title>{{ title | translate }}</h2>
+@if (subtitle) {
+<mat-dialog-content>
+  <p>{{ subtitle | translate }}</p>
+</mat-dialog-content>
+}
+<mat-dialog-actions>
+  <button
+    mat-button
+    initi
+    (click)="cancel()">
+    {{ cancelText | translate }}
+  </button>
+  <button
+    mat-flat-button
+    (click)="confirm()">
+    {{ confirmText | translate }}
+  </button>
+</mat-dialog-actions>

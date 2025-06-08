@@ -1,0 +1,24 @@
+.cards-header {
+  width: 100%;
+  display: inline-flex;
+  gap: 16px;
+
+  .cards-header-search {
+    flex: 1;
+  }
+}
+.card-tile {
+  background-color: var(--mat-sys-surface-container);
+  border-radius: 12px;
+  cursor: pointer;
+
+  .card-tile-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 16px;
+  }
+}

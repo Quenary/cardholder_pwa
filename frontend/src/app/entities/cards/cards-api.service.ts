@@ -11,7 +11,7 @@ export class CardApiService {
   constructor(private httpClient: HttpClient) {}
 
   create(body: ICardBase): Observable<ICard> {
-    return this.httpClient.post<ICard>(`${environment.api}/card`, body);
+    return this.httpClient.post<ICard>(`${environment.api}/cards`, body);
   }
 
   read(cardId: number): Observable<ICard> {

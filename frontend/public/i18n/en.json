@@ -3,8 +3,12 @@
         "TITLE": "Cardholder",
         "YES": "Yes",
         "NO": "No",
+        "SAVE": "Сохранить",
         "CLOSE": "Close",
-        "REQUEST_ERROR": "Request error"
+        "CANCEL": "Cancel",
+        "REQUEST_ERROR": "Request error",
+        "UNSAVED_WARN": "Unsaved data will be lost",
+        "CONFIRM": "Confirm"
     },
     "NAV": {
         "CARD": "Карты",
@@ -26,6 +30,17 @@
         "CONFIRM_PASSWORD": "Confirm password",
         "PASSWORD_HINT": "Upper and lower case letter, a number and a special symbol",
         "SIGNUP": "Sign up",
-        "SIGNIN": "Already have an account?"
+        "SIGNIN": "Already have an account?",
+        "SUCCESS": "Account created!"
+    },
+    "CARDS": {
+        "SEARCH": "Search",
+        "SEARCH_PLACEHOLDER": "Name",
+        "CARD": {
+            "CODE": "Код",
+            "CODE_TYPE": "Тип кода",
+            "NAME": "Наименование",
+            "DESCRIPTION": "Описание"
+        }
     }
 }

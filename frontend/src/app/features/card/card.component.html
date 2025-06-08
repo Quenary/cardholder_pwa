@@ -1,1 +1,79 @@
-<p>card works!</p>
+<form
+  [formGroup]="form"
+  class="card-form flex-form"
+  (submit)="onSubmit()">
+  <section class="card-form-scan">
+    <button
+      mat-fab
+      type="button"
+      (click)="scanCode()">
+      <mat-icon>qr_code_scanner</mat-icon>
+    </button>
+  </section>
+
+  <section class="card-form-codes">
+    <mat-form-field class="card-form-field">
+      <mat-label aria-required="true">{{
+        'CARDS.CARD.CODE' | translate
+      }}</mat-label>
+      <input
+        matInput
+        type="text"
+        id="card-code"
+        formControlName="code" />
+    </mat-form-field>
+    <mat-form-field class="card-form-field">
+      <mat-label aria-required="true">{{
+        'CARDS.CARD.CODE_TYPE' | translate
+      }}</mat-label>
+      <input
+        matInput
+        type="text"
+        id="card-code-type"
+        formControlName="code_type" />
+    </mat-form-field>
+  </section>
+
+  <mat-form-field class="card-form-field">
+    <mat-label aria-required="true">{{
+      'CARDS.CARD.NAME' | translate
+    }}</mat-label>
+    <input
+      matInput
+      type="text"
+      id="card-name"
+      formControlName="name" />
+  </mat-form-field>
+  <mat-form-field class="card-form-field">
+    <mat-label>{{ 'CARDS.CARD.DESCRIPTION' | translate }}</mat-label>
+    <textarea
+      matInput
+      type="text"
+      id="card-description"
+      formControlName="description">
+    </textarea>
+  </mat-form-field>
+
+  <section class="card-form-buttons">
+    <button
+      mat-button
+      routerLink="/cards"
+      type="button"
+      [disabled]="isLoading$ | async">
+      <mat-icon>close</mat-icon>
+      {{ 'GENERAL.CLOSE' | translate }}
+    </button>
+    <button
+      mat-flat-button
+      type="submit"
+      [disabled]="(isLoading$ | async) || !(hasChanges$ | async)">
+      {{ 'GENERAL.SAVE' | translate }}
+      <mat-icon>save</mat-icon>
+      @if (isLoading$ | async) {
+      <mat-icon iconPositionEnd
+        ><mat-spinner [diameter]="15"></mat-spinner
+      ></mat-icon>
+      }
+    </button>
+  </section>
+</form>

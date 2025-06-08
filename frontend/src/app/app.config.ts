@@ -27,7 +27,7 @@ import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { getTokenInterceptor } from './core/interceptors/token.interceptor';
 
 function HttpLoaderFactory(httpClient: HttpClient) {
-  return new TranslateHttpLoader(httpClient, '../i18n/', '.json');
+  return new TranslateHttpLoader(httpClient, '/i18n/', '.json');
 }
 
 export const appConfig: ApplicationConfig = {

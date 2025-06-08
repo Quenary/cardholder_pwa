@@ -109,6 +109,11 @@ export class RegisterComponent {
       )
       .subscribe({
         next: () => {
+          this.matStackBar.open(
+            this.translateService.instant('REGISTER.SUCCESS'),
+            this.translateService.instant('GENERAL.CLOSE'),
+            { duration: 5000 }
+          );
           this.router.navigate(['/auth']);
         },
         error: (error: HttpErrorResponse) => {

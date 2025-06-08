@@ -23,17 +23,27 @@
       id="password"
       formControlName="password" />
   </mat-form-field>
-  <button
-    mat-flat-button
-    type="submit">
-    <mat-icon>login</mat-icon>
-    {{ 'AUTH.SIGNIN' | translate }}
-  </button>
-  <button
-    mat-button
-    routerLink="/register"
-    type="button">
-    <mat-icon>person_add</mat-icon>
-    {{ 'AUTH.SIGNUP' | translate }}
-  </button>
+
+  <section class="auth-form-buttons">
+    <button
+      mat-flat-button
+      [disabled]="isLoading$ | async"
+      type="submit">
+      <mat-icon>login</mat-icon>
+      {{ 'AUTH.SIGNIN' | translate }}
+      @if (isLoading$ | async) {
+      <mat-icon iconPositionEnd
+        ><mat-spinner [diameter]="15"></mat-spinner
+      ></mat-icon>
+      }
+    </button>
+    <button
+      mat-button
+      routerLink="/register"
+      [disabled]="isLoading$ | async"
+      type="button">
+      <mat-icon>person_add</mat-icon>
+      {{ 'AUTH.SIGNUP' | translate }}
+    </button>
+  </section>
 </form>

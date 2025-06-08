@@ -1,1 +1,53 @@
-<p>cards works!</p>
+<router-outlet></router-outlet>
+
+@if (showParent$ | async) {
+<section class="cards-header">
+  <mat-autocomplete #matAutocompleteRef="matAutocomplete">
+    @for (option of autocompleteOptions$ | async; track option) {
+    <mat-option [value]="option">{{ option }}</mat-option>
+    }
+  </mat-autocomplete>
+  <mat-form-field class="cards-header-search">
+    <mat-label>{{ 'CARDS.SEARCH' | translate }}</mat-label>
+    <input
+      #searchInput
+      type="text"
+      [placeholder]="'CARDS.SEARCH_PLACEHOLDER' | translate"
+      aria-label="Search by name"
+      matInput
+      [formControl]="searchControl"
+      [matAutocomplete]="matAutocompleteRef" />
+    @if (searchControl.value) {
+    <mat-icon
+      matSuffix
+      (click)="searchControl.reset()"
+      >cancel
+    </mat-icon>
+    }
+  </mat-form-field>
+
+  <button
+    mat-fab
+    (click)="openCard('new')">
+    <mat-icon>add</mat-icon>
+  </button>
+</section>
+
+<mat-grid-list
+  [cols]="2"
+  rowHeight="4:3"
+  gutterSize="16px">
+  @if (isLoading$ | async) { @for (card of cardsPlaceholder; track card) {
+  <mat-grid-tile class="card-tile animated-placeholder"> </mat-grid-tile>
+  } } @else { @for (card of cards$ | async; track card) {
+  <mat-grid-tile
+    matRipple
+    class="card-tile"
+    (click)="openCard(card.id)">
+    <div class="card-tile-content">
+      {{ card.name }}
+    </div>
+  </mat-grid-tile>
+  } }
+</mat-grid-list>
+}

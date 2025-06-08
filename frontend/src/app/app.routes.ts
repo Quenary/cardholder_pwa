@@ -1,9 +1,13 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
-import { provideState } from '@ngrx/store';
+import { provideState, Store } from '@ngrx/store';
 import { cardsReducer } from './entities/cards/state/cards.reducers';
 import { provideEffects } from '@ngrx/effects';
 import { CardsEffects } from './entities/cards/state/cards.effects';
+import { inject } from '@angular/core';
+import { IAppState } from './app.state';
+import { selectCardsActiveHasChanges } from './entities/cards/state/cards.selectors';
+import { canDeactivateWithDialogGuard } from './core/guards/can-deactivate-with-dialog.guard';
 
 export const routes: Routes = [
   {
@@ -26,6 +30,7 @@ export const routes: Routes = [
   {
     path: 'cards',
     canActivate: [authGuard],
+
     loadComponent: () =>
       import('./features/cards/cards.component').then((c) => c.CardsComponent),
     children: [
@@ -33,6 +38,14 @@ export const routes: Routes = [
         path: ':id',
         loadComponent: () =>
           import('./features/card/card.component').then((c) => c.CardComponent),
+        canDeactivate: [
+          () => {
+            const store = inject(Store<IAppState>);
+            return canDeactivateWithDialogGuard([
+              store.select(selectCardsActiveHasChanges),
+            ]);
+          },
+        ],
       },
     ],
     providers: [

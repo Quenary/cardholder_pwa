@@ -5,10 +5,12 @@ import { AuthActions } from './auth.actions';
 export interface IAuthState {
   tokenResponse: ITokenResponse;
   init: boolean;
+  isLoading: boolean;
 }
 export const initialState: IAuthState = {
   tokenResponse: null,
   init: false,
+  isLoading: false,
 };
 export const authReducer = createReducer(
   initialState,
@@ -18,11 +20,21 @@ export const authReducer = createReducer(
     init: true,
   })),
   on(
+    AuthActions.token,
+    AuthActions.refreshToken,
+    AuthActions.logout,
+    (state, payload) => ({
+      ...state,
+      isLoading: true,
+    })
+  ),
+  on(
     AuthActions.tokenSuccess,
     AuthActions.refreshTokenSuccess,
     (state, payload) => ({
       ...state,
       tokenResponse: payload.tokenResponse,
+      isLoading: false,
     })
   ),
   on(
@@ -33,6 +45,7 @@ export const authReducer = createReducer(
     (state, payload) => ({
       ...state,
       tokenResponse: null,
+      isLoading: false,
     })
   )
 );

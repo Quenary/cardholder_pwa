@@ -1,0 +1,27 @@
+.card-form {
+  .card-form-scan,
+  .card-form-codes {
+    display: flex;
+    flex-direction: column;
+  }
+  .card-form-scan {
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--mat-sys-primary-container);
+    min-height: 100px;
+  }
+  .card-form-codes {
+    align-items: flex-start;
+    justify-content: flex-start;
+    .card-form-field {
+      width: 100%;
+    }
+  }
+
+  .card-form-buttons {
+    width: 100%;
+    flex-basis: 100%;
+    display: inline-flex;
+    justify-content: flex-end;
+  }
+}

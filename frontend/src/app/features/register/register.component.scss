@@ -6,10 +6,6 @@
   justify-content: center;
 
   .register-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     background-color: var(--mat-sys-surface-container);
     color: var(--mat-sys-on-surface);
     padding: 20px;
@@ -17,8 +13,16 @@
     width: 100%;
     max-width: 600px;
 
-    .register-form-field {
+    .register-form-header {
       width: 100%;
+      text-align: center;
+    }
+    .register-form-buttons {
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      width: auto;
+      gap: 8px;
     }
   }
 }

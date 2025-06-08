@@ -7,6 +7,7 @@ import { inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
   catchError,
+  filter,
   first,
   of,
   skip,
@@ -16,10 +17,15 @@ import {
 } from 'rxjs';
 import { IAppState } from 'src/app/app.state';
 import { AuthActions } from 'src/app/entities/auth/state/auth.actions';
-import { selectAuthTokenResponse } from 'src/app/entities/auth/state/auth.selectors';
+import {
+  selectAuth,
+  selectAuthTokenResponse,
+} from 'src/app/entities/auth/state/auth.selectors';
+
+const ignoreList = ['/token'];
 
 const ignore = (req: HttpRequest<unknown>): boolean => {
-  return req.url.includes('/token');
+  return ignoreList.some((item) => req.url.includes(item));
 };
 
 const isRefreshable = (req: HttpRequest<unknown>, error: unknown): boolean => {
@@ -27,7 +33,7 @@ const isRefreshable = (req: HttpRequest<unknown>, error: unknown): boolean => {
     error instanceof HttpErrorResponse &&
     error.status === 401 &&
     req &&
-    !req.url.includes('/token')
+    !ignore(req)
   );
 };
 
@@ -50,10 +56,15 @@ export const getTokenInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   const store = inject(Store<IAppState>);
-  return store.select(selectAuthTokenResponse).pipe(
+  return store.select(selectAuth).pipe(
+    filter((auth) => auth.init),
     first(),
-    switchMap((tokens) =>
-      next(cloneWithToken(req, tokens.access_token)).pipe(
+    switchMap((auth) => {
+      const tokens = auth.tokenResponse;
+      if (!tokens) {
+        return next(req);
+      }
+      return next(cloneWithToken(req, tokens.access_token)).pipe(
         catchError((error) => {
           if (isRefreshable(req, error)) {
             if (!isRefreshing) {
@@ -88,7 +99,7 @@ export const getTokenInterceptor: HttpInterceptorFn = (req, next) => {
           }
           return throwError(() => error);
         })
-      )
-    )
+      );
+    })
   );
 };

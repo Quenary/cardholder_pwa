@@ -1,24 +1,126 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IAppState } from 'src/app/app.state';
-import { ICard } from 'src/app/entities/cards/cards-interface';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
-import { selectCards } from 'src/app/entities/cards/state/cards.selectors';
+import { MatGridList, MatGridTile } from '@angular/material/grid-list';
+import { AsyncPipe } from '@angular/common';
+import {
+  combineLatest,
+  distinctUntilChanged,
+  filter,
+  map,
+  shareReplay,
+  startWith,
+} from 'rxjs';
+import {
+  MatAutocomplete,
+  MatOption,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
+import {} from '@angular/material/';
+import {
+  MatInput,
+  MatFormField,
+  MatLabel,
+  MatSuffix,
+} from '@angular/material/input';
+import { TranslateModule } from '@ngx-translate/core';
+import { MatIcon } from '@angular/material/icon';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatRipple } from '@angular/material/core';
+import {
+  selectCardsIsLoading,
+  selectCardsList,
+} from 'src/app/entities/cards/state/cards.selectors';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatFabButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-cards',
-  imports: [],
+  imports: [
+    RouterOutlet,
+    MatGridList,
+    MatGridTile,
+    AsyncPipe,
+    MatAutocomplete,
+    MatOption,
+    MatAutocompleteTrigger,
+    MatInput,
+    MatFormField,
+    MatLabel,
+    TranslateModule,
+    MatIcon,
+    MatSuffix,
+    ReactiveFormsModule,
+    MatRipple,
+    MatFabButton,
+  ],
   templateUrl: './cards.component.html',
   styleUrl: './cards.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardsComponent implements OnInit {
   private readonly store = inject(Store<IAppState>);
   private readonly router = inject(Router);
-  public readonly cards = this.store.select(selectCards);
+  private readonly destroyRef = inject(DestroyRef);
+  public readonly showParent$ = this.router.events.pipe(
+    startWith(null),
+    map(() => this.router.url === '/cards'),
+    distinctUntilChanged(),
+    shareReplay(1)
+  );
+  public readonly cardsPlaceholder = Array(6).fill(null);
+  public readonly isLoading$ = this.store
+    .select(selectCardsIsLoading)
+    .pipe(shareReplay(1));
+  /**
+   * All cards
+   */
+  private readonly _cards$ = this.store.select(selectCardsList);
+  /**
+   * Form control for search field
+   */
+  public readonly searchControl = new FormControl<string>(null);
+  /**
+   * Filtered cards
+   */
+  public readonly cards$ = combineLatest([
+    this._cards$,
+    this.searchControl.valueChanges.pipe(startWith(null)),
+  ]).pipe(
+    map(([list, search]) => {
+      if (!search) {
+        return list;
+      }
+      const searchLC = search.toLowerCase();
+      return list.filter((item) => item.name.toLowerCase().includes(searchLC));
+    })
+  );
+  /**
+   * Filtered search options
+   */
+  public readonly autocompleteOptions$ = this.cards$.pipe(
+    map((list) => list.map((item) => item.name))
+  );
 
   ngOnInit(): void {
-    this.store.dispatch(CardsActions.list());
+    this.showParent$
+      .pipe(
+        filter((res) => res),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: () => {
+          this.store.dispatch(CardsActions.list());
+        },
+      });
   }
 
   public openCard(cardId: number | 'new'): void {
