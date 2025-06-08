@@ -8,7 +8,9 @@
         "CANCEL": "Cancel",
         "REQUEST_ERROR": "Request error",
         "UNSAVED_WARN": "Unsaved data will be lost",
-        "CONFIRM": "Confirm"
+        "CONFIRM": "Confirm",
+        "DELETE_WARN": "Confirm deletion",
+        "DELETE": "Delete"
     },
     "NAV": {
         "CARD": "Карты",

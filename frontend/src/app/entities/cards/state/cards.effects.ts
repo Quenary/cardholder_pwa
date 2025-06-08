@@ -1,14 +1,27 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { CardsActions } from './cards.actions';
-import { catchError, map, of, switchMap, tap, withLatestFrom } from 'rxjs';
+import {
+  catchError,
+  EMPTY,
+  map,
+  of,
+  switchMap,
+  tap,
+  withLatestFrom,
+} from 'rxjs';
 import { CardApiService } from '../cards-api.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IAppState } from 'src/app/app.state';
-import { selectCardsActive } from './cards.selectors';
+import { selectCardsActive, selectCardsActiveInfo } from './cards.selectors';
+import { MatDialog } from '@angular/material/dialog';
+import {
+  ConfirmDialogComponent,
+  IConfirmDialogData,
+} from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
 
 @Injectable()
 export class CardsEffects {
@@ -18,6 +31,7 @@ export class CardsEffects {
   private readonly matStackBar = inject(MatSnackBar);
   private readonly translateService = inject(TranslateService);
   private readonly router = inject(Router);
+  private readonly matDialog = inject(MatDialog);
 
   list$ = createEffect(() =>
     this.actions$.pipe(
@@ -90,6 +104,25 @@ export class CardsEffects {
           map((info) => CardsActions.updateSuccess({ info })),
           catchError((error) => of(CardsActions.updateError({ error })))
         )
+      )
+    )
+  );
+
+  deleteAttempt$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CardsActions.deleteAttempt),
+      withLatestFrom(this.store.select(selectCardsActiveInfo)),
+      switchMap(([action, info]) =>
+        this.matDialog
+          .open(ConfirmDialogComponent, {
+            data: <IConfirmDialogData>{ title: 'GENERAL.DELETE_WARN' },
+          })
+          .afterClosed()
+          .pipe(
+            switchMap((res) =>
+              res ? of(CardsActions.delete({ id: info.id })) : EMPTY
+            )
+          )
       )
     )
   );

@@ -2,6 +2,7 @@
   [formGroup]="form"
   class="card-form flex-form"
   (submit)="onSubmit()">
+  
   <section class="card-form-scan">
     <button
       mat-fab
@@ -55,6 +56,16 @@
   </mat-form-field>
 
   <section class="card-form-buttons">
+    @if (canDelete$ | async) {
+    <button
+      mat-button
+      type="button"
+      [disabled]="isLoading$ | async"
+      (click)="onDelete()">
+      <mat-icon>delete</mat-icon>
+      {{ 'GENERAL.DELETE' | translate }}
+    </button>
+    }
     <button
       mat-button
       routerLink="/cards"

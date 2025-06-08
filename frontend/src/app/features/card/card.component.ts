@@ -25,6 +25,7 @@ import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
 import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
+  selectCardsActiveCanDelete,
   selectCardsActiveHasChanges,
   selectCardsActiveInfo,
   selectCardsIsLoading,
@@ -56,6 +57,7 @@ export class CardComponent implements OnInit, OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
 
   public readonly isLoading$ = this.store.select(selectCardsIsLoading);
+  public readonly canDelete$ = this.store.select(selectCardsActiveCanDelete);
   public readonly hasChanges$ = this.store.select(selectCardsActiveHasChanges);
   public readonly form = new FormGroup<TInterfaceToForm<ICardBase>>({
     code: new FormControl<string>(null, [Validators.required]),
@@ -100,6 +102,10 @@ export class CardComponent implements OnInit, OnDestroy {
       return;
     }
     this.store.dispatch(CardsActions.saveCard());
+  }
+
+  public onDelete(): void {
+    this.store.dispatch(CardsActions.deleteAttempt());
   }
 
   public scanCode() {}

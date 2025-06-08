@@ -21,6 +21,7 @@ export const CardsActions = createActionGroup({
     'update success': props<{ info: ICard }>(),
     'update error': props<{ error: HttpErrorResponse }>(),
     // DELETE
+    'delete attempt': emptyProps(),
     delete: props<{ id: number }>(),
     'delete success': emptyProps(),
     'delete error': props<{ error: HttpErrorResponse }>(),

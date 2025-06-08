@@ -15,6 +15,10 @@ export const selectCardsActive = createSelector(
   _selectCards,
   (state) => state.active
 );
+export const selectCardsActiveCanDelete = createSelector(
+  _selectCards,
+  (state) => !!state.active?.info
+);
 export const selectCardsActiveInfo = createSelector(
   _selectCards,
   (state) => state.active?.info ?? null
