@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ICard, ICardBase } from './card-interface';
+import { ICard, ICardBase } from './cards-interface';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 

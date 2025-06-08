@@ -62,7 +62,7 @@ export class AppComponent {
         {
           name: translates.CARD,
           icon: 'credit_card',
-          link: '/card',
+          link: '/cards',
         },
         {
           name: translates.USER,

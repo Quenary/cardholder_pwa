@@ -24,7 +24,7 @@ export class AuthEffects {
       switchMap((action) =>
         this.authApiService.token(action.body).pipe(
           tap(() => {
-            this.router.navigate(['/card']);
+            this.router.navigate(['/cards']);
           }),
           map((tokenResponse) => AuthActions.tokenSuccess({ tokenResponse })),
           catchError((error) => of(AuthActions.tokenError({ error })))

@@ -1,10 +1,14 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { provideState } from '@ngrx/store';
+import { cardsReducer } from './entities/cards/state/cards.reducers';
+import { provideEffects } from '@ngrx/effects';
+import { CardsEffects } from './entities/cards/state/cards.effects';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/card',
+    redirectTo: '/cards',
     pathMatch: 'full',
   },
   {
@@ -20,10 +24,21 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'card',
+    path: 'cards',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/card/card.component').then((c) => c.CardComponent),
+      import('./features/cards/cards.component').then((c) => c.CardsComponent),
+    children: [
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/card/card.component').then((c) => c.CardComponent),
+      },
+    ],
+    providers: [
+      provideState('cards', cardsReducer),
+      provideEffects(CardsEffects),
+    ],
   },
   {
     path: 'user',
