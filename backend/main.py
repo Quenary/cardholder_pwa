@@ -1,50 +1,69 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 import models, database, auth, schemas
 from env import ACCESS_TOKEN_LIFETIME_MIN, API_PATH
 from typing import cast
+from starlette.datastructures import Address
+from datetime import datetime
 
 app = FastAPI(root_path=API_PATH)
 models.Base.metadata.create_all(bind=database.engine)
 ACCESS_TOKEN_EXPIRE_SECONDS: int = int(ACCESS_TOKEN_LIFETIME_MIN * 60)
 
 
-@app.post("/token", response_model=schemas.TokenResponse)
-def login_for_access_token(
+@app.post("/token", response_model=schemas.TokenResponse, tags=["auth"])
+def login(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(database.get_db),
 ):
     user = auth.authenticate_user(db, form_data.username, form_data.password)
     if not user:
-        raise HTTPException(status_code=400, detail="Incorrect credentials")
-    access_token = auth.create_access_token(data={"sub": user.username})
-    refresh_token = auth.create_refresh_token(cast(str, user.username))
-    return schemas.TokenResponse(
-        access_token=access_token,
-        token_type="bearer",
-        expires_in=ACCESS_TOKEN_EXPIRE_SECONDS,
-        refresh_token=refresh_token,
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token, access_exp = auth.create_access_token({"sub": user.username})
+    refresh_token = auth.create_refresh_token(
+        user.id,
+        db,
+        request.headers.get("user-agent"),
+        cast(Address, request.client).host,
     )
+    return auth.build_token_response(access_token, access_exp, refresh_token)
 
 
-@app.post("/token/refresh", response_model=schemas.TokenResponse)
-def refresh_token(refresh_token: str):
-    new_refresh_token = auth.rotate_refresh_token(refresh_token)
-    username = auth.refresh_token_store[new_refresh_token]
-    access_token = auth.create_access_token(data={"sub": username})
-    return schemas.TokenResponse(
-        access_token=access_token,
-        token_type="bearer",
-        expires_in=ACCESS_TOKEN_EXPIRE_SECONDS,
-        refresh_token=new_refresh_token,
+@app.post("/token/refresh", response_model=schemas.TokenResponse, tags=["auth"])
+def refresh_token(
+    request: Request,
+    form: schemas.RefreshRequest,
+    db: Session = Depends(database.get_db),
+):
+    db_token = (
+        db.query(models.RefreshToken)
+        .filter_by(token=form.refresh_token, revoked=False)
+        .first()
     )
+    if not db_token or db_token.expires_at < datetime.utcnow():
+        raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
+    user = db_token.user
+    auth.revoke_refresh_token(db, db_token.token)
+    access_token, access_exp = auth.create_access_token({"sub": user.username})
+    new_refresh = auth.create_refresh_token(
+        user.id,
+        db,
+        request.headers.get("user-agent"),
+        cast(Address, request.client).host,
+    )
+    return auth.build_token_response(access_token, access_exp, new_refresh)
 
 
-@app.post("/logout")
-def logout(refresh_token: str):
-    auth.revoke_refresh_token(refresh_token)
-    return {"detail": "Logged out successfully"}
+@app.post("/logout", tags=["auth"])
+def logout(form: schemas.RevokeRequest, db: Session = Depends(database.get_db)):
+    auth.revoke_refresh_token(db, form.refresh_token)
+    return {"detail": "Logged out successfully."}
 
 
 @app.post("/user", response_model=schemas.User)

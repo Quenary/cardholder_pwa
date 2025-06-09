@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
@@ -12,12 +12,11 @@ from env import (
     ACCESS_TOKEN_LIFETIME_MIN,
     REFRESH_TOKEN_LIFETIME_MIN,
 )
+import schemas
+import secrets
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-# В реальном приложении - хранить в Redis или БД
-refresh_token_store = {}
 
 
 def verify_password(plain: str, hashed) -> bool:
@@ -28,51 +27,61 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def authenticate_user(db: Session, username: str, password: str) -> models.User | None:
-    user = db.query(models.User).filter(models.User.username == username).first()
-    if not user or not verify_password(password, user.hashed_password):
-        return None
-    return user
-
-
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     expire = datetime.utcnow() + (
         expires_delta or timedelta(minutes=ACCESS_TOKEN_LIFETIME_MIN)
     )
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    return encoded_jwt, expire
 
 
-def create_refresh_token(username: str):
-    expire = datetime.utcnow() + timedelta(minutes=REFRESH_TOKEN_LIFETIME_MIN)
-    to_encode = {"sub": username, "exp": expire, "type": "refresh"}
-    token = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
-    refresh_token_store[token] = username
-    return token
+def create_refresh_token(
+    user_id: int, db: Session, user_agent: str | None = None, ip: str | None = None
+):
+    token = secrets.token_urlsafe(32)
+    expires_at = datetime.utcnow() + timedelta(minutes=REFRESH_TOKEN_LIFETIME_MIN)
+    db_token = models.RefreshToken(
+        token=token,
+        user_id=user_id,
+        expires_at=expires_at,
+        user_agent=user_agent,
+        ip_address=ip,
+    )
+    db.add(db_token)
+    db.commit()
+    db.refresh(db_token)
+    return db_token
 
 
-def rotate_refresh_token(old_token: str):
-    username = validate_refresh_token(old_token)
-    # Удаляем старый токен
-    refresh_token_store.pop(old_token, None)
-    # Создаем новый
-    return create_refresh_token(username)
+def revoke_refresh_token(db: Session, token: str):
+    db_token = db.query(models.RefreshToken).filter_by(token=token).first()
+    if db_token:
+        db_token.revoked = True
+        db.commit()
 
 
-def validate_refresh_token(token: str) -> str:
-    try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        if payload.get("type") != "refresh":
-            raise HTTPException(status_code=403, detail="Invalid token type")
-        username = cast(str, payload.get("sub"))
-        print(username)
-        print(token)
-        if token not in refresh_token_store or refresh_token_store[token] != username:
-            raise HTTPException(status_code=403, detail="Token revoked")
-        return username
-    except JWTError:
-        raise HTTPException(status_code=403, detail="Invalid token")
+def get_user_by_username(db: Session, username: str):
+    return db.query(models.User).filter(models.User.username == username).first()
+
+
+def authenticate_user(db: Session, username: str, password: str):
+    user = get_user_by_username(db, username)
+    if not user or not verify_password(password, user.hashed_password):
+        return None
+    return user
+
+
+def build_token_response(
+    access_token: str, access_exp: datetime, refresh_token: models.RefreshToken
+):
+    return schemas.TokenResponse(
+        access_token=access_token,
+        token_type="bearer",
+        expires_in=int((access_exp - datetime.utcnow()).total_seconds()),
+        refresh_token=refresh_token.token,
+    )
 
 
 async def get_current_user(
@@ -90,10 +99,3 @@ async def get_current_user(
     if not user:
         raise credentials_exception
     return user
-
-
-def revoke_refresh_token(token: str):
-    if token in refresh_token_store:
-        refresh_token_store.pop(token)
-    else:
-        raise HTTPException(status_code=404, detail="Token not found")

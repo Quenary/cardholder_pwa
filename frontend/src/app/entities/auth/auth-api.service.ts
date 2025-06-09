@@ -24,23 +24,15 @@ export class AuthApiService {
   tokenRefresh(refresh_token: string): Observable<ITokenResponse> {
     return this.httpClient.post<ITokenResponse>(
       `${environment.api}/token/refresh`,
-      {},
-      {
-        params: {
-          refresh_token,
-        },
-      }
+      { refresh_token }
     );
   }
 
   logout(refresh_token: string): Observable<string> {
     return this.httpClient.post(
       `${environment.api}/logout`,
-      {},
+      { refresh_token },
       {
-        params: {
-          refresh_token,
-        },
         observe: 'body',
         responseType: 'text',
       }
