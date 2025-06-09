@@ -5,7 +5,7 @@ import {
   inject,
   OnInit,
 } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IAppState } from 'src/app/app.state';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
@@ -41,6 +41,8 @@ import {
 } from 'src/app/entities/cards/state/cards.selectors';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatFabButton } from '@angular/material/button';
+import { CardCodeViewerComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
+import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
 
 @Component({
   selector: 'app-cards',
@@ -61,6 +63,9 @@ import { MatFabButton } from '@angular/material/button';
     ReactiveFormsModule,
     MatRipple,
     MatFabButton,
+    CardCodeViewerComponent,
+    IsValidCardPipe,
+    RouterLink,
   ],
   templateUrl: './cards.component.html',
   styleUrl: './cards.component.scss',
@@ -121,9 +126,5 @@ export class CardsComponent implements OnInit {
           this.store.dispatch(CardsActions.list());
         },
       });
-  }
-
-  public openCard(cardId: number | 'new'): void {
-    this.router.navigate([`/cards/${cardId}`]);
   }
 }

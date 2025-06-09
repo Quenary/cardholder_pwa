@@ -9,11 +9,10 @@
       (click)="scanCode()">
       <mat-icon>qr_code_scanner</mat-icon>
     </button>
-    @if (viewerData$ | async; as data) { @defer {
+    @if (form.value | isValidCard) { @defer {
     <app-card-code-viewer
       class="card-form-scan-viewer"
-      [code]="data.code"
-      [code_type]="data.code_type">
+      [card]="form.value">
     </app-card-code-viewer>
     } }
   </section>

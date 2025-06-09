@@ -12,7 +12,7 @@
   border-radius: 12px;
   cursor: pointer;
 
-  .card-tile-content {
+  &-content {
     width: 100%;
     height: 100%;
     display: flex;
@@ -20,5 +20,28 @@
     align-items: flex-start;
     justify-content: flex-start;
     padding: 16px;
+    gap: 16px;
+
+    &-header {
+      display: inline-flex;
+      width: 100%;
+      font-size: 20px;
+
+      &-text {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      &-icon {
+        margin-left: auto;
+        color: var(--mat-sys-primary);
+        overflow: unset;
+      }
+    }
+
+    &-preview {
+      align-self: center;
+    }
   }
 }

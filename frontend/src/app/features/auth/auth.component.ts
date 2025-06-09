@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatInput } from '@angular/material/input';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatButton } from '@angular/material/button';
@@ -35,6 +35,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
   ],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthComponent {
   private readonly store = inject(Store);

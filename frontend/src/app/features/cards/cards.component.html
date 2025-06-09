@@ -28,7 +28,7 @@
 
   <button
     mat-fab
-    (click)="openCard('new')">
+    routerLink="/cards/new">
     <mat-icon>add</mat-icon>
   </button>
 </section>
@@ -43,10 +43,21 @@
   <mat-grid-tile
     matRipple
     class="card-tile"
-    (click)="openCard(card.id)">
+    [routerLink]="['/cards', card.id]">
     <div class="card-tile-content">
-      {{ card.name }}
-      <!-- TODO Add code preview and view in large dialog -->
+      <section class="card-tile-content-header">
+        <span class="card-tile-content-header-text">
+          {{ card.name }}
+        </span>
+        <mat-icon class="card-tile-content-header-icon">edit_note</mat-icon>
+      </section>
+      @if (card | isValidCard) { @defer {
+      <app-card-code-viewer
+        class="card-tile-content-preview"
+        [card]="card"
+        (click)="$event.stopPropagation()">
+      </app-card-code-viewer>
+      } }
     </div>
   </mat-grid-tile>
   } }

@@ -28,13 +28,12 @@ import {
   selectCardsActiveCanDelete,
   selectCardsActiveHasChanges,
   selectCardsActiveInfo,
-  selectCardsActiveViewerData,
   selectCardsIsLoading,
 } from 'src/app/entities/cards/state/cards.selectors';
 import { AsyncPipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import type { ICardScannerResult } from '../card-scanner/card-scanner.component';
-import { CardCodeViewerComponent } from '../card-code-viewer/card-code-viewer.component';
+import { CardCodeViewerComponent } from '../../shared/components/card-code-viewer/card-code-viewer.component';
 import { EBarcodeFormat } from 'src/app/entities/cards/cards-const';
 import {
   MatAutocomplete,
@@ -42,6 +41,7 @@ import {
   MatOption,
 } from '@angular/material/autocomplete';
 import { map, Observable, startWith } from 'rxjs';
+import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
 
 @Component({
   selector: 'app-card',
@@ -61,6 +61,7 @@ import { map, Observable, startWith } from 'rxjs';
     MatAutocomplete,
     MatOption,
     MatAutocompleteTrigger,
+    IsValidCardPipe,
   ],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss',
@@ -75,7 +76,6 @@ export class CardComponent implements OnInit, OnDestroy {
   public readonly isLoading$ = this.store.select(selectCardsIsLoading);
   public readonly canDelete$ = this.store.select(selectCardsActiveCanDelete);
   public readonly hasChanges$ = this.store.select(selectCardsActiveHasChanges);
-  public readonly viewerData$ = this.store.select(selectCardsActiveViewerData);
   public readonly form = new FormGroup<TInterfaceToForm<ICardBase>>({
     code: new FormControl<string>(null, [Validators.required]),
     code_type: new FormControl<string>(null, [Validators.required]),
