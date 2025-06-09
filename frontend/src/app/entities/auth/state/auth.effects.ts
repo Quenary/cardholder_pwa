@@ -13,7 +13,7 @@ export class AuthEffects {
   constructor(
     private actions$: Actions,
     private authApiService: AuthApiService,
-    private matStackBar: MatSnackBar,
+    private matSnackBar: MatSnackBar,
     private translateService: TranslateService,
     private router: Router
   ) {}
@@ -88,7 +88,7 @@ export class AuthEffects {
           AuthActions.logoutError
         ),
         tap((action) => {
-          this.matStackBar.open(
+          this.matSnackBar.open(
             `${this.translateService.instant('GENERAL.REQUEST_ERROR')}: ${
               action.error.message
             }`,

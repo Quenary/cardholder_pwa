@@ -1,0 +1,22 @@
+<div class="card-scanner">
+  <section class="card-scanner-header">
+    <mat-chip-listbox
+      [formControl]="deviceControl"
+      aria-label="Camera device selection">
+      @for (device of devices$ | async; track device) {
+      <mat-chip-option [value]="device">{{ device.label }}</mat-chip-option>
+      }
+    </mat-chip-listbox>
+  </section>
+  <video
+    class="card-scanner-video"
+    #video>
+  </video>
+  <section class="card-scanner-footer">
+    <button
+      mat-button
+      (click)="close()"
+      >{{ 'GENERAL.CLOSE' | translate }}</button
+    >
+  </section>
+</div>

@@ -28,7 +28,7 @@ export class CardsEffects {
   private readonly actions$ = inject(Actions);
   private readonly store = inject(Store<IAppState>);
   private readonly cardsApiService = inject(CardApiService);
-  private readonly matStackBar = inject(MatSnackBar);
+  private readonly matSnackBar = inject(MatSnackBar);
   private readonly translateService = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly matDialog = inject(MatDialog);
@@ -161,7 +161,7 @@ export class CardsEffects {
           CardsActions.deleteError
         ),
         tap((action) => {
-          this.matStackBar.open(
+          this.matSnackBar.open(
             `${this.translateService.instant('GENERAL.REQUEST_ERROR')}: ${
               action.error.message
             }`,

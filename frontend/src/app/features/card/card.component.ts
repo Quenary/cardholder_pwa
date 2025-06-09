@@ -31,6 +31,8 @@ import {
   selectCardsIsLoading,
 } from 'src/app/entities/cards/state/cards.selectors';
 import { AsyncPipe } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
+import type { ICardScannerResult } from '../card-scanner/card-scanner.component';
 
 @Component({
   selector: 'app-card',
@@ -55,6 +57,7 @@ export class CardComponent implements OnInit, OnDestroy {
   private readonly store = inject(Store<IAppState>);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly matDialog = inject(MatDialog);
 
   public readonly isLoading$ = this.store.select(selectCardsIsLoading);
   public readonly canDelete$ = this.store.select(selectCardsActiveCanDelete);
@@ -108,5 +111,24 @@ export class CardComponent implements OnInit, OnDestroy {
     this.store.dispatch(CardsActions.deleteAttempt());
   }
 
-  public scanCode() {}
+  public scanCode() {
+    import('../card-scanner/card-scanner.component').then((c) => {
+      this.matDialog
+        .open(c.CardScannerComponent, {
+          width: 'calc(100% - 50px)',
+          height: 'calc(100% - 50px)',
+        })
+        .afterClosed()
+        .subscribe({
+          next: (res: ICardScannerResult) => {
+            if (res) {
+              this.form.patchValue({
+                code: res.text,
+                code_type: res.format,
+              });
+            }
+          },
+        });
+    });
+  }
 }

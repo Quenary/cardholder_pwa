@@ -49,7 +49,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 export class RegisterComponent {
   private readonly userApiService = inject(UserApiService);
   private readonly router = inject(Router);
-  private readonly matStackBar = inject(MatSnackBar);
+  private readonly matSnackBar = inject(MatSnackBar);
   private readonly translateService = inject(TranslateService);
 
   public isLoading: boolean = false;
@@ -109,7 +109,7 @@ export class RegisterComponent {
       )
       .subscribe({
         next: () => {
-          this.matStackBar.open(
+          this.matSnackBar.open(
             this.translateService.instant('REGISTER.SUCCESS'),
             this.translateService.instant('GENERAL.CLOSE'),
             { duration: 5000 }
@@ -117,7 +117,7 @@ export class RegisterComponent {
           this.router.navigate(['/auth']);
         },
         error: (error: HttpErrorResponse) => {
-          this.matStackBar.open(
+          this.matSnackBar.open(
             `${this.translateService.instant('GENERAL.REQUEST_ERROR')} ${
               error.message
             }`,
