@@ -1,4 +1,4 @@
 - create venv ```python -m venv venv```
 - activate with ```source venv/bin/activate``` or ```venv/scripts/activate```
 - install deps ```pip install -r requirements.txt```
-- run with ```fastapi dev main.py```
+- run with ```fastapi dev app/main.py```

@@ -4,16 +4,16 @@ from jose import jwt, JWTError
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
-import models, database
+import app.schemas as schemas, app.db as db, app.db.models as models
 from typing import cast
-from env import (
+import secrets
+from app.env import (
     JWT_SECRET_KEY,
     JWT_ALGORITHM,
     ACCESS_TOKEN_LIFETIME_MIN,
     REFRESH_TOKEN_LIFETIME_MIN,
 )
-import schemas
-import secrets
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -85,7 +85,7 @@ def build_token_response(
 
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme), db: Session = Depends(database.get_db)
+    token: str = Depends(oauth2_scheme), db: Session = Depends(db.get_db)
 ) -> models.User:
     credentials_exception = HTTPException(status_code=401, detail="Invalid token")
     try:
