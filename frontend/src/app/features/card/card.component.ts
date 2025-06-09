@@ -28,11 +28,13 @@ import {
   selectCardsActiveCanDelete,
   selectCardsActiveHasChanges,
   selectCardsActiveInfo,
+  selectCardsActiveViewerData,
   selectCardsIsLoading,
 } from 'src/app/entities/cards/state/cards.selectors';
 import { AsyncPipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import type { ICardScannerResult } from '../card-scanner/card-scanner.component';
+import { CardCodeViewerComponent } from '../card-code-viewer/card-code-viewer.component';
 
 @Component({
   selector: 'app-card',
@@ -48,6 +50,7 @@ import type { ICardScannerResult } from '../card-scanner/card-scanner.component'
     RouterLink,
     AsyncPipe,
     MatFabButton,
+    CardCodeViewerComponent,
   ],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss',
@@ -62,6 +65,7 @@ export class CardComponent implements OnInit, OnDestroy {
   public readonly isLoading$ = this.store.select(selectCardsIsLoading);
   public readonly canDelete$ = this.store.select(selectCardsActiveCanDelete);
   public readonly hasChanges$ = this.store.select(selectCardsActiveHasChanges);
+  public readonly viewerData$ = this.store.select(selectCardsActiveViewerData);
   public readonly form = new FormGroup<TInterfaceToForm<ICardBase>>({
     code: new FormControl<string>(null, [Validators.required]),
     code_type: new FormControl<string>(null, [Validators.required]),

@@ -2,7 +2,6 @@
   [formGroup]="form"
   class="card-form flex-form"
   (submit)="onSubmit()">
-  
   <section class="card-form-scan">
     <button
       mat-fab
@@ -10,6 +9,13 @@
       (click)="scanCode()">
       <mat-icon>qr_code_scanner</mat-icon>
     </button>
+    @if (viewerData$ | async; as data) { @defer {
+    <app-card-code-viewer
+      class="card-form-scan-viewer"
+      [code]="data.code"
+      [code_type]="data.code_type">
+    </app-card-code-viewer>
+    } }
   </section>
 
   <section class="card-form-codes">
@@ -23,6 +29,8 @@
         id="card-code"
         formControlName="code" />
     </mat-form-field>
+
+    <!-- TODO add autocomplete from codes list -->
     <mat-form-field class="card-form-field">
       <mat-label aria-required="true">{{
         'CARDS.CARD.CODE_TYPE' | translate

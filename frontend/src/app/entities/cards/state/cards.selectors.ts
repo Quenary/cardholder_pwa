@@ -1,5 +1,6 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { ICardsState } from './cards.reducers';
+import { isValidCodeType } from '../cards-const';
 
 const _selectCards = createFeatureSelector<ICardsState>('cards');
 export const selectCards = createSelector(_selectCards, (state) => state);
@@ -26,4 +27,23 @@ export const selectCardsActiveInfo = createSelector(
 export const selectCardsActiveHasChanges = createSelector(
   _selectCards,
   (state) => state.active?.hasChanges ?? false
+);
+/**
+ * Selects valid viewer data of active card or null
+ */
+export const selectCardsActiveViewerData = createSelector(
+  _selectCards,
+  (state) => {
+    const form = state.active?.form ?? state.active?.info;
+    if (!form) {
+      return null;
+    }
+    if (!form.code || !isValidCodeType(form.code_type)) {
+      return null;
+    }
+    return {
+      code: form.code,
+      code_type: form.code_type,
+    };
+  }
 );
