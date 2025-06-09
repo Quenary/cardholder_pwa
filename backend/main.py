@@ -86,9 +86,42 @@ def user_get_info(current_user=Depends(auth.get_current_user)):
     return current_user
 
 
+@app.put("/user")
+def update_user(
+    data: schemas.UserUpdate,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    if not current_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if data.username:
+        current_user.username = data.username
+    if data.email:
+        current_user.email = data.email
+    if data.password:
+        current_user.hashed_password = auth.get_password_hash(data.password)
+    db.commit()
+    return current_user
+
+
+@app.delete("/user")
+def delete_user(
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    if not current_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.query(models.Card).filter_by(owner_id=current_user.id).delete()
+    db.query(models.RefreshToken).filter_by(user_id=current_user.id).delete()
+    db.delete(current_user)
+    db.commit()
+    return {"detail": "User and all related data deleted"}
+
+
 @app.get("/cards", response_model=list[schemas.Card])
 def get_cards(
-    db: Session = Depends(database.get_db), user=Depends(auth.get_current_user)
+    db: Session = Depends(database.get_db),
+    user: models.User = Depends(auth.get_current_user),
 ):
     return db.query(models.Card).filter(models.Card.owner_id == user.id).all()
 
