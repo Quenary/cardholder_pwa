@@ -1,20 +1,19 @@
 .card-form {
-  .card-form-scan {
+  &-scan {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     border: 2px solid var(--mat-sys-primary-container);
-    min-height: 100px;
     gap: 16px;
     padding: 16px;
 
-    .card-form-scan-viewer {
+    &-viewer {
       min-width: 160px;
       min-height: 160px;
     }
   }
-  .card-form-codes {
+  &-codes {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -24,7 +23,7 @@
     }
   }
 
-  .card-form-buttons {
+  &-buttons {
     width: 100%;
     flex-basis: 100%;
     display: inline-flex;

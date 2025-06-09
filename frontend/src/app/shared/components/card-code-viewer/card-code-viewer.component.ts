@@ -76,10 +76,8 @@ export class CardCodeViewerComponent
   }
 
   protected tryDrawCode(text: string, format: string): void {
+    const canvas = this.canvasRef.nativeElement;
     try {
-      const canvas = this.canvasRef.nativeElement;
-      // const ctx = canvas.getContext('2d');
-      // ctx.clearRect(0, 0, canvas.width, canvas.height);
       const bcid = ZxingToBwipMap[format as keyof typeof BarcodeFormat];
       Bwip.toCanvas(canvas, {
         bcid,
@@ -90,6 +88,8 @@ export class CardCodeViewerComponent
         barcolor: this.color,
       });
     } catch (e) {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       console.error(e);
     }
   }

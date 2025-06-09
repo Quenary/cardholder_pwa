@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AuthActions } from './auth.actions';
 import { AuthApiService } from 'src/app/entities/auth/auth-api.service';
@@ -10,13 +10,11 @@ import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthEffects {
-  constructor(
-    private actions$: Actions,
-    private authApiService: AuthApiService,
-    private matSnackBar: MatSnackBar,
-    private translateService: TranslateService,
-    private router: Router
-  ) {}
+  private readonly actions$ = inject(Actions);
+  private readonly authApiService = inject(AuthApiService);
+  private readonly matSnackBar = inject(MatSnackBar);
+  private readonly translateService = inject(TranslateService);
+  private readonly router = inject(Router);
 
   token$ = createEffect(() =>
     this.actions$.pipe(

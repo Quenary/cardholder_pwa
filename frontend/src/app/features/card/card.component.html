@@ -70,6 +70,7 @@
   <section class="card-form-buttons">
     @if (canDelete$ | async) {
     <button
+      class="warn-color"
       mat-button
       type="button"
       [disabled]="isLoading$ | async"

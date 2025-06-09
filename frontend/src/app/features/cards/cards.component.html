@@ -27,6 +27,7 @@
   </mat-form-field>
 
   <button
+    class="accent-color"
     mat-fab
     routerLink="/cards/new">
     <mat-icon>add</mat-icon>
@@ -49,7 +50,9 @@
         <span class="card-tile-content-header-text">
           {{ card.name }}
         </span>
-        <mat-icon class="card-tile-content-header-icon">edit_note</mat-icon>
+        <mat-icon class="card-tile-content-header-icon accent-color">
+          edit_note
+        </mat-icon>
       </section>
       @if (card | isValidCard) { @defer {
       <app-card-code-viewer
