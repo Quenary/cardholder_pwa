@@ -35,6 +35,13 @@ import { AsyncPipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import type { ICardScannerResult } from '../card-scanner/card-scanner.component';
 import { CardCodeViewerComponent } from '../card-code-viewer/card-code-viewer.component';
+import { EBarcodeFormat } from 'src/app/entities/cards/cards-const';
+import {
+  MatAutocomplete,
+  MatAutocompleteTrigger,
+  MatOption,
+} from '@angular/material/autocomplete';
+import { map, Observable, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-card',
@@ -51,6 +58,9 @@ import { CardCodeViewerComponent } from '../card-code-viewer/card-code-viewer.co
     AsyncPipe,
     MatFabButton,
     CardCodeViewerComponent,
+    MatAutocomplete,
+    MatOption,
+    MatAutocompleteTrigger,
   ],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss',
@@ -72,6 +82,19 @@ export class CardComponent implements OnInit, OnDestroy {
     name: new FormControl<string>(null, [Validators.required]),
     description: new FormControl<string>(null),
   });
+  private readonly codeTypeAutocompleteList: string[] =
+    Object.values(EBarcodeFormat);
+  public readonly codeTypeAutocompleteList$: Observable<string[]> =
+    this.form.controls.code_type.valueChanges.pipe(
+      startWith(null),
+      map((value) => {
+        if (!value) {
+          return this.codeTypeAutocompleteList;
+        }
+        value = value.toUpperCase();
+        return this.codeTypeAutocompleteList.filter((c) => c.includes(value));
+      })
+    );
 
   ngOnInit(): void {
     this.activatedRoute.params

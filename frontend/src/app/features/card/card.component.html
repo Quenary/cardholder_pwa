@@ -30,16 +30,21 @@
         formControlName="code" />
     </mat-form-field>
 
-    <!-- TODO add autocomplete from codes list -->
     <mat-form-field class="card-form-field">
-      <mat-label aria-required="true">{{
-        'CARDS.CARD.CODE_TYPE' | translate
-      }}</mat-label>
+      <mat-label aria-required="true">
+        {{ 'CARDS.CARD.CODE_TYPE' | translate }}
+      </mat-label>
+      <mat-autocomplete #codeTypeAutocomplete="matAutocomplete">
+        @for (codeType of codeTypeAutocompleteList$ | async; track codeType) {
+        <mat-option [value]="codeType">{{ codeType }}</mat-option>
+        }
+      </mat-autocomplete>
       <input
         matInput
         type="text"
         id="card-code-type"
-        formControlName="code_type" />
+        formControlName="code_type"
+        [matAutocomplete]="codeTypeAutocomplete" />
     </mat-form-field>
   </section>
 
