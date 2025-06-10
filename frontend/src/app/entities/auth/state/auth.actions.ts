@@ -18,5 +18,9 @@ export const AuthActions = createActionGroup({
     logout: props<{ refreshToken: string }>(),
     'logout success': emptyProps(),
     'logout error': props<{ error: HttpErrorResponse }>(),
+    /**
+     * Logout without api call on user deletion
+     */
+    'logout silent': emptyProps(),
   },
 });

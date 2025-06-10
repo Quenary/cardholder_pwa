@@ -8,6 +8,8 @@ import { inject } from '@angular/core';
 import { IAppState } from './app.state';
 import { selectCardsActiveHasChanges } from './entities/cards/state/cards.selectors';
 import { canDeactivateWithDialogGuard } from './core/guards/can-deactivate-with-dialog.guard';
+import { userReducer } from './entities/user/state/user.reducers';
+import { UserEffects } from './entities/user/state/user.effects';
 
 export const routes: Routes = [
   {
@@ -58,5 +60,6 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/user/user.component').then((c) => c.UserComponent),
+    providers: [provideState('user', userReducer), provideEffects(UserEffects)],
   },
 ];

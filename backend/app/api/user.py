@@ -25,7 +25,7 @@ def user_get_info(current_user=Depends(auth.get_current_user)):
     return current_user
 
 
-@router.put("/user")
+@router.put("/user", response_model=schemas.User)
 def update_user(
     data: schemas.UserUpdate,
     db: Session = Depends(db.get_db),

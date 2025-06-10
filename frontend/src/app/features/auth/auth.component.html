@@ -1,5 +1,6 @@
 <form
   class="auth-form"
+  autocomplete="on"
   [formGroup]="form"
   (submit)="onSubmit()">
   <h1>{{ 'AUTH.WELCOME' | translate }}</h1>
@@ -10,7 +11,9 @@
     <input
       matInput
       type="text"
-      id="username"
+      id="login_username"
+      name="login_username"
+      autocomplete="username"
       formControlName="username" />
   </mat-form-field>
   <mat-form-field class="auth-form-field">
@@ -21,6 +24,8 @@
       matInput
       type="password"
       id="password"
+      name="password"
+      autocomplete="current-password"
       formControlName="password" />
   </mat-form-field>
 

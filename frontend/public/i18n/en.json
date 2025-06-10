@@ -26,11 +26,6 @@
     },
     "REGISTER": {
         "NEW_ACCOUNT": "New account",
-        "USERNAME": "Username",
-        "EMAIL": "E-mail",
-        "PASSWORD": "Password",
-        "CONFIRM_PASSWORD": "Confirm password",
-        "PASSWORD_HINT": "Upper and lower case letter, a number and a special symbol",
         "SIGNUP": "Sign up",
         "SIGNIN": "Already have an account?",
         "SUCCESS": "Account created!"
@@ -44,5 +39,18 @@
             "NAME": "Наименование",
             "DESCRIPTION": "Описание"
         }
+    },
+    "USER": {
+        "USERNAME": "Username",
+        "EMAIL": "E-mail",
+        "PASSWORD": "Password",
+        "CONFIRM_PASSWORD": "Confirm password",
+        "PASSWORD_HINTS": [
+            "At least 8 characters",
+            "Latin upper and lower case letters",
+            "Numbers",
+            "Special character: @$!%*#?&"
+        ],
+        "DELETE_WARN": "Do you want to permanently delete the user and all associated data?"
     }
 }

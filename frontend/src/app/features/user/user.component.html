@@ -1,1 +1,30 @@
-<p>user works!</p>
+<div class="user-component">
+  <app-user-form
+    [value]="userInfo$ | async"
+    [disabled]="isLoading$ | async"
+    (OnSubmit)="onSubmit($event)">
+    <section class="user-component-buttons">
+      <button
+        class="warn-color"
+        mat-button
+        type="button"
+        [disabled]="isLoading$ | async"
+        (click)="onDelete()">
+        <mat-icon>delete</mat-icon>
+        {{ 'GENERAL.DELETE' | translate }}
+      </button>
+      <button
+        mat-flat-button
+        type="submit"
+        [disabled]="isLoading$ | async">
+        {{ 'GENERAL.SAVE' | translate }}
+        <mat-icon>save</mat-icon>
+        @if (isLoading$ | async) {
+        <mat-icon iconPositionEnd
+          ><mat-spinner [diameter]="15"></mat-spinner
+        ></mat-icon>
+        }
+      </button>
+    </section>
+  </app-user-form>
+</div>

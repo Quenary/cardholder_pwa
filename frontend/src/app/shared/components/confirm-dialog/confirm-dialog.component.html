@@ -1,7 +1,13 @@
 <h2 mat-dialog-title>{{ title | translate }}</h2>
 @if (subtitle) {
 <mat-dialog-content>
-  <p>{{ subtitle | translate }}</p>
+  @if (addCheckbox) {
+  <mat-checkbox
+    [checked]="confirmCheckboxValue"
+    (change)="confirmCheckboxValue = $event.checked">
+  </mat-checkbox>
+  }
+  <span>{{ subtitle | translate }}</span>
 </mat-dialog-content>
 }
 <mat-dialog-actions>
@@ -12,6 +18,7 @@
   </button>
   <button
     mat-flat-button
+    [disabled]="addCheckbox && !confirmCheckboxValue"
     (click)="confirm()">
     {{ confirmText | translate }}
   </button>

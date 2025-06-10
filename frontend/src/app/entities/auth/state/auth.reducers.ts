@@ -47,5 +47,9 @@ export const authReducer = createReducer(
       tokenResponse: null,
       isLoading: false,
     })
-  )
+  ),
+  on(AuthActions.logoutSilent, (state, payload) => ({
+    ...initialState,
+    init: true,
+  }))
 );

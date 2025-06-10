@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
 
-  .register-form {
+  .register-component {
     background-color: var(--mat-sys-surface-container);
     color: var(--mat-sys-on-surface);
     padding: 20px;
@@ -13,11 +13,11 @@
     width: 100%;
     max-width: 600px;
 
-    .register-form-header {
+    &-header {
       width: 100%;
       text-align: center;
     }
-    .register-form-buttons {
+    &-buttons {
       margin: 0 auto;
       display: flex;
       flex-direction: column;

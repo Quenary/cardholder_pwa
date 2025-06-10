@@ -1,9 +1,11 @@
-<mat-sidenav-container class="app-side-nav">
+<mat-sidenav-container class="sidenav-container">
   <mat-sidenav
+    class="sidenav"
     mode="push"
     [opened]="sidenavOpened"
     (openedChange)="sidenavOpened = $event">
     <mat-nav-list
+      class="sidenav-list"
       aria-label="Main navigation"
       (click)="sidenavOpened = false">
       @for (item of links$ | async; track item) {
@@ -20,18 +22,20 @@
       }
     </mat-nav-list>
   </mat-sidenav>
-  <mat-sidenav-content class="app-side-nav-content">
+  <mat-sidenav-content class="sidenav-container-content">
     @if (showToolbar$ | async) {
-    <mat-toolbar
-      ><button
+    <mat-toolbar class="sidenav-container-content-toolbar">
+      <button
         mat-icon-button
         (click)="sidenavOpened = !sidenavOpened">
         <mat-icon>menu</mat-icon>
       </button>
-      <span>{{ 'GENERAL.TITLE' | translate }}</span>
+      <span class="sidenav-container-content-toolbar-title">
+        {{ 'GENERAL.TITLE' | translate }}
+      </span>
     </mat-toolbar>
     }
-    <section class="app-side-nav-content-outlet">
+    <section class="sidenav-container-content-outlet">
       <router-outlet></router-outlet>
     </section>
   </mat-sidenav-content>

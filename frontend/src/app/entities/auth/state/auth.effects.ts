@@ -40,7 +40,7 @@ export class AuthEffects {
             AuthActions.refreshTokenSuccess({ tokenResponse })
           ),
           catchError((error) => {
-            this.logout();
+            this.onLogout();
             return of(AuthActions.refreshTokenError({ error }));
           })
         )
@@ -70,11 +70,22 @@ export class AuthEffects {
           map(() => AuthActions.logoutSuccess()),
           catchError((error) => of(AuthActions.logoutError({ error }))),
           finalize(() => {
-            this.logout();
+            this.onLogout();
           })
         )
       )
     )
+  );
+
+  $logoutSilent = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.logoutSilent),
+        tap(() => {
+          this.onLogout();
+        })
+      ),
+    { dispatch: false }
   );
 
   showErrors$ = createEffect(
@@ -99,9 +110,9 @@ export class AuthEffects {
   );
 
   /**
-   * Callback for logout or refresh error
+   * Callback for logout, refresh error, user deletion etc.
    */
-  private logout() {
+  private onLogout() {
     localStorage.removeItem(ELocalStorageKey.TOKEN_RESPONSE);
     this.router.navigate(['/auth']);
   }

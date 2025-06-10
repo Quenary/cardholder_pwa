@@ -8,7 +8,7 @@ export enum ELocalStorageKey {
  * Enum of useful regexp
  */
 export const ERegexp = {
-  login: /^[a-zA-Z0-9]{4,}$/,
+  login: /^[a-zA-Z0-9_]{4,}$/,
   /**
    * At least
    * 1 char

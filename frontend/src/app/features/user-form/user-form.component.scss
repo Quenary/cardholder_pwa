@@ -1,0 +1,10 @@
+:host {
+  .user-form {
+    &-password-hints {
+      padding-left: 20px;
+      margin: unset;
+      width: 100%;
+      padding-bottom: 20px;
+    }
+  }
+}

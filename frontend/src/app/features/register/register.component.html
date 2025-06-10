@@ -1,81 +1,29 @@
-<form
-  class="register-form flex-form"
-  [formGroup]="form"
-  (submit)="onSubmit()">
-  <h1 class="register-form-header">{{ 'REGISTER.NEW_ACCOUNT' | translate }}</h1>
-  <mat-form-field class="register-form-field">
-    <mat-label aria-required="true">{{
-      'REGISTER.USERNAME' | translate
-    }}</mat-label>
-    <input
-      matInput
-      type="text"
-      id="username"
-      formControlName="username" />
-  </mat-form-field>
-  <mat-form-field class="register-form-field">
-    <mat-label aria-required="true">{{
-      'REGISTER.EMAIL' | translate
-    }}</mat-label>
-    <input
-      matInput
-      type="email"
-      id="email"
-      formControlName="email" />
-  </mat-form-field>
-  <mat-form-field class="register-form-field">
-    <mat-label aria-required="true">{{
-      'REGISTER.PASSWORD' | translate
-    }}</mat-label>
-    <input
-      matInput
-      [type]="hidePassword ? 'password' : 'text'"
-      id="password"
-      formControlName="password"
-      [matTooltip]="'REGISTER.PASSWORD_HINT' | translate" />
-    <mat-icon
-      matSuffix
-      (click)="hidePassword = !hidePassword"
-      >{{ hidePassword ? 'visibility_off' : 'visibility' }}
-    </mat-icon>
-  </mat-form-field>
-  <mat-form-field class="register-form-field">
-    <mat-label aria-required="true">{{
-      'REGISTER.CONFIRM_PASSWORD' | translate
-    }}</mat-label>
-    <input
-      matInput
-      [type]="hideConfirmPassword ? 'password' : 'text'"
-      id="confirm-password"
-      formControlName="confirmPassword"
-      [matTooltip]="'REGISTER.PASSWORD_HINT' | translate" />
-    <mat-icon
-      matSuffix
-      (click)="hideConfirmPassword = !hideConfirmPassword"
-      >{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}
-    </mat-icon>
-  </mat-form-field>
-
-  <section class="register-form-buttons">
-    <button
-      mat-flat-button
-      type="submit"
-      [disabled]="isLoading">
-      {{ 'REGISTER.SIGNUP' | translate }}
-      <mat-icon>person_add</mat-icon>
-      @if (isLoading) {
-      <mat-icon iconPositionEnd
-        ><mat-spinner [diameter]="15"></mat-spinner
-      ></mat-icon>
-      }
-    </button>
-    <button
-      mat-button
-      routerLink="/auth"
-      type="button"
-      [disabled]="isLoading">
-      <mat-icon>login</mat-icon>
-      {{ 'REGISTER.SIGNIN' | translate }}
-    </button>
-  </section>
-</form>
+<div class="register-component">
+  <h1 class="register-component-header">{{
+    'REGISTER.NEW_ACCOUNT' | translate
+  }}</h1>
+  <app-user-form (OnSubmit)="onSubmit($event)">
+    <section class="register-component-buttons">
+      <button
+        mat-flat-button
+        type="submit"
+        [disabled]="isLoading">
+        {{ 'REGISTER.SIGNUP' | translate }}
+        <mat-icon>person_add</mat-icon>
+        @if (isLoading) {
+        <mat-icon iconPositionEnd
+          ><mat-spinner [diameter]="15"></mat-spinner
+        ></mat-icon>
+        }
+      </button>
+      <button
+        mat-button
+        routerLink="/auth"
+        type="button"
+        [disabled]="isLoading">
+        <mat-icon>login</mat-icon>
+        {{ 'REGISTER.SIGNIN' | translate }}
+      </button>
+    </section>
+  </app-user-form>
+</div>
