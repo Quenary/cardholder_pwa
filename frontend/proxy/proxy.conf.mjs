@@ -5,8 +5,5 @@ export default [
         secure: false,
         logLevel: 'debug',
         changeOrigin: true,
-        pathRewrite: {
-            "^/api": ""
-        }
     }
 ]

@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - $HOME/.cardholder_pwa:/cardholder_pwa
+    restart: unless-stopped
