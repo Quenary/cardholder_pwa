@@ -19,9 +19,11 @@
         "RELOAD": "Reload"
     },
     "NAV": {
-        "CARD": "Карты",
-        "USER": "Пользователь",
-        "EXIT": "Выход"
+        "AUTH": "Authorization",
+        "REGISTER": "Registration",
+        "CARD": "Cards",
+        "USER": "User",
+        "EXIT": "Exit"
     },
     "AUTH": {
         "WELCOME": "Welcome",
@@ -40,10 +42,10 @@
         "SEARCH": "Search",
         "SEARCH_PLACEHOLDER": "Name",
         "CARD": {
-            "CODE": "Код",
-            "CODE_TYPE": "Тип кода",
-            "NAME": "Наименование",
-            "DESCRIPTION": "Описание"
+            "CODE": "Code",
+            "CODE_TYPE": "Code type",
+            "NAME": "Name",
+            "DESCRIPTION": "Description"
         }
     },
     "USER": {

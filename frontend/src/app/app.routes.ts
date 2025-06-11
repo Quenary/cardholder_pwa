@@ -10,6 +10,12 @@ import { canDeactivateWithDialogGuard } from './core/guards/can-deactivate-with-
 import { userReducer } from './entities/user/state/user.reducers';
 import { UserEffects } from './entities/user/state/user.effects';
 import { isOnlineGuard } from './core/guards/is-online.guard';
+import { TranslateService } from '@ngx-translate/core';
+
+const titleTranslate = (titleKey: string) => () => {
+  const translateService = inject(TranslateService);
+  return translateService.instant(titleKey);
+};
 
 export const routes: Routes = [
   {
@@ -19,11 +25,13 @@ export const routes: Routes = [
   },
   {
     path: 'auth',
+    title: titleTranslate('NAV.AUTH'),
     loadComponent: () =>
       import('./features/auth/auth.component').then((c) => c.AuthComponent),
   },
   {
     path: 'register',
+    title: titleTranslate('NAV.REGISTER'),
     loadComponent: () =>
       import('./features/register/register.component').then(
         (c) => c.RegisterComponent
@@ -32,7 +40,7 @@ export const routes: Routes = [
   {
     path: 'cards',
     canActivate: [authGuard],
-
+    title: titleTranslate('NAV.CARD'),
     loadComponent: () =>
       import('./features/cards/cards.component').then((c) => c.CardsComponent),
     children: [
@@ -59,6 +67,7 @@ export const routes: Routes = [
   {
     path: 'user',
     canActivate: [authGuard, isOnlineGuard],
+    title: titleTranslate('NAV.USER'),
     loadComponent: () =>
       import('./features/user/user.component').then((c) => c.UserComponent),
     providers: [provideState('user', userReducer), provideEffects(UserEffects)],
