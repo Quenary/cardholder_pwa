@@ -3,6 +3,10 @@ from sqlalchemy import Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from sqlalchemy.sql import func
 from datetime import datetime
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .user import User
 
 
 class Card(Base):
@@ -19,4 +23,4 @@ class Card(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
-    owner = relationship("User", back_populates="cards")
+    owner: Mapped["User"] = relationship("User", back_populates="cards")

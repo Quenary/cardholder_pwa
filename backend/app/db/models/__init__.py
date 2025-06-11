@@ -1,4 +1,5 @@
+from .base import Base
 from .user import User
 from .refresh_token import RefreshToken
 from .card import Card
-from .base import Base
+from .password_recovery_code import PasswordRecoveryCode

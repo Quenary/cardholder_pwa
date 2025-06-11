@@ -2,6 +2,12 @@ from .base import Base
 from sqlalchemy import Integer, String, DateTime
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from datetime import datetime
+from typing import TYPE_CHECKING, Type
+
+if TYPE_CHECKING:
+    from .card import Card
+    from .refresh_token import RefreshToken
+    from .password_recovery_code import PasswordRecoveryCode
 
 
 class User(Base):
@@ -14,5 +20,10 @@ class User(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
-    cards = relationship("Card", back_populates="owner")
-    refresh_tokens = relationship("RefreshToken", back_populates="user")
+    cards: Mapped[list["Card"]] = relationship("Card", back_populates="owner")
+    refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
+        "RefreshToken", back_populates="user"
+    )
+    password_recovery_codes: Mapped[list["PasswordRecoveryCode"]] = relationship(
+        "PasswordRecoveryCode", back_populates="user"
+    )

@@ -7,12 +7,7 @@ from sqlalchemy.orm import Session
 import app.schemas as schemas, app.db as db, app.db.models as models
 from typing import cast
 import secrets
-from app.env import (
-    JWT_SECRET_KEY,
-    JWT_ALGORITHM,
-    ACCESS_TOKEN_LIFETIME_MIN,
-    REFRESH_TOKEN_LIFETIME_MIN,
-)
+from app.config import Config
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
@@ -30,10 +25,10 @@ def get_password_hash(password: str) -> str:
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     expire = datetime.utcnow() + (
-        expires_delta or timedelta(minutes=ACCESS_TOKEN_LIFETIME_MIN)
+        expires_delta or timedelta(minutes=Config.ACCESS_TOKEN_LIFETIME_MIN)
     )
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, Config.JWT_SECRET_KEY, algorithm=Config.JWT_ALGORITHM)
     return encoded_jwt, expire
 
 
@@ -41,7 +36,7 @@ def create_refresh_token(
     user_id: int, db: Session, user_agent: str | None = None, ip: str | None = None
 ):
     token = secrets.token_urlsafe(32)
-    expires_at = datetime.utcnow() + timedelta(minutes=REFRESH_TOKEN_LIFETIME_MIN)
+    expires_at = datetime.utcnow() + timedelta(minutes=Config.REFRESH_TOKEN_LIFETIME_MIN)
     db_token = models.RefreshToken(
         token=token,
         user_id=user_id,
@@ -89,7 +84,7 @@ async def get_current_user(
 ) -> models.User:
     credentials_exception = HTTPException(status_code=401, detail="Invalid token")
     try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        payload = jwt.decode(token, Config.JWT_SECRET_KEY, algorithms=[Config.JWT_ALGORITHM])
         username: str = cast(str, payload.get("sub"))
         if not username:
             raise credentials_exception

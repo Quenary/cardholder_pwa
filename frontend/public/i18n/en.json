@@ -30,13 +30,23 @@
         "USERNAME": "Username",
         "PASSWORD": "Password",
         "SIGNIN": "Sign in",
-        "SIGNUP": "Don't have an account?"
+        "SIGNUP": "Don't have an account?",
+        "PASSWORD_RECOVERY": "Password recovery"
     },
     "REGISTER": {
         "NEW_ACCOUNT": "New account",
         "SIGNUP": "Sign up",
         "SIGNIN": "Already have an account?",
         "SUCCESS": "Account created!"
+    },
+    "PASSWORD_RECOVERY": {
+        "TITLE": "Password recovery",
+        "EMAIL": "E-mail",
+        "CODE": "Code",
+        "PASSWORD": "Password",
+        "CONFIRM_PASSWORD": "Confirm password",
+        "HAVE_CODE": "Have the code?",
+        "SENT": "If the user exists, instructions will be sent to email."
     },
     "CARDS": {
         "SEARCH": "Search",
@@ -56,8 +66,7 @@
         "PASSWORD_HINTS": [
             "At least 8 characters",
             "Latin upper and lower case letters",
-            "Numbers",
-            "Special character: @$!%*#?&"
+            "Numbers"
         ],
         "DELETE_WARN": "Do you want to permanently delete the user and all associated data?"
     }

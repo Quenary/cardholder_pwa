@@ -72,4 +72,24 @@ export const routes: Routes = [
       import('./features/user/user.component').then((c) => c.UserComponent),
     providers: [provideState('user', userReducer), provideEffects(UserEffects)],
   },
+  {
+    path: 'password-recovery',
+    title: titleTranslate('PASSWORD_RECOVERY.TITLE'),
+    children: [
+      {
+        path: 'request',
+        loadComponent: () =>
+          import(
+            './features/password-recovery-request/password-recovery-request.component'
+          ).then((c) => c.PasswordRecoveryRequestComponent),
+      },
+      {
+        path: 'submit',
+        loadComponent: () =>
+          import(
+            './features/password-recovery-submit/password-recovery-submit.component'
+          ).then((c) => c.PasswordRecoverySubmitComponent),
+      },
+    ],
+  },
 ];

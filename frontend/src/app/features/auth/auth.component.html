@@ -50,5 +50,13 @@
       <mat-icon>person_add</mat-icon>
       {{ 'AUTH.SIGNUP' | translate }}
     </button>
+    <button
+      mat-button
+      routerLink="/password-recovery/request"
+      [disabled]="isLoading$ | async"
+      type="button">
+      <mat-icon>error</mat-icon>
+      {{ 'AUTH.PASSWORD_RECOVERY' | translate }}
+    </button>
   </section>
 </form>

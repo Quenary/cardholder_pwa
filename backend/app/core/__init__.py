@@ -1,1 +1,2 @@
-import app.core.auth as auth
+from .auth import *
+from .smtp import EmailSender
