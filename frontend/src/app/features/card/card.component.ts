@@ -19,7 +19,6 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
-import { IAppState } from 'src/app/app.state';
 import { ICardBase } from 'src/app/entities/cards/cards-interface';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
 import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
@@ -68,7 +67,7 @@ import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardComponent implements OnInit, OnDestroy {
-  private readonly store = inject(Store<IAppState>);
+  private readonly store = inject(Store);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly matDialog = inject(MatDialog);

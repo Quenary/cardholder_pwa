@@ -4,7 +4,6 @@ import { catchError, EMPTY, map, of, switchMap, tap } from 'rxjs';
 import { UserActions } from './user.actions';
 import { UserApiService } from '../user-api.service';
 import { Store } from '@ngrx/store';
-import { IAppState } from 'src/app/app.state';
 import { MatDialog } from '@angular/material/dialog';
 import {
   ConfirmDialogComponent,
@@ -18,7 +17,7 @@ import { AuthActions } from '../../auth/state/auth.actions';
 export class UserEffects {
   private readonly actions$ = inject(Actions);
   private readonly userApiService = inject(UserApiService);
-  private readonly store = inject(Store<IAppState>);
+  private readonly store = inject(Store);
   private readonly matDialog = inject(MatDialog);
   private readonly matSnackBar = inject(MatSnackBar);
   private readonly translateService = inject(TranslateService);

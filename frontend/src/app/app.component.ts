@@ -17,9 +17,10 @@ import {
   MatListItemIcon,
 } from '@angular/material/list';
 import { Store } from '@ngrx/store';
-import { IAppState } from './app.state';
 import { selectAuthTokenResponse } from './entities/auth/state/auth.selectors';
 import { AuthActions } from './entities/auth/state/auth.actions';
+import { selectAppIsOffline } from './state/app.selectors';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 interface INavItem {
   name: string;
@@ -45,14 +46,16 @@ interface INavItem {
     RouterLinkActive,
     AsyncPipe,
     MatIconButton,
+    MatProgressSpinner,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  private readonly store = inject(Store<IAppState>);
+  private readonly store = inject(Store);
   private readonly translateService = inject(TranslateService);
+  public readonly isOffline$ = this.store.select(selectAppIsOffline);
   /**
    * Items for side nav panel
    */

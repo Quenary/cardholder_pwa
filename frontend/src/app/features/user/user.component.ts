@@ -4,7 +4,6 @@ import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
-import { IAppState } from 'src/app/app.state';
 import { IUserUpdate } from 'src/app/entities/user/user-interface';
 import { UserFormComponent } from '../user-form/user-form.component';
 import {
@@ -28,7 +27,7 @@ import { AsyncPipe } from '@angular/common';
   styleUrl: './user.component.scss',
 })
 export class UserComponent implements OnInit {
-  private readonly store = inject(Store<IAppState>);
+  private readonly store = inject(Store);
   public readonly isLoading$ = this.store.select(selectUserIsLoading);
   public readonly userInfo$ = this.store.select(selectUserInfo);
 

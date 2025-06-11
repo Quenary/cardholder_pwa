@@ -15,7 +15,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { IAppState } from 'src/app/app.state';
 import { selectCardsActive, selectCardsActiveInfo } from './cards.selectors';
 import { MatDialog } from '@angular/material/dialog';
 import {
@@ -26,7 +25,7 @@ import {
 @Injectable()
 export class CardsEffects {
   private readonly actions$ = inject(Actions);
-  private readonly store = inject(Store<IAppState>);
+  private readonly store = inject(Store);
   private readonly cardsApiService = inject(CardApiService);
   private readonly matSnackBar = inject(MatSnackBar);
   private readonly translateService = inject(TranslateService);

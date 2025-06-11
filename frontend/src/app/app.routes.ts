@@ -5,11 +5,11 @@ import { cardsReducer } from './entities/cards/state/cards.reducers';
 import { provideEffects } from '@ngrx/effects';
 import { CardsEffects } from './entities/cards/state/cards.effects';
 import { inject } from '@angular/core';
-import { IAppState } from './app.state';
 import { selectCardsActiveHasChanges } from './entities/cards/state/cards.selectors';
 import { canDeactivateWithDialogGuard } from './core/guards/can-deactivate-with-dialog.guard';
 import { userReducer } from './entities/user/state/user.reducers';
 import { UserEffects } from './entities/user/state/user.effects';
+import { isOnlineGuard } from './core/guards/is-online.guard';
 
 export const routes: Routes = [
   {
@@ -38,11 +38,12 @@ export const routes: Routes = [
     children: [
       {
         path: ':id',
+        canActivate: [isOnlineGuard],
         loadComponent: () =>
           import('./features/card/card.component').then((c) => c.CardComponent),
         canDeactivate: [
           () => {
-            const store = inject(Store<IAppState>);
+            const store = inject(Store);
             return canDeactivateWithDialogGuard([
               store.select(selectCardsActiveHasChanges),
             ]);
@@ -57,7 +58,7 @@ export const routes: Routes = [
   },
   {
     path: 'user',
-    canActivate: [authGuard],
+    canActivate: [authGuard, isOnlineGuard],
     loadComponent: () =>
       import('./features/user/user.component').then((c) => c.UserComponent),
     providers: [provideState('user', userReducer), provideEffects(UserEffects)],

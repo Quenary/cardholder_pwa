@@ -6,4 +6,6 @@ You may also need following packages ```pip3 install python-is-python3 python3-d
 - create venv ```python -m venv venv```
 - activate with ```source venv/bin/activate``` or ```venv/scripts/activate```
 - install deps ```pip install -r requirements.txt```
-- run with ```fastapi dev app/main.py```
+- run
+    - windows ```$env:DB_URL="sqlite:///./cardholder_pwa.db"; fastapi dev app/main.py```
+    - linux ```DB_URL="sqlite:///./cardholder_pwa.db" fastapi dev app/main.py```

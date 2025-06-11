@@ -7,7 +7,6 @@ import { inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
   catchError,
-  filter,
   first,
   of,
   skip,
@@ -15,7 +14,6 @@ import {
   throwError,
   timeout,
 } from 'rxjs';
-import { IAppState } from 'src/app/app.state';
 import { AuthActions } from 'src/app/entities/auth/state/auth.actions';
 import {
   selectAuth,
@@ -55,10 +53,9 @@ export const getTokenInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  const store = inject(Store<IAppState>);
+  const store = inject(Store);
   return store.select(selectAuth).pipe(
-    filter((auth) => auth.init),
-    first(),
+    first((auth) => auth.init),
     switchMap((auth) => {
       const tokens = auth.tokenResponse;
       if (!tokens) {

@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { provideStore, Store } from '@ngrx/store';
+import { provideState, provideStore, Store } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import {
@@ -25,6 +25,11 @@ import { translateInitializer } from './core/app-initializers/translate-initiali
 import { authInitializer } from './core/app-initializers/auth-initializer';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { getTokenInterceptor } from './core/interceptors/token.interceptor';
+import { provideServiceWorker } from '@angular/service-worker';
+import { appReducer } from './state/app.reducers';
+import { AppEffects } from './state/app.effects';
+import { NetworkService } from './core/services/network.service';
+import { UpdateService } from './core/services/update.service';
 
 function HttpLoaderFactory(httpClient: HttpClient) {
   return new TranslateHttpLoader(httpClient, '/i18n/', '.json');
@@ -34,8 +39,10 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideStore({ auth: authReducer }),
-    provideEffects([AuthEffects]),
+    provideStore(),
+    provideState('app', appReducer),
+    provideState('auth', authReducer),
+    provideEffects([AppEffects, AuthEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
     provideHttpClient(withInterceptors([getTokenInterceptor])),
     importProvidersFrom(
@@ -51,6 +58,18 @@ export const appConfig: ApplicationConfig = {
       translateInitializer(inject(EnvironmentInjector))
     ),
     provideAppInitializer(() => authInitializer(inject(Store))),
+    provideAppInitializer(() => {
+      const networkService = inject(NetworkService);
+      return networkService.init();
+    }),
+    provideAppInitializer(() => {
+      const updateService = inject(UpdateService);
+      return updateService.init();
+    }),
     provideAnimationsAsync(),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
   ],
 };

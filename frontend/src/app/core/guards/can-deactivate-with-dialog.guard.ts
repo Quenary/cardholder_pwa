@@ -6,7 +6,6 @@ import {
   forkJoin,
   from,
   isObservable,
-  map,
   Observable,
   of,
   switchMap,

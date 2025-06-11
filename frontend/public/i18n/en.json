@@ -1,9 +1,10 @@
 {
     "GENERAL": {
         "TITLE": "Cardholder",
+        "CONNECTION": "Connecting",
         "YES": "Yes",
         "NO": "No",
-        "SAVE": "Сохранить",
+        "SAVE": "Save",
         "CLOSE": "Close",
         "CANCEL": "Cancel",
         "REQUEST_ERROR": "Request error",
@@ -11,6 +12,11 @@
         "CONFIRM": "Confirm",
         "DELETE_WARN": "Confirm deletion",
         "DELETE": "Delete"
+    },
+    "UPDATE": {
+        "TITLE": "Update",
+        "SUBTITLE": "A new version of the application is available. You need to reload the page to update.",
+        "RELOAD": "Reload"
     },
     "NAV": {
         "CARD": "Карты",

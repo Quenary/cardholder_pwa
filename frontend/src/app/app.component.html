@@ -33,6 +33,14 @@
       <span class="sidenav-container-content-toolbar-title">
         {{ 'GENERAL.TITLE' | translate }}
       </span>
+      @if (isOffline$ | async) {
+      <section class="sidenav-container-content-toolbar-connection">
+        {{ 'GENERAL.CONNECTION' | translate }}
+        <mat-icon iconPositionEnd
+          ><mat-spinner [diameter]="24"></mat-spinner>
+        </mat-icon>
+      </section>
+      }
     </mat-toolbar>
     }
     <section class="sidenav-container-content-outlet">

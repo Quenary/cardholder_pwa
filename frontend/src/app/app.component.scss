@@ -24,6 +24,11 @@
         &-title {
           margin-left: 16px;
         }
+        &-connection {
+          display: inline-flex;
+          margin-left: auto;
+          gap: 8px;
+        }
       }
 
       &-outlet {

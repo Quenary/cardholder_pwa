@@ -10,4 +10,4 @@ ACCESS_TOKEN_LIFETIME_MIN: float = float(
 REFRESH_TOKEN_LIFETIME_MIN: float = float(
     os.environ.get("REFRESH_TOKEN_LIFETIME_MIN") or 60 * 24 * 30
 )
-DB_URL: str = os.environ.get("DB_URL") or "sqlite:///./cardholder_pwa.db"
+DB_URL: str = os.environ.get("DB_URL") or "sqlite:////cardholder_pwa/cardholder_pwa.db"

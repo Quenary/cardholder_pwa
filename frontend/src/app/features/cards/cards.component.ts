@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { IAppState } from 'src/app/app.state';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
 import { MatGridList, MatGridTile } from '@angular/material/grid-list';
 import { AsyncPipe } from '@angular/common';
@@ -72,9 +71,10 @@ import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardsComponent implements OnInit {
-  private readonly store = inject(Store<IAppState>);
+  private readonly store = inject(Store);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  
   public readonly showParent$ = this.router.events.pipe(
     startWith(null),
     map(() => this.router.url === '/cards'),

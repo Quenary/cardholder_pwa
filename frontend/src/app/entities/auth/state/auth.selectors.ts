@@ -1,7 +1,7 @@
-import { createSelector } from '@ngrx/store';
-import { IAppState } from 'src/app/app.state';
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { IAuthState } from './auth.reducers';
 
-const _selectAuth = (state: IAppState) => state.auth;
+const _selectAuth = createFeatureSelector<IAuthState>('auth');
 export const selectAuth = createSelector(_selectAuth, (state) => state);
 export const selectAuthIsLoading = createSelector(
   _selectAuth,
