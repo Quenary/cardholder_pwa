@@ -10,7 +10,7 @@ def get_cards(
     db: Session = Depends(db.get_db),
     user: models.User = Depends(auth.get_current_user),
 ):
-    return db.query(models.Card).filter(models.Card.owner_id == user.id).all()
+    return db.query(models.Card).filter(models.Card.user_id == user.id).all()
 
 
 @router.get("/cards/{card_id}", response_model=schemas.Card)
@@ -19,7 +19,7 @@ def get_card(
     db: Session = Depends(db.get_db),
     user=Depends(auth.get_current_user),
 ):
-    card = db.query(models.Card).filter_by(id=card_id, owner_id=user.id).first()
+    card = db.query(models.Card).filter_by(id=card_id, user_id=user.id).first()
     if not card:
         raise HTTPException(status_code=404, detail="Card not found")
     return card
@@ -31,7 +31,7 @@ def create_card(
     db: Session = Depends(db.get_db),
     user=Depends(auth.get_current_user),
 ):
-    new_card = models.Card(**card.dict(), owner_id=user.id)
+    new_card = models.Card(**card.dict(), user_id=user.id)
     db.add(new_card)
     db.commit()
     db.refresh(new_card)
@@ -45,7 +45,7 @@ def update_card(
     db: Session = Depends(db.get_db),
     user=Depends(auth.get_current_user),
 ):
-    card = db.query(models.Card).filter_by(id=card_id, owner_id=user.id).first()
+    card = db.query(models.Card).filter_by(id=card_id, user_id=user.id).first()
     if not card:
         raise HTTPException(status_code=404, detail="Card not found")
     for key, value in updated.dict().items():
@@ -61,7 +61,7 @@ def delete_card(
     db: Session = Depends(db.get_db),
     user=Depends(auth.get_current_user),
 ):
-    card = db.query(models.Card).filter_by(id=card_id, owner_id=user.id).first()
+    card = db.query(models.Card).filter_by(id=card_id, user_id=user.id).first()
     if not card:
         raise HTTPException(status_code=404, detail="Card not found")
     db.delete(card)

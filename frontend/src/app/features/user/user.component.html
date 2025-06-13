@@ -2,6 +2,7 @@
   <app-user-form
     [value]="userInfo$ | async"
     [disabled]="isLoading$ | async"
+    (OnChange)="onValueChange($event)"
     (OnSubmit)="onSubmit($event)">
     <section class="user-component-buttons">
       <button
@@ -16,7 +17,7 @@
       <button
         mat-flat-button
         type="submit"
-        [disabled]="isLoading$ | async">
+        [disabled]="(isLoading$ | async) || !(hasChanges$ | async)">
         {{ 'GENERAL.SAVE' | translate }}
         <mat-icon>save</mat-icon>
         @if (isLoading$ | async) {

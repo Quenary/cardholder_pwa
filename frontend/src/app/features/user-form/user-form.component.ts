@@ -1,10 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   EventEmitter,
+  inject,
   Input,
+  OnInit,
   Output,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ValidatorFn,
   AbstractControl,
@@ -40,7 +44,9 @@ import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
   styleUrl: './user-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UserFormComponent {
+export class UserFormComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   @Input()
   set value(value: Partial<IUserCreate & IUserUpdate>) {
     this.form.patchValue(value);
@@ -55,6 +61,8 @@ export class UserFormComponent {
   }
   @Output()
   readonly OnSubmit = new EventEmitter<IUserCreate & IUserUpdate>();
+  @Output()
+  readonly OnChange = new EventEmitter<IUserCreate & IUserUpdate>();
 
   public hidePassword: boolean = true;
   public hideConfirmPassword: boolean = true;
@@ -96,6 +104,14 @@ export class UserFormComponent {
       Validators.email,
     ]),
   });
+
+  ngOnInit(): void {
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.OnChange.emit(this.form.getRawValue());
+      });
+  }
 
   public onSubmit(): void {
     if (this.form.invalid) {

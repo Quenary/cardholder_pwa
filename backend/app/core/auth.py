@@ -82,6 +82,7 @@ def build_token_response(
 async def get_current_user(
     token: str = Depends(oauth2_scheme), db: Session = Depends(db.get_db)
 ) -> models.User:
+    """Get current user by token. Raise 401 on fail."""
     credentials_exception = HTTPException(status_code=401, detail="Invalid token")
     try:
         payload = jwt.decode(token, Config.JWT_SECRET_KEY, algorithms=[Config.JWT_ALGORITHM])

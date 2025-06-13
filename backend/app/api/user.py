@@ -7,8 +7,14 @@ router = APIRouter(tags=["user"])
 
 @router.post("/user", response_model=schemas.User)
 def user_register(user: schemas.UserCreate, db: Session = Depends(db.get_db)):
+    exception = HTTPException(
+        status_code=400, detail="Username or email is already registered"
+    )
     if db.query(models.User).filter(models.User.username == user.username).first():
-        raise HTTPException(status_code=400, detail="Username already registered")
+        raise exception
+    if db.query(models.User).filter(models.User.email == user.email).first():
+        raise exception
+
     new_user = models.User(
         username=user.username,
         email=user.email,
@@ -31,8 +37,20 @@ def update_user(
     db: Session = Depends(db.get_db),
     current_user: models.User = Depends(auth.get_current_user),
 ):
-    if not current_user:
-        raise HTTPException(status_code=404, detail="User not found")
+    exception = HTTPException(
+        status_code=400, detail="Username or email is already registered"
+    )
+    if (
+        data.username != current_user.username
+        and db.query(models.User).filter_by(username=data.username).first()
+    ):
+        raise exception
+    if (
+        data.email != current_user.email
+        and db.query(models.User).filter_by(email=data.email).first()
+    ):
+        raise exception
+
     if data.username:
         current_user.username = data.username
     if data.email:
@@ -48,10 +66,9 @@ def delete_user(
     db: Session = Depends(db.get_db),
     current_user: models.User = Depends(auth.get_current_user),
 ):
-    if not current_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    db.query(models.Card).filter_by(owner_id=current_user.id).delete()
+    db.query(models.Card).filter_by(user_id=current_user.id).delete()
     db.query(models.RefreshToken).filter_by(user_id=current_user.id).delete()
+    db.query(models.PasswordRecoveryCode).filter_by(user_id=current_user.id).delete()
     db.delete(current_user)
     db.commit()
     return {"detail": "User and all related data deleted"}

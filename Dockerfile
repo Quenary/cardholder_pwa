@@ -14,28 +14,23 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend .
 COPY .env* ./app
 
-# Stage 3 - combine
+# Stage 3 - container build
 FROM python:3.11-slim
 WORKDIR /
-COPY --from=frontend-builder /app/dist/cardholder_pwa/browser /app/frontend
-COPY --from=backend-builder /app /app/backend
-COPY --from=backend-builder /usr/local/ /usr/local/
 
-# Install nginx
-RUN apt-get update && apt-get install -y nginx && \
+RUN apt-get update && apt-get install -y nginx supervisor && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
-# Copy nginx config
+COPY --from=frontend-builder /app/dist/cardholder_pwa/browser /app/frontend
+COPY --from=backend-builder /app /app/backend
+COPY --from=backend-builder /usr/local/ /usr/local/
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Directory for sqlite and other files
+# Dir for sqlite and other files
 RUN mkdir -p /cardholder_pwa && chmod 777 /cardholder_pwa
 
-# Открываем порты
 EXPOSE 80
 
-# Запускаем сервисы
-CMD service nginx start && \
-    cd /app/backend && \
-    uvicorn app.main:app --host 127.0.0.1 --port 8000
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

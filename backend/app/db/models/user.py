@@ -20,7 +20,7 @@ class User(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
-    cards: Mapped[list["Card"]] = relationship("Card", back_populates="owner")
+    cards: Mapped[list["Card"]] = relationship("Card", back_populates="user")
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
         "RefreshToken", back_populates="user"
     )

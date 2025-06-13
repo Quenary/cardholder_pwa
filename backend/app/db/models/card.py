@@ -3,7 +3,7 @@ from sqlalchemy import Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from sqlalchemy.sql import func
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from .user import User
@@ -15,12 +15,12 @@ class Card(Base):
     code: Mapped[str] = mapped_column(String, nullable=False)
     code_type: Mapped[str] = mapped_column(String, nullable=False)
     name: Mapped[str] = mapped_column(String, nullable=False)
-    description: Mapped[Text] = mapped_column(Text)
-    owner_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    description: Mapped[Optional[Text]] = mapped_column(Text, nullable=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
-    owner: Mapped["User"] = relationship("User", back_populates="cards")
+    user: Mapped["User"] = relationship("User", back_populates="cards")

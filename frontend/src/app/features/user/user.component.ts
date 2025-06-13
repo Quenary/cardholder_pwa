@@ -7,6 +7,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { IUserUpdate } from 'src/app/entities/user/user-interface';
 import { UserFormComponent } from '../user-form/user-form.component';
 import {
+  selectUserHasChanges,
   selectUserInfo,
   selectUserIsLoading,
 } from 'src/app/entities/user/state/user.selectors';
@@ -29,10 +30,15 @@ import { AsyncPipe } from '@angular/common';
 export class UserComponent implements OnInit {
   private readonly store = inject(Store);
   public readonly isLoading$ = this.store.select(selectUserIsLoading);
+  public readonly hasChanges$ = this.store.select(selectUserHasChanges);
   public readonly userInfo$ = this.store.select(selectUserInfo);
 
   ngOnInit(): void {
     this.store.dispatch(UserActions.read());
+  }
+
+  onValueChange(form: IUserUpdate) {
+    this.store.dispatch(UserActions.setForm({ form }));
   }
 
   onSubmit($event: IUserUpdate): void {
