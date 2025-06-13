@@ -1,3 +1,4 @@
+import { AsyncPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
 import {
@@ -10,12 +11,17 @@ import {
 } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import { MatInput, MatFormField, MatLabel, MatSuffix } from '@angular/material/input';
+import {
+  MatInput,
+  MatFormField,
+  MatLabel,
+  MatSuffix,
+} from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { finalize, first } from 'rxjs';
+import { BehaviorSubject, finalize, first } from 'rxjs';
 import { ERegexp } from 'src/app/app.consts';
 import { PasswordRecoveryApiService } from 'src/app/entities/password-recovery/password-recovery-api.service';
 import { IPasswordRecoverySubmit } from 'src/app/entities/password-recovery/password-recovery-interface';
@@ -34,6 +40,7 @@ import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
     TranslateModule,
     MatProgressSpinner,
     MatSuffix,
+    AsyncPipe,
   ],
   templateUrl: './password-recovery-submit.component.html',
   styleUrl: './password-recovery-submit.component.scss',
@@ -47,7 +54,7 @@ export class PasswordRecoverySubmitComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
 
-  public isLoading: boolean = false;
+  public readonly isLoading$ = new BehaviorSubject<boolean>(false);
   public hidePassword: boolean = true;
   public hideConfirmPassword: boolean = true;
   private readonly confirmPasswordMatchValidator: ValidatorFn = (
@@ -66,16 +73,14 @@ export class PasswordRecoverySubmitComponent implements OnInit {
     return null;
   };
   public readonly form = new FormGroup<
-    TInterfaceToForm<IPasswordRecoverySubmit> & {
-      confirmPassword: FormControl<string>;
-    }
+    TInterfaceToForm<IPasswordRecoverySubmit>
   >({
     code: new FormControl<string>(null, [Validators.required]),
     password: new FormControl<string>(null, [
       Validators.required,
       Validators.pattern(ERegexp.password),
     ]),
-    confirmPassword: new FormControl<string>(null, [
+    confirm_password: new FormControl<string>(null, [
       Validators.required,
       Validators.pattern(ERegexp.password),
       this.confirmPasswordMatchValidator.bind(this),
@@ -97,13 +102,12 @@ export class PasswordRecoverySubmitComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
-    const { confirmPassword, ...body } = this.form.getRawValue();
+    this.isLoading$.next(true);
     this.passwordRecoveryApiService
-      .submit(body)
+      .submit(this.form.getRawValue())
       .pipe(
         finalize(() => {
-          this.isLoading = false;
+          this.isLoading$.next(false);
         })
       )
       .subscribe({

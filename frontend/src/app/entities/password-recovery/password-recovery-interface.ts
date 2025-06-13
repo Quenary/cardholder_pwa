@@ -4,4 +4,5 @@ export interface IPasswordRecoveryCode {
 export interface IPasswordRecoverySubmit {
   code: string;
   password: string;
+  confirm_password: string;
 }
