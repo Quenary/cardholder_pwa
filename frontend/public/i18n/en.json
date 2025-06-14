@@ -66,7 +66,7 @@
         "CONFIRM_PASSWORD": "Confirm password",
         "PASSWORD_HINTS": [
             "At least 8 characters",
-            "Latin upper and lower case letters",
+            "Upper and lower case letters",
             "Numbers"
         ],
         "DELETE_WARN": "Do you want to permanently delete the user and all associated data?"
