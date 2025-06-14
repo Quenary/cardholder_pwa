@@ -61,6 +61,7 @@
     "USER": {
         "USERNAME": "Имя пользователя",
         "EMAIL": "E-mail",
+        "CHANGE_PASSWORD": "Изменить пароль",
         "PASSWORD": "Пароль",
         "CONFIRM_PASSWORD": "Повторить пароль",
         "PASSWORD_HINTS": [

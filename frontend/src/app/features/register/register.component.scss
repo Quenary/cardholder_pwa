@@ -10,12 +10,17 @@
       width: 100%;
       text-align: center;
     }
-    &-buttons {
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      width: auto;
-      gap: 8px;
+    &-form {
+      &-password-hints {
+        @include form-password-hints;
+      }
+      &-buttons {
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        width: auto;
+        gap: 8px;
+      }
     }
   }
 }

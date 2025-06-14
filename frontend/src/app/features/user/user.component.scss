@@ -1,7 +1,18 @@
+@import 'mixins';
+
 .user-component {
-    &-buttons {
-        width: 100%;
-        display: inline-flex;
-        justify-content: flex-end;
+  &-form {
+    &-checkbox {
+      display: inline-flex;
+      width: 100%;
     }
+    &-password-hints {
+      @include form-password-hints;
+    }
+    &-buttons {
+      width: 100%;
+      display: inline-flex;
+      justify-content: flex-end;
+    }
+  }
 }

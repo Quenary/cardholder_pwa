@@ -1,11 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
-import { IUserUpdate } from 'src/app/entities/user/user-interface';
-import { UserFormComponent } from '../user-form/user-form.component';
+import { IUserCreate, IUserUpdate } from 'src/app/entities/user/user-interface';
 import {
   selectUserHasChanges,
   selectUserInfo,
@@ -13,6 +12,24 @@ import {
 } from 'src/app/entities/user/state/user.selectors';
 import { UserActions } from 'src/app/entities/user/state/user.actions';
 import { AsyncPipe } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+  ReactiveFormsModule,
+  FormGroup,
+  FormControl,
+  Validators,
+} from '@angular/forms';
+import {
+  MatInput,
+  MatFormField,
+  MatLabel,
+  MatSuffix,
+} from '@angular/material/input';
+import { ERegexp } from 'src/app/app.consts';
+import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
+import { passwordMatchValidator } from 'src/app/shared/validators/passwords-match.validator';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatCheckbox, MatCheckboxChange } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-user',
@@ -21,28 +38,91 @@ import { AsyncPipe } from '@angular/common';
     MatButton,
     TranslateModule,
     MatProgressSpinner,
-    UserFormComponent,
     AsyncPipe,
+    MatInput,
+    MatIcon,
+    MatFormField,
+    MatLabel,
+    ReactiveFormsModule,
+    TranslateModule,
+    MatSuffix,
+    MatCheckbox,
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss',
 })
 export class UserComponent implements OnInit {
   private readonly store = inject(Store);
+  private readonly destroyRef = inject(DestroyRef);
+
+  private get value(): IUserUpdate {
+    return this.form.value as IUserUpdate;
+  }
+
   public readonly isLoading$ = this.store.select(selectUserIsLoading);
   public readonly hasChanges$ = this.store.select(selectUserHasChanges);
-  public readonly userInfo$ = this.store.select(selectUserInfo);
+  public hidePassword: boolean = true;
+  public hideConfirmPassword: boolean = true;
+  public readonly form = new FormGroup<
+    TInterfaceToForm<IUserCreate & IUserUpdate>
+  >(
+    {
+      username: new FormControl<string>(null, [
+        Validators.required,
+        Validators.pattern(ERegexp.login),
+      ]),
+      password: new FormControl<string>({ value: null, disabled: true }, [
+        Validators.pattern(ERegexp.password),
+      ]),
+      confirm_password: new FormControl<string>(
+        { value: null, disabled: true },
+        [Validators.pattern(ERegexp.password)]
+      ),
+      email: new FormControl<string>(null, [
+        Validators.required,
+        Validators.email,
+      ]),
+    },
+    passwordMatchValidator()
+  );
+
+  onChangePasswordCheck($event: MatCheckboxChange) {
+    this.form.patchValue({
+      password: null,
+      confirm_password: null,
+    });
+    const password = this.form.controls.password;
+    const confirm_password = this.form.controls.confirm_password;
+    if ($event.checked) {
+      password.enable();
+      confirm_password.enable();
+    } else {
+      password.disable();
+      confirm_password.disable();
+    }
+  }
 
   ngOnInit(): void {
     this.store.dispatch(UserActions.read());
+    this.store
+      .select(selectUserInfo)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((info) => {
+        this.form.patchValue(info);
+      });
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.store.dispatch(UserActions.setForm({ form: this.value }));
+      });
   }
 
-  onValueChange(form: IUserUpdate) {
-    this.store.dispatch(UserActions.setForm({ form }));
-  }
+  onSubmit(): void {
+    if (this.form.invalid) {
+      return;
+    }
 
-  onSubmit($event: IUserUpdate): void {
-    this.store.dispatch(UserActions.update({ body: $event }));
+    this.store.dispatch(UserActions.update({ body: this.value }));
   }
 
   onDelete(): void {

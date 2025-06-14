@@ -40,20 +40,13 @@ def update_user(
     exception = HTTPException(
         status_code=400, detail="Username or email is already registered"
     )
-    if (
-        data.username != current_user.username
-        and db.query(models.User).filter_by(username=data.username).first()
-    ):
-        raise exception
-    if (
-        data.email != current_user.email
-        and db.query(models.User).filter_by(email=data.email).first()
-    ):
-        raise exception
-
-    if data.username:
+    if data.username != current_user.username:
+        if db.query(models.User).filter_by(username=data.username).first():
+            raise exception
         current_user.username = data.username
-    if data.email:
+    if data.email != current_user.email:
+        if db.query(models.User).filter_by(email=data.email).first():
+            raise exception
         current_user.email = data.email
     if data.password:
         current_user.hashed_password = auth.get_password_hash(data.password)

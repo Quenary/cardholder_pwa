@@ -50,7 +50,8 @@ export const userReducer = createReducer(
     const hasChanges =
       form.username !== info.username ||
       form.email !== info.email ||
-      !!form.password;
+      !!form.password ||
+      !!form.confirm_password;
     return {
       ...state,
       form,

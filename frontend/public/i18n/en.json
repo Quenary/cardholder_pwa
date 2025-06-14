@@ -61,6 +61,7 @@
     "USER": {
         "USERNAME": "Username",
         "EMAIL": "E-mail",
+        "CHANGE_PASSWORD": "Change password",
         "PASSWORD": "Password",
         "CONFIRM_PASSWORD": "Confirm password",
         "PASSWORD_HINTS": [

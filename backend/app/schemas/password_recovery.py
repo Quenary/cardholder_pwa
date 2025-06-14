@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, field_validator, model_validator
-import re
 from typing import Self
+from .validators import password_validator
 
 
 class PasswordRecoveryCodeBody(BaseModel):
@@ -19,13 +19,7 @@ class PasswordRecoverySubmitBody(BaseModel):
     @field_validator("password", "confirm_password")
     @classmethod
     def validate_password(cls, v: str) -> str:
-        if not re.search(r"[A-Z]", v):
-            raise ValueError("The password must contain at least one uppercase letter.")
-        if not re.search(r"[a-z]", v):
-            raise ValueError("The password must contain at least one lowercase letter.")
-        if not re.search(r"\d", v):
-            raise ValueError("The password must contain at least one number.")
-        return v
+        return password_validator(v)
 
     @model_validator(mode="after")
     def check_passwords_match(self) -> Self:

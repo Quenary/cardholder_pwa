@@ -7,5 +7,11 @@ export interface IUserCreate {
   username: string;
   email: string;
   password: string;
+  confirm_password: string;
 }
-export interface IUserUpdate extends IUserCreate {}
+export interface IUserUpdate {
+  username: string;
+  email: string;
+  password?: string;
+  confirm_password?: string;
+}
