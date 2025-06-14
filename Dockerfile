@@ -1,6 +1,3 @@
-ARG VERSION
-ENV VERSION=$VERSION
-
 # Stage 1 - frontend build
 FROM node:20 AS frontend-builder
 WORKDIR /app
@@ -20,6 +17,9 @@ COPY .env* ./app
 # Stage 3 - container build
 FROM python:3.11-slim
 WORKDIR /
+
+ARG VERSION
+ENV VERSION=$VERSION
 
 RUN apt-get update && apt-get install -y nginx supervisor && \
     rm -rf /var/lib/apt/lists/* && \
