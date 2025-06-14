@@ -1,12 +1,9 @@
 import { AsyncPipe } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
 import {
-  AbstractControl,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
-  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
@@ -26,6 +23,7 @@ import { ERegexp } from 'src/app/app.consts';
 import { PasswordRecoveryApiService } from 'src/app/entities/password-recovery/password-recovery-api.service';
 import { IPasswordRecoverySubmit } from 'src/app/entities/password-recovery/password-recovery-interface';
 import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
+import { passwordMatchValidator } from 'src/app/shared/validators/passwords-match.validator';
 
 @Component({
   selector: 'app-password-recovery-submit',
@@ -57,35 +55,22 @@ export class PasswordRecoverySubmitComponent implements OnInit {
   public readonly isLoading$ = new BehaviorSubject<boolean>(false);
   public hidePassword: boolean = true;
   public hideConfirmPassword: boolean = true;
-  private readonly confirmPasswordMatchValidator: ValidatorFn = (
-    control: AbstractControl<string>
-  ) => {
-    if (!this.form) {
-      return null;
-    }
-    const passwordControl = this.form.get('password');
-
-    if (passwordControl) {
-      return passwordControl.value !== control.value
-        ? { confirmPasswordMatchValidator: true }
-        : null;
-    }
-    return null;
-  };
   public readonly form = new FormGroup<
     TInterfaceToForm<IPasswordRecoverySubmit>
-  >({
-    code: new FormControl<string>(null, [Validators.required]),
-    password: new FormControl<string>(null, [
-      Validators.required,
-      Validators.pattern(ERegexp.password),
-    ]),
-    confirm_password: new FormControl<string>(null, [
-      Validators.required,
-      Validators.pattern(ERegexp.password),
-      this.confirmPasswordMatchValidator.bind(this),
-    ]),
-  });
+  >(
+    {
+      code: new FormControl<string>(null, [Validators.required]),
+      password: new FormControl<string>(null, [
+        Validators.required,
+        Validators.pattern(ERegexp.password),
+      ]),
+      confirm_password: new FormControl<string>(null, [
+        Validators.required,
+        Validators.pattern(ERegexp.password),
+      ]),
+    },
+    [passwordMatchValidator()]
+  );
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.pipe(first()).subscribe((params) => {
@@ -113,15 +98,6 @@ export class PasswordRecoverySubmitComponent implements OnInit {
       .subscribe({
         next: () => {
           this.router.navigate(['/auth']);
-        },
-        error: (error: HttpErrorResponse) => {
-          this.matSnackBar.open(
-            `${this.translateServie.instant('GENERAL.REQUEST_ERROR')}: ${
-              error.message
-            }`,
-            this.translateServie.instant('GENERAL.CLOSE'),
-            { duration: 10000 }
-          );
         },
       });
   }

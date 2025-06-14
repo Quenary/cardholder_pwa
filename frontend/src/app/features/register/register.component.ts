@@ -8,7 +8,6 @@ import { IUserCreate, IUserUpdate } from 'src/app/entities/user/user-interface';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { BehaviorSubject, finalize } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { HttpErrorResponse } from '@angular/common/http';
 import {
   FormGroup,
   FormControl,
@@ -101,15 +100,6 @@ export class RegisterComponent {
             { duration: 5000 }
           );
           this.router.navigate(['/auth']);
-        },
-        error: (error: HttpErrorResponse) => {
-          this.matSnackBar.open(
-            `${this.translateService.instant('GENERAL.REQUEST_ERROR')} ${
-              error.message
-            }`,
-            this.translateService.instant('GENERAL.CLOSE'),
-            { duration: 10000 }
-          );
         },
       });
   }

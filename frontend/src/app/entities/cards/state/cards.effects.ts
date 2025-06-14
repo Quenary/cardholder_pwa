@@ -11,8 +11,6 @@ import {
   withLatestFrom,
 } from 'rxjs';
 import { CardApiService } from '../cards-api.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectCardsActive, selectCardsActiveInfo } from './cards.selectors';
@@ -27,8 +25,6 @@ export class CardsEffects {
   private readonly actions$ = inject(Actions);
   private readonly store = inject(Store);
   private readonly cardsApiService = inject(CardApiService);
-  private readonly matSnackBar = inject(MatSnackBar);
-  private readonly translateService = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly matDialog = inject(MatDialog);
 
@@ -144,29 +140,6 @@ export class CardsEffects {
         ofType(CardsActions.deleteSuccess),
         tap((action) => {
           this.router.navigate(['/cards'], { replaceUrl: true });
-        })
-      ),
-    { dispatch: false }
-  );
-
-  showErrors$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(
-          CardsActions.listError,
-          CardsActions.createError,
-          CardsActions.readError,
-          CardsActions.updateError,
-          CardsActions.deleteError
-        ),
-        tap((action) => {
-          this.matSnackBar.open(
-            `${this.translateService.instant('GENERAL.REQUEST_ERROR')}: ${
-              action.error.message
-            }`,
-            this.translateService.instant('GENERAL.CLOSE'),
-            { duration: 10000 }
-          );
         })
       ),
     { dispatch: false }

@@ -28,7 +28,6 @@ import {
 import { ERegexp } from 'src/app/app.consts';
 import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
 import { passwordMatchValidator } from 'src/app/shared/validators/passwords-match.validator';
-import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatCheckbox, MatCheckboxChange } from '@angular/material/checkbox';
 
 @Component({

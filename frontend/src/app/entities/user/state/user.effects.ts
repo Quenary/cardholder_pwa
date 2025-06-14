@@ -9,8 +9,6 @@ import {
   ConfirmDialogComponent,
   IConfirmDialogData,
 } from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateService } from '@ngx-translate/core';
 import { AuthActions } from '../../auth/state/auth.actions';
 
 @Injectable()
@@ -19,8 +17,6 @@ export class UserEffects {
   private readonly userApiService = inject(UserApiService);
   private readonly store = inject(Store);
   private readonly matDialog = inject(MatDialog);
-  private readonly matSnackBar = inject(MatSnackBar);
-  private readonly translateService = inject(TranslateService);
 
   read$ = createEffect(() =>
     this.actions$.pipe(
@@ -83,27 +79,6 @@ export class UserEffects {
         ofType(UserActions.deleteSuccess),
         tap(() => {
           this.store.dispatch(AuthActions.logoutSilent());
-        })
-      ),
-    { dispatch: false }
-  );
-
-  showErrors$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(
-          UserActions.readError,
-          UserActions.updateError,
-          UserActions.deleteError
-        ),
-        tap((action) => {
-          this.matSnackBar.open(
-            `${this.translateService.instant('GENERAL.REQUEST_ERROR')}: ${
-              action.error.message
-            }`,
-            this.translateService.instant('GENERAL.CLOSE'),
-            { duration: 10000 }
-          );
         })
       ),
     { dispatch: false }

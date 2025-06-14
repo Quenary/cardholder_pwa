@@ -11,6 +11,7 @@ import { userReducer } from './entities/user/state/user.reducers';
 import { UserEffects } from './entities/user/state/user.effects';
 import { isOnlineGuard } from './core/guards/is-online.guard';
 import { TranslateService } from '@ngx-translate/core';
+import { selectUserHasChanges } from './entities/user/state/user.selectors';
 
 const titleTranslate = (titleKey: string) => () => {
   const translateService = inject(TranslateService);
@@ -67,6 +68,14 @@ export const routes: Routes = [
   {
     path: 'user',
     canActivate: [authGuard, isOnlineGuard],
+    canDeactivate: [
+      () => {
+        const store = inject(Store);
+        return canDeactivateWithDialogGuard([
+          store.select(selectUserHasChanges),
+        ]);
+      },
+    ],
     title: titleTranslate('NAV.USER'),
     loadComponent: () =>
       import('./features/user/user.component').then((c) => c.UserComponent),

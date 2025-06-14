@@ -1,5 +1,4 @@
 import { AsyncPipe } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   FormControl,
@@ -76,15 +75,6 @@ export class PasswordRecoveryRequestComponent {
             { duration: 10000 }
           );
           this.router.navigate(['/auth']);
-        },
-        error: (error: HttpErrorResponse) => {
-          this.matSnackBar.open(
-            `${this.translateServie.instant('GENERAL.REQUEST_ERROR')}: ${
-              error.message
-            }`,
-            this.translateServie.instant('GENERAL.CLOSE'),
-            { duration: 10000 }
-          );
         },
       });
   }
