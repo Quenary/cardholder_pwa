@@ -83,7 +83,7 @@ export const routes: Routes = [
   },
   {
     path: 'password-recovery',
-    title: titleTranslate('PASSWORD_RECOVERY.TITLE'),
+    title: titleTranslate('NAV.PASSWORD_RECOVERY'),
     children: [
       {
         path: 'request',
@@ -100,5 +100,11 @@ export const routes: Routes = [
           ).then((c) => c.PasswordRecoverySubmitComponent),
       },
     ],
+  },
+  {
+    path: 'about',
+    title: titleTranslate('NAV.ABOUT'),
+    loadComponent: () =>
+      import('./features/about/about.component').then((c) => c.AboutComponent),
   },
 ];

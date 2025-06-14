@@ -65,13 +65,18 @@ export class AppComponent {
       map((translates) => [
         {
           name: translates.CARD,
-          icon: 'credit_card',
+          icon: 'credit_card_outlined',
           link: '/cards',
         },
         {
           name: translates.USER,
-          icon: 'person',
+          icon: 'person_outlined',
           link: '/user',
+        },
+        {
+          name: translates.ABOUT,
+          icon: 'info_outlined',
+          link: '/about',
         },
         {
           name: translates.EXIT,

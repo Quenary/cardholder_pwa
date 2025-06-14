@@ -27,6 +27,7 @@
         formControlName="username" />
     </mat-form-field>
     <mat-checkbox
+      #changePasswordCheckbox
       class="user-component-form-checkbox"
       id="change-password-checkbox"
       name="change-password-checkbox"
@@ -67,11 +68,13 @@
         {{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}
       </mat-icon>
     </mat-form-field>
+    @if (changePasswordCheckbox.checked) {
     <ul class="user-component-form-password-hints">
       @for (item of 'USER.PASSWORD_HINTS' | translate; track item) {
       <li>{{ item }}</li>
       }
     </ul>
+    }
     <section class="user-component-form-buttons">
       <button
         class="warn-color"

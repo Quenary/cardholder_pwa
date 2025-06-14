@@ -21,8 +21,10 @@
     "NAV": {
         "AUTH": "Authorization",
         "REGISTER": "Registration",
+        "PASSWORD_RECOVERY": "Password recovery",
         "CARD": "Cards",
         "USER": "User",
+        "ABOUT": "About",
         "EXIT": "Exit"
     },
     "AUTH": {
@@ -70,5 +72,11 @@
             "Numbers"
         ],
         "DELETE_WARN": "Do you want to permanently delete the user and all associated data?"
+    },
+    "ABOUT": {
+        "HOMEPAGE": "Home page",
+        "IMAGE_VERSION": "Docker image version",
+        "BACKEND_VERSION": "API version",
+        "FRONTEND_VERSION": "Web App version"
     }
 }

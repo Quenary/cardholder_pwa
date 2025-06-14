@@ -1,3 +1,6 @@
+ARG VERSION
+ENV VERSION=$VERSION
+
 # Stage 1 - frontend build
 FROM node:20 AS frontend-builder
 WORKDIR /app
