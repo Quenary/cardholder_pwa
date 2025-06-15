@@ -9,6 +9,7 @@ RUN npm run build
 # Stage 2 - backend build
 FROM python:3.11 AS backend-builder
 WORKDIR /app
+RUN pip install --upgrade pip setuptools
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend .
