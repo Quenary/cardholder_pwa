@@ -19,15 +19,29 @@ import {
   map,
   Observable,
   retry,
+  shareReplay,
+  startWith,
+  Subject,
   Subscription,
+  switchMap,
+  tap,
   throwError,
 } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { AsyncPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatChipListbox, MatChipOption } from '@angular/material/chips';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatIcon } from '@angular/material/icon';
+import {
+  MatListItem,
+  MatListItemTitle,
+  MatActionList,
+} from '@angular/material/list';
+import {
+  MatBottomSheet,
+  MAT_BOTTOM_SHEET_DATA,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 
 export interface ICardScannerResult {
   text: string;
@@ -35,15 +49,39 @@ export interface ICardScannerResult {
 }
 
 @Component({
+  selector: 'app-card-scanner-device-sheet',
+  imports: [MatListItem, MatListItemTitle, MatActionList, TranslateModule],
+  template: `
+    <mat-action-list>
+      @for (device of devices; track device) {
+      <mat-list-item (click)="onSelectDevice(device)">
+        <span matListItemTitle>
+          {{ device.label }}
+        </span>
+      </mat-list-item>
+      }
+    </mat-action-list>
+  `,
+})
+export class CardScannerDeviceSheetComponent {
+  private readonly matBottomSheetRef = inject(MatBottomSheetRef);
+  private readonly data = inject(MAT_BOTTOM_SHEET_DATA);
+  public readonly devices: MediaDeviceInfo[] = this.data.devices ?? [];
+
+  onSelectDevice(device: MediaDeviceInfo): void {
+    this.matBottomSheetRef.dismiss({ device });
+  }
+}
+
+@Component({
   selector: 'app-card-scanner',
   imports: [
     MatButton,
     TranslateModule,
-    AsyncPipe,
     ReactiveFormsModule,
     MatButton,
-    MatChipListbox,
-    MatChipOption,
+    MatIcon,
+    MatButton,
   ],
   templateUrl: './card-scanner.component.html',
   styleUrl: './card-scanner.component.scss',
@@ -55,10 +93,15 @@ export class CardScannerComponent implements OnInit, OnDestroy {
   private readonly matSnackBar = inject(MatSnackBar);
   private readonly translateService = inject(TranslateService);
   private readonly ngZone = inject(NgZone);
+  private readonly matBottomSheet = inject(MatBottomSheet);
 
-  public readonly devices$: Observable<MediaDeviceInfo[]> = from(
-    BrowserMultiFormatReader.listVideoInputDevices()
-  );
+  private readonly onScanStarts$ = new Subject<void>();
+  public readonly devices$: Observable<MediaDeviceInfo[]> =
+    this.onScanStarts$.pipe(
+      startWith(null),
+      switchMap(() => from(BrowserMultiFormatReader.listVideoInputDevices())),
+      shareReplay(1)
+    );
   public readonly deviceControl = new FormControl<MediaDeviceInfo>(null);
   @ViewChild('video', { static: true, read: ElementRef<HTMLVideoElement> })
   private readonly videoElementRef: ElementRef<HTMLVideoElement>;
@@ -95,6 +138,11 @@ export class CardScannerComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Wrap scan to observable and start it
+   * @param deviceId
+   * @returns
+   */
   private startScanning(deviceId: string): Observable<Result> {
     return this.ngZone.runOutsideAngular(
       () =>
@@ -121,40 +169,112 @@ export class CardScannerComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Start scan on video source selection
+   * @param $event
+   */
   public onSelectSource($event: MediaDeviceInfo) {
     this.scanSubscription?.unsubscribe();
     if (!!$event) {
+      let first = true;
       this.scanSubscription = this.startScanning($event.deviceId)
         .pipe(
+          tap(() => {
+            if (first) {
+              this.onScanStarts$.next();
+              first = false;
+            }
+          }),
           catchError((error) => {
-            this.matSnackBar.open(
-              error,
-              this.translateService.instant('GENERAL.CLOSE'),
-              { duration: 10000 }
-            );
+            this.onError(error);
             return throwError(() => error);
           }),
-          retry(2)
+          retry({ count: 2, delay: 1000 })
         )
         .subscribe({
           next: (res) => {
-            if (res) {
-              const text = res.getText();
-              const intFormat = res.getBarcodeFormat();
-              const format = Object.entries(BarcodeFormat).find(
-                ([key, value]) => value === intFormat
-              )[0];
-              this.close({
-                text,
-                format,
-              });
-            }
+            this.onResult(res);
           },
         });
     }
   }
 
+  /**
+   * Callback to scanner error
+   * @param error
+   */
+  private onError(error: any) {
+    this.matSnackBar.open(
+      error,
+      this.translateService.instant('GENERAL.CLOSE'),
+      { duration: 10000 }
+    );
+  }
+
+  /**
+   * Callback to scanner result
+   * @param res
+   * @returns
+   */
+  private onResult(res: Result): void {
+    if (!res) {
+      return;
+    }
+    const text = res.getText();
+    const intFormat = res.getBarcodeFormat();
+    const format = Object.entries(BarcodeFormat).find(
+      ([key, value]) => value === intFormat
+    )[0];
+    this.close({
+      text,
+      format,
+    });
+  }
+
+  /**
+   * Callback to file selection
+   * @param $event
+   * @returns
+   */
+  public decodeFromFile($event: Event & { target: HTMLInputElement }) {
+    const file = $event.target.files[0];
+    if (!file) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const image = new Image();
+      image.src = e.target.result as string;
+      this.reader
+        .decodeFromImageElement(image)
+        .then((res) => {
+          this.onResult(res);
+        })
+        .catch((error) => {
+          this.onError(error);
+        });
+    };
+    reader.readAsDataURL(file);
+  }
+
   public close($event?: ICardScannerResult) {
     this.matDialogRef.close($event);
+  }
+
+  public onClickSelectDevice(): void {
+    this.devices$.pipe(first()).subscribe((devices) => {
+      this.matBottomSheet
+        .open(CardScannerDeviceSheetComponent, {
+          data: {
+            devices,
+          },
+        })
+        .afterDismissed()
+        .subscribe((data) => {
+          if (data?.device) {
+            this.deviceControl.setValue(data.device);
+          }
+        });
+    });
   }
 }

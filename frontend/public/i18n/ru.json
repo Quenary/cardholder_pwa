@@ -58,7 +58,11 @@
             "CODE_TYPE": "Тип кода",
             "NAME": "Наименование",
             "DESCRIPTION": "Описание",
-            "COLOR": "Цвет"
+            "COLOR": "Цвет",
+            "SCAN": {
+                "SELECT_SOURCE": "Выбрать источник",
+                "FROM_FILE": "Добавить из файла"
+            }
         }
     },
     "USER": {

@@ -1,13 +1,4 @@
 <div class="card-scanner">
-  <section class="card-scanner-header">
-    <mat-chip-listbox
-      [formControl]="deviceControl"
-      aria-label="Camera device selection">
-      @for (device of devices$ | async; track device) {
-      <mat-chip-option [value]="device">{{ device.label }}</mat-chip-option>
-      }
-    </mat-chip-listbox>
-  </section>
   <video
     class="card-scanner-video"
     #video>
@@ -15,8 +6,33 @@
   <section class="card-scanner-footer">
     <button
       mat-button
-      (click)="close()"
-      >{{ 'GENERAL.CLOSE' | translate }}</button
-    >
+      (click)="onClickSelectDevice()">
+      <mat-icon>videocam_outlined</mat-icon>
+      @if (deviceControl.value) {
+      {{ deviceControl.value.label }}
+      } @else {
+      {{ 'CARDS.CARD.SCAN.SELECT_SOURCE' | translate }}
+      }
+    </button>
+    <button
+      mat-button
+      class="accent-color"
+      (click)="fileInput.click()">
+      <mat-icon>image</mat-icon>
+      {{ 'CARDS.CARD.SCAN.FROM_FILE' | translate }}
+      <input
+        #fileInput
+        hidden
+        type="file"
+        id="card-scanner-from-file"
+        accept="image/*"
+        multiple="false"
+        (change)="decodeFromFile($any($event))" />
+    </button>
+    <button
+      mat-button
+      (click)="close()">
+      {{ 'GENERAL.CLOSE' | translate }}
+    </button>
   </section>
 </div>
