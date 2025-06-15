@@ -32,6 +32,8 @@ COPY --from=backend-builder /usr/local/ /usr/local/
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+RUN pip install --upgrade pip setuptools
+
 # Dir for sqlite and other files
 RUN mkdir -p /cardholder_pwa && chmod 777 /cardholder_pwa
 
