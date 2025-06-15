@@ -11,10 +11,7 @@ You may also need following packages `pip3 install python-is-python3 python3-dev
 - create venv `python -m venv venv`
 - activate with `source venv/bin/activate` or `venv/scripts/activate`
 - install deps `pip install -r requirements.txt`
-- migrate db with `alembic upgrade head`
-- run
-  - windows `fastapi dev app/main.py`
-  - linux `fastapi dev app/main.py`
+- run app with ```python start.py```
 
 ### Migrations
 
