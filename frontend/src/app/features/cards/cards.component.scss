@@ -9,6 +9,7 @@
 }
 .card-tile {
   background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
   border-radius: 12px;
   cursor: pointer;
 
@@ -19,13 +20,12 @@
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    padding: 16px;
-    gap: 16px;
 
     &-header {
       display: inline-flex;
       width: 100%;
       font-size: 20px;
+      padding: 16px 16px 8px 16px;
 
       &-text {
         text-overflow: ellipsis;
@@ -41,6 +41,8 @@
     }
 
     &-preview {
+      padding: 8px 16px 16px 16px;
+      width: 100%;
       flex: 1;
       align-self: center;
     }

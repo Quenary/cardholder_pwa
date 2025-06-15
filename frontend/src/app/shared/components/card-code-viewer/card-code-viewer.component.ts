@@ -54,9 +54,14 @@ export class CardCodeViewerComponent
   protected readonly matDialog = inject(MatDialog);
   @Input() card: Partial<ICardBase> = null;
   @Input() scale: number = 3;
-  @Input() color: string = getComputedStyle(
-    document.documentElement
-  ).getPropertyValue('--mat-sys-on-background');
+  @Input('color') set _color(value: string) {
+    if (value) {
+      this.color = value;
+    }
+  }
+  color: string = getComputedStyle(document.documentElement).getPropertyValue(
+    '--mat-sys-on-background'
+  );
   /**
    * Barcode canvas element ref
    */
@@ -101,7 +106,6 @@ export class CardCodeViewerComponent
       data: <ICardCodeViewerData>{
         card: this.card,
         scale: this.scale * 2,
-        color: this.color,
       },
     });
   }

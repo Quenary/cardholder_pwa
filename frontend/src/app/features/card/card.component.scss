@@ -22,6 +22,11 @@
       width: 100%;
     }
   }
+  &-field {
+    input[type="color"]{
+      height: 40px;
+    }
+  }
 
   &-buttons {
     width: 100%;

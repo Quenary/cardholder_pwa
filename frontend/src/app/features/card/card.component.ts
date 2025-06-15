@@ -12,9 +12,14 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MatButton, MatFabButton } from '@angular/material/button';
+import { MatButton, MatFabButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import { MatInput, MatFormField, MatLabel } from '@angular/material/input';
+import {
+  MatInput,
+  MatFormField,
+  MatLabel,
+  MatSuffix,
+} from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -41,6 +46,7 @@ import {
 } from '@angular/material/autocomplete';
 import { map, Observable, startWith } from 'rxjs';
 import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
+import { ERegexp } from 'src/app/app.consts';
 
 @Component({
   selector: 'app-card',
@@ -50,6 +56,7 @@ import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
     MatFormField,
     MatLabel,
     MatButton,
+    MatIconButton,
     ReactiveFormsModule,
     TranslateModule,
     MatProgressSpinner,
@@ -61,6 +68,7 @@ import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
     MatOption,
     MatAutocompleteTrigger,
     IsValidCardPipe,
+    MatSuffix,
   ],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss',
@@ -80,6 +88,7 @@ export class CardComponent implements OnInit, OnDestroy {
     code_type: new FormControl<string>(null, [Validators.required]),
     name: new FormControl<string>(null, [Validators.required]),
     description: new FormControl<string>(null),
+    color: new FormControl<string>(null, [Validators.pattern(ERegexp.color)]),
   });
   private readonly codeTypeAutocompleteList: string[] =
     Object.values(EBarcodeFormat);

@@ -42,6 +42,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatFabButton } from '@angular/material/button';
 import { CardCodeViewerComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
 import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
+import { GetOnColorPipe } from 'src/app/shared/pipes/get-on-color.pipe';
 
 @Component({
   selector: 'app-cards',
@@ -65,6 +66,7 @@ import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
     CardCodeViewerComponent,
     IsValidCardPipe,
     RouterLink,
+    GetOnColorPipe,
   ],
   templateUrl: './cards.component.html',
   styleUrl: './cards.component.scss',

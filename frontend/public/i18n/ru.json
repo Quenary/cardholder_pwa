@@ -57,7 +57,8 @@
             "CODE": "Код",
             "CODE_TYPE": "Тип кода",
             "NAME": "Наименование",
-            "DESCRIPTION": "Описание"
+            "DESCRIPTION": "Описание",
+            "COLOR": "Цвет"
         }
     },
     "USER": {

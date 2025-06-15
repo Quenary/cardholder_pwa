@@ -59,6 +59,7 @@ export const cardsReducer = createReducer(
       code_type: null,
       name: null,
       description: null,
+      color: null,
     };
     const hasChanges = Object.entries(payload.form).some(
       ([k, v]) => v != info[k as keyof ICardBase]

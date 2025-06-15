@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from app.db import Base, engine
 from app.config import Config
 from app.api import (
     auth_router,
@@ -9,7 +8,6 @@ from app.api import (
     public_router,
 )
 
-Base.metadata.create_all(bind=engine)
 app = FastAPI(root_path=Config.API_PATH)
 app.include_router(auth_router)
 app.include_router(user_router)

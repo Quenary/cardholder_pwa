@@ -67,6 +67,23 @@
     </textarea>
   </mat-form-field>
 
+  <mat-form-field class="card-form-field">
+    <mat-label>{{ 'CARDS.CARD.COLOR' | translate }}</mat-label>
+    <input
+      matInput
+      type="color"
+      id="card-color"
+      formControlName="color" />
+    @if (form.controls.color.value) {
+    <button
+      mat-icon-button
+      matSuffix
+      (click)="form.controls.color.setValue(null)">
+      <mat-icon>clear </mat-icon>
+    </button>
+    }
+  </mat-form-field>
+
   <section class="card-form-buttons">
     @if (canDelete$ | async) {
     <button

@@ -57,7 +57,8 @@
             "CODE": "Code",
             "CODE_TYPE": "Code type",
             "NAME": "Name",
-            "DESCRIPTION": "Description"
+            "DESCRIPTION": "Description",
+            "COLOR": "Color"
         }
     },
     "USER": {

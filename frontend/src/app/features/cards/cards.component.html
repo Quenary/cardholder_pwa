@@ -57,6 +57,8 @@
       @if (card | isValidCard) { @defer {
       <app-card-code-viewer
         class="card-tile-content-preview"
+        [style.background]="card.color"
+        [color]="card.color | getOnColor"
         [card]="card"
         (click)="$event.stopPropagation()">
       </app-card-code-viewer>

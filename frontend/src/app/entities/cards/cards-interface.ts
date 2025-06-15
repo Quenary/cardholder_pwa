@@ -3,6 +3,7 @@ export interface ICardBase {
   code_type: string;
   name: string;
   description: string;
+  color: string;
 }
 export interface ICard extends ICardBase {
   id: number;

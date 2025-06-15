@@ -1,10 +1,10 @@
 {
   "name": "cardholder-pwa",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port=4207 --open",
-    "start:sw":"ng serve --configuration=production --port=4207 --open",
+    "start:sw": "ng serve --configuration=production --port=4207 --open",
     "build": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

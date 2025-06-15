@@ -16,4 +16,8 @@ export const ERegexp = {
    * 1 num
    */
   password: /(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,64}/,
+  /**
+   * Hex color string
+   */
+  color: /^#(?:[0-9a-fA-F]{3}){1,2}$/,
 };
