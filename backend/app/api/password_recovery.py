@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 from app.core.smtp import EmailSender
 from app.config import Config
 
-email_sender = EmailSender()
 router = APIRouter(tags=["password recovery"], prefix="/recovery")
 
 
@@ -31,7 +30,7 @@ def code(
             scheme = request.scope["scheme"]
             if host and scheme:
                 reset_url = f"{scheme}://{host}/password-recovery/submit?code={code}"
-            email_sender.send_password_reset_email(body.email, code, reset_url)
+            EmailSender.send_password_reset_email(body.email, code, reset_url)
         except Exception as e:
             raise HTTPException(500, f"Unable to send email. Try again later.")
 

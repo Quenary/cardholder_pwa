@@ -82,6 +82,8 @@
         "HOMEPAGE": "Домашняя страница",
         "IMAGE_VERSION": "Версия Docker-образа",
         "BACKEND_VERSION": "Версия API-приложения",
-        "FRONTEND_VERSION": "Версия WEB-приложения"
+        "FRONTEND_VERSION": "Версия WEB-приложения",
+        "SMTP_STATUS": "Статус SMTP",
+        "SMTP_TEST": "Тест"
     }
 }

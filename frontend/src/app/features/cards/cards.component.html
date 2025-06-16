@@ -38,7 +38,7 @@
   [cols]="2"
   rowHeight="4:3"
   gutterSize="16px">
-  @if (isLoading$ | async) { @for (card of cardsPlaceholder; track card) {
+  @if (isLoading$ | async) { @for (pc of cardsPlaceholder; track pc) {
   <mat-grid-tile class="card-tile animated-placeholder"> </mat-grid-tile>
   } } @else { @for (card of cards$ | async; track card) {
   <mat-grid-tile

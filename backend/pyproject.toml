@@ -1,6 +1,6 @@
 [project]
 name = "Cardholder_pwa"
-version = "0.0.4"
+version = "0.0.5"
 description = "This app allows you to store your discount cards in one place."
 authors = [
     {name = "Eugene Savin", email = "evgeny.savin.ad@gmail.com"}

@@ -1,20 +1,56 @@
 <div class="about-component">
-  <mat-list role="list">
-    <mat-list-item>
-      <a href="https://github.com/Quenary/cardholder_pwa" target="_blank">
-        {{'ABOUT.HOMEPAGE' | translate}}
-      </a>
-    </mat-list-item>
+  <mat-list>
+    <a
+      role="navigation"
+      mat-list-item
+      href="https://github.com/Quenary/cardholder_pwa"
+      target="_blank">
+      <span matListItemTitle>
+        {{ 'ABOUT.HOMEPAGE' | translate }}
+      </span>
+      <mat-icon matListItemIcon>open_in_new</mat-icon>
+    </a>
+    <mat-divider></mat-divider>
     @if (version$ | async; as version) {
-    <mat-list-item role="listitem">
-      {{ 'ABOUT.IMAGE_VERSION' | translate }} {{ version.image_version }}
+    <mat-list-item role="">
+      <span matListItemTitle>
+        {{ 'ABOUT.IMAGE_VERSION' | translate }} {{ version.image_version }}
+      </span>
     </mat-list-item>
-    <mat-list-item role="listitem">
-      {{ 'ABOUT.BACKEND_VERSION' | translate }} {{ version.app_version }}
+    <mat-list-item>
+      <span matListItemTitle>
+        {{ 'ABOUT.BACKEND_VERSION' | translate }} {{ version.app_version }}
+      </span>
     </mat-list-item>
     }
-    <mat-list-item role="listitem">
-      {{ 'ABOUT.FRONTEND_VERSION' | translate }} {{ frontendVersion }}
+    <mat-list-item>
+      <span matListItemTitle>
+        {{ 'ABOUT.FRONTEND_VERSION' | translate }} {{ frontendVersion }}
+      </span>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+    <mat-list-item>
+      @if (smtpStatus$ | async) {
+      <mat-icon matListItemIcon>check_circle</mat-icon>
+      } @else {
+      <mat-icon
+        matListItemIcon
+        [style.color]="'var(--mat-sys-error)'">
+        warning_outlined
+      </mat-icon>
+      }
+      <span
+        matListItemTitle
+        class="row-line">
+        {{ 'ABOUT.SMTP_STATUS' | translate }}
+        <button
+          mat-button
+          [disabled]="!(smtpStatus$ | async)"
+          (click)="onSmtpTest()">
+          <mat-icon>mail</mat-icon>
+          {{ 'ABOUT.SMTP_TEST' | translate }}
+        </button>
+      </span>
     </mat-list-item>
   </mat-list>
 </div>

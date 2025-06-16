@@ -82,6 +82,8 @@
         "HOMEPAGE": "Home page",
         "IMAGE_VERSION": "Docker image version",
         "BACKEND_VERSION": "API version",
-        "FRONTEND_VERSION": "Web App version"
+        "FRONTEND_VERSION": "Web App version",
+        "SMTP_STATUS": "SMTP status",
+        "SMTP_TEST": "Test"
     }
 }

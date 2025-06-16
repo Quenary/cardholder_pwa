@@ -6,11 +6,14 @@ from app.config import Config
 
 
 class EmailSender:
-    def __init__(self):
-        pass
+    @classmethod
+    def status(cls) -> bool:
+        """Check minimum configuration of client. True is valid"""
+        return all([Config.SMTP_SERVER, Config.SMTP_PORT, Config.SMTP_FROM_EMAIL])
 
-    def send_email(self, to_email: str, subject: str, body: str) -> bool:
-        if not all([Config.SMTP_SERVER, Config.SMTP_PORT, Config.SMTP_FROM_EMAIL]):
+    @classmethod
+    def send_email(cls, to_email: str, subject: str, body: str) -> bool:
+        if not cls.status():
             raise ValueError("SMTP configuration is incomplete")
 
         msg = MIMEMultipart()
@@ -29,8 +32,9 @@ class EmailSender:
             server.send_message(msg)
         return True
 
+    @classmethod
     def send_password_reset_email(
-        self, to_email: str, code: str, reset_url: Optional[str] = None
+        cls, to_email: str, code: str, reset_url: Optional[str] = None
     ) -> bool:
         """Send password reset email to user"""
 
@@ -57,4 +61,4 @@ Your verification code is:
 If you did not request this, please ignore this email.
 """
 
-        return self.send_email(to_email, subject, body)
+        return cls.send_email(to_email, subject, body)
