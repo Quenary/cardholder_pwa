@@ -1,20 +1,16 @@
-.card-scanner {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+:host {
+  .mat-dialog-content {
+    overflow: hidden;
+    padding: 0;
 
-  &-video {
-    width: 100%;
-    flex: 1;
+    &-video {
+      width: 100%;
+      height: 100%;
+    }
   }
-  &-footer {
-    width: 100%;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+
+  .mat-dialog-actions {
+    margin-top: auto;
     gap: 8px;
   }
 }

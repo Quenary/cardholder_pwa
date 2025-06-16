@@ -29,7 +29,11 @@ import {
 } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import {
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import {
   MatListItem,
@@ -82,6 +86,8 @@ export class CardScannerDeviceSheetComponent {
     MatButton,
     MatIcon,
     MatButton,
+    MatDialogActions,
+    MatDialogContent,
   ],
   templateUrl: './card-scanner.component.html',
   styleUrl: './card-scanner.component.scss',

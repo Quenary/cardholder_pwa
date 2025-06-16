@@ -69,6 +69,9 @@
                 "SAVE": "Card saved",
                 "DELETE": "Card deleted"
             }
+        },
+        "VIEWER": {
+            "INVERT": "Invert colors"
         }
     },
     "USER": {

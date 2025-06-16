@@ -1,38 +1,38 @@
-<div class="card-scanner">
+<mat-dialog-content class="mat-dialog-content">
   <video
-    class="card-scanner-video"
+    class="mat-dialog-content-video"
     #video>
   </video>
-  <section class="card-scanner-footer">
-    <button
-      mat-button
-      (click)="onClickSelectDevice()">
-      <mat-icon>videocam_outlined</mat-icon>
-      @if (deviceControl.value) {
-      {{ deviceControl.value.label }}
-      } @else {
-      {{ 'CARDS.CARD.SCAN.SELECT_SOURCE' | translate }}
-      }
-    </button>
-    <button
-      mat-button
-      class="accent-color"
-      (click)="fileInput.click()">
-      <mat-icon>image</mat-icon>
-      {{ 'CARDS.CARD.SCAN.FROM_FILE' | translate }}
-      <input
-        #fileInput
-        hidden
-        type="file"
-        id="card-scanner-from-file"
-        accept="image/*"
-        multiple="false"
-        (change)="decodeFromFile($any($event))" />
-    </button>
-    <button
-      mat-button
-      (click)="close()">
-      {{ 'GENERAL.CLOSE' | translate }}
-    </button>
-  </section>
-</div>
+</mat-dialog-content>
+<mat-dialog-actions class="mat-dialog-actions">
+  <button
+    mat-button
+    (click)="onClickSelectDevice()">
+    <mat-icon>videocam_outlined</mat-icon>
+    @if (deviceControl.value) {
+    {{ deviceControl.value.label }}
+    } @else {
+    {{ 'CARDS.CARD.SCAN.SELECT_SOURCE' | translate }}
+    }
+  </button>
+  <button
+    mat-button
+    class="accent-color"
+    (click)="fileInput.click()">
+    <mat-icon>image</mat-icon>
+    {{ 'CARDS.CARD.SCAN.FROM_FILE' | translate }}
+    <input
+      #fileInput
+      hidden
+      type="file"
+      id="card-scanner-from-file"
+      accept="image/*"
+      multiple="false"
+      (change)="decodeFromFile($any($event))" />
+  </button>
+  <button
+    mat-flat-button
+    (click)="close()">
+    {{ 'GENERAL.CLOSE' | translate }}
+  </button>
+</mat-dialog-actions>
