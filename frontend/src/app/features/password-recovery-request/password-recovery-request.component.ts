@@ -10,10 +10,10 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput, MatFormField, MatLabel } from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, finalize } from 'rxjs';
+import { SnackService } from 'src/app/core/services/snack.service';
 import { PasswordRecoveryApiService } from 'src/app/entities/password-recovery/password-recovery-api.service';
 import { IPasswordRecoveryCode } from 'src/app/entities/password-recovery/password-recovery-interface';
 import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
@@ -40,9 +40,9 @@ export class PasswordRecoveryRequestComponent {
   private readonly passwordRecoveryApiService = inject(
     PasswordRecoveryApiService
   );
-  private readonly matSnackBar = inject(MatSnackBar);
-  private readonly translateServie = inject(TranslateService);
+  private readonly translateService = inject(TranslateService);
   private readonly router = inject(Router);
+  private readonly snackService = inject(SnackService);
 
   public readonly isLoading$ = new BehaviorSubject<boolean>(false);
   public readonly form = new FormGroup<TInterfaceToForm<IPasswordRecoveryCode>>(
@@ -69,12 +69,13 @@ export class PasswordRecoveryRequestComponent {
       )
       .subscribe({
         next: () => {
-          this.matSnackBar.open(
-            this.translateServie.instant('PASSWORD_RECOVERY.SENT'),
-            this.translateServie.instant('GENERAL.CLOSE'),
-            { duration: 10000 }
+          this.snackService.success(
+            this.translateService.instant('PASSWORD_RECOVERY.SENT')
           );
           this.router.navigate(['/auth']);
+        },
+        error: (error) => {
+          this.snackService.error(error);
         },
       });
   }

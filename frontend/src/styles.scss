@@ -37,6 +37,7 @@ body {
   }
 }
 
+// Animation for cards loading
 .animated-placeholder {
   animation-name: placeholderAnimation;
   animation-duration: 1.5s;
@@ -54,4 +55,25 @@ body {
   }
 }
 
-// TODO change scroll styles
+// MatSnackBar styling
+.mat-snack-no-overflow {
+  overflow: hidden;
+
+  .mat-mdc-snack-bar-label {
+    overflow: hidden;
+    .mat-mdc-snack-bar-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+.mat-snack-error {
+  --mdc-snackbar-container-color: var(--mat-sys-error);
+  --mdc-snackbar-supporting-text-color: var(--mat-sys-on-error);
+  --mat-snack-bar-button-color: var(--mat-sys-on-error);
+}
+.mat-snack-success {
+  --mdc-snackbar-container-color: var(--mat-sys-primary);
+  --mdc-snackbar-supporting-text-color: var(--mat-sys-on-primary);
+  --mat-snack-bar-button-color: var(--mat-sys-on-primary);
+}

@@ -7,7 +7,6 @@ import { UserApiService } from 'src/app/entities/user/user-api.service';
 import { IUserCreate, IUserUpdate } from 'src/app/entities/user/user-interface';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { BehaviorSubject, finalize } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   FormGroup,
   FormControl,
@@ -24,6 +23,7 @@ import {
   MatSuffix,
 } from '@angular/material/input';
 import { AsyncPipe } from '@angular/common';
+import { SnackService } from 'src/app/core/services/snack.service';
 
 @Component({
   selector: 'app-register',
@@ -49,8 +49,8 @@ import { AsyncPipe } from '@angular/common';
 export class RegisterComponent {
   private readonly userApiService = inject(UserApiService);
   private readonly router = inject(Router);
-  private readonly matSnackBar = inject(MatSnackBar);
   private readonly translateService = inject(TranslateService);
+  private readonly snackService = inject(SnackService);
 
   public readonly isLoading$ = new BehaviorSubject<boolean>(false);
   public hidePassword: boolean = true;
@@ -94,12 +94,13 @@ export class RegisterComponent {
       )
       .subscribe({
         next: () => {
-          this.matSnackBar.open(
-            this.translateService.instant('REGISTER.SUCCESS'),
-            this.translateService.instant('GENERAL.CLOSE'),
-            { duration: 5000 }
+          this.snackService.success(
+            this.translateService.instant('REGISTER.SUCCESS')
           );
           this.router.navigate(['/auth']);
+        },
+        error: (error) => {
+          this.snackService.error(error);
         },
       });
   }

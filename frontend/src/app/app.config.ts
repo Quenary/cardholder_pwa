@@ -30,7 +30,6 @@ import { appReducer } from './state/app.reducers';
 import { AppEffects } from './state/app.effects';
 import { NetworkService } from './core/services/network.service';
 import { UpdateService } from './core/services/update.service';
-import { errorInterceptor } from './core/interceptors/error.interceptor';
 
 function HttpLoaderFactory(httpClient: HttpClient) {
   return new TranslateHttpLoader(httpClient, '/i18n/', '.json');
@@ -45,9 +44,7 @@ export const appConfig: ApplicationConfig = {
     provideState('auth', authReducer),
     provideEffects([AppEffects, AuthEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
-    provideHttpClient(
-      withInterceptors([getTokenInterceptor, errorInterceptor])
-    ),
+    provideHttpClient(withInterceptors([getTokenInterceptor])),
     importProvidersFrom(
       TranslateModule.forRoot({
         loader: {

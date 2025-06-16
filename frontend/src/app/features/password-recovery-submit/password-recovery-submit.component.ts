@@ -15,11 +15,11 @@ import {
   MatSuffix,
 } from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, finalize, first } from 'rxjs';
 import { ERegexp } from 'src/app/app.consts';
+import { SnackService } from 'src/app/core/services/snack.service';
 import { PasswordRecoveryApiService } from 'src/app/entities/password-recovery/password-recovery-api.service';
 import { IPasswordRecoverySubmit } from 'src/app/entities/password-recovery/password-recovery-interface';
 import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
@@ -47,10 +47,10 @@ export class PasswordRecoverySubmitComponent implements OnInit {
   private readonly passwordRecoveryApiService = inject(
     PasswordRecoveryApiService
   );
-  private readonly matSnackBar = inject(MatSnackBar);
-  private readonly translateServie = inject(TranslateService);
+  private readonly translateService = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly snackService = inject(SnackService);
 
   public readonly isLoading$ = new BehaviorSubject<boolean>(false);
   public hidePassword: boolean = true;
@@ -97,7 +97,13 @@ export class PasswordRecoverySubmitComponent implements OnInit {
       )
       .subscribe({
         next: () => {
+          this.snackService.success(
+            this.translateService.instant('PASSWORD_RECOVERY.SUCCESS')
+          );
           this.router.navigate(['/auth']);
+        },
+        error: (error) => {
+          this.snackService.error(error);
         },
       });
   }

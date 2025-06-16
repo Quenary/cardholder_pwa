@@ -27,10 +27,9 @@ import {
   tap,
   throwError,
 } from 'rxjs';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIcon } from '@angular/material/icon';
 import {
   MatListItem,
@@ -42,6 +41,7 @@ import {
   MAT_BOTTOM_SHEET_DATA,
   MatBottomSheetRef,
 } from '@angular/material/bottom-sheet';
+import { SnackService } from 'src/app/core/services/snack.service';
 
 export interface ICardScannerResult {
   text: string;
@@ -90,10 +90,9 @@ export class CardScannerComponent implements OnInit, OnDestroy {
   private readonly matDialogRef = inject(MatDialogRef);
   private readonly reader = new BrowserMultiFormatReader();
   private readonly destroyRef = inject(DestroyRef);
-  private readonly matSnackBar = inject(MatSnackBar);
-  private readonly translateService = inject(TranslateService);
   private readonly ngZone = inject(NgZone);
   private readonly matBottomSheet = inject(MatBottomSheet);
+  private readonly snackService = inject(SnackService);
 
   private readonly onScanStarts$ = new Subject<void>();
   public readonly devices$: Observable<MediaDeviceInfo[]> =
@@ -204,11 +203,7 @@ export class CardScannerComponent implements OnInit, OnDestroy {
    * @param error
    */
   private onError(error: any) {
-    this.matSnackBar.open(
-      error,
-      this.translateService.instant('GENERAL.CLOSE'),
-      { duration: 10000 }
-    );
+    this.snackService.error(error);
   }
 
   /**

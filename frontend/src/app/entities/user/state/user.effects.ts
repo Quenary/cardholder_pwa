@@ -10,6 +10,8 @@ import {
   IConfirmDialogData,
 } from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
 import { AuthActions } from '../../auth/state/auth.actions';
+import { SnackService } from 'src/app/core/services/snack.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class UserEffects {
@@ -17,6 +19,8 @@ export class UserEffects {
   private readonly userApiService = inject(UserApiService);
   private readonly store = inject(Store);
   private readonly matDialog = inject(MatDialog);
+  private readonly snackService = inject(SnackService);
+  private readonly translateService = inject(TranslateService);
 
   read$ = createEffect(() =>
     this.actions$.pipe(
@@ -40,6 +44,19 @@ export class UserEffects {
         )
       )
     )
+  );
+
+  updateSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(UserActions.updateSuccess),
+        tap(() => {
+          this.snackService.success(
+            this.translateService.instant('USER.SUCCESS.UPDATE')
+          );
+        })
+      ),
+    { dispatch: false }
   );
 
   deleteAttempt$ = createEffect(() =>
@@ -78,7 +95,25 @@ export class UserEffects {
       this.actions$.pipe(
         ofType(UserActions.deleteSuccess),
         tap(() => {
+          this.snackService.success(
+            this.translateService.instant('USER.SUCCESS.DELETE')
+          );
           this.store.dispatch(AuthActions.logoutSilent());
+        })
+      ),
+    { dispatch: false }
+  );
+
+  showErrors$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(
+          UserActions.readError,
+          UserActions.updateError,
+          UserActions.deleteError
+        ),
+        tap((action) => {
+          this.snackService.error(action.error);
         })
       ),
     { dispatch: false }

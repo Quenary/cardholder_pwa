@@ -19,6 +19,8 @@ import {
   ConfirmDialogComponent,
   IConfirmDialogData,
 } from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
+import { SnackService } from 'src/app/core/services/snack.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class CardsEffects {
@@ -27,6 +29,8 @@ export class CardsEffects {
   private readonly cardsApiService = inject(CardApiService);
   private readonly router = inject(Router);
   private readonly matDialog = inject(MatDialog);
+  private readonly snackService = inject(SnackService);
+  private readonly translateService = inject(TranslateService);
 
   list$ = createEffect(() =>
     this.actions$.pipe(
@@ -103,6 +107,19 @@ export class CardsEffects {
     )
   );
 
+  showSaveSnack$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(CardsActions.createSuccess, CardsActions.updateSuccess),
+        tap(() => {
+          this.snackService.success(
+            this.translateService.instant('CARDS.CARD.SUCCESS.SAVE')
+          );
+        })
+      ),
+    { dispatch: false }
+  );
+
   deleteAttempt$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CardsActions.deleteAttempt),
@@ -139,7 +156,27 @@ export class CardsEffects {
       this.actions$.pipe(
         ofType(CardsActions.deleteSuccess),
         tap((action) => {
+          this.snackService.success(
+            this.translateService.instant('CARDS.CARD.SUCCESS.DELETE')
+          );
           this.router.navigate(['/cards'], { replaceUrl: true });
+        })
+      ),
+    { dispatch: false }
+  );
+
+  showErrors$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(
+          CardsActions.listError,
+          CardsActions.createError,
+          CardsActions.readError,
+          CardsActions.updateError,
+          CardsActions.deleteError
+        ),
+        tap((action) => {
+          this.snackService.error(action.error);
         })
       ),
     { dispatch: false }

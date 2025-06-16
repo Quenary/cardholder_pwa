@@ -5,12 +5,14 @@ import { AuthApiService } from 'src/app/entities/auth/auth-api.service';
 import { catchError, finalize, map, of, switchMap, tap } from 'rxjs';
 import { ELocalStorageKey } from 'src/app/app.consts';
 import { Router } from '@angular/router';
+import { SnackService } from 'src/app/core/services/snack.service';
 
 @Injectable()
 export class AuthEffects {
   private readonly actions$ = inject(Actions);
   private readonly authApiService = inject(AuthApiService);
   private readonly router = inject(Router);
+  private readonly snackService = inject(SnackService);
 
   token$ = createEffect(() =>
     this.actions$.pipe(
@@ -79,6 +81,21 @@ export class AuthEffects {
         ofType(AuthActions.logoutSilent),
         tap(() => {
           this.onLogout();
+        })
+      ),
+    { dispatch: false }
+  );
+
+  showErrors$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(
+          AuthActions.tokenError,
+          AuthActions.refreshTokenError,
+          AuthActions.logoutError
+        ),
+        tap((action) => {
+          this.snackService.error(action.error);
         })
       ),
     { dispatch: false }
