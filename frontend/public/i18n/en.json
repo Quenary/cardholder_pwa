@@ -62,6 +62,7 @@
             "DESCRIPTION": "Description",
             "COLOR": "Color",
             "SCAN": {
+                "PERMISSION_ERROR": "Access to video device is denied or feature is not supported.",
                 "SELECT_SOURCE": "Select source",
                 "FROM_FILE": "Add from file"
             },

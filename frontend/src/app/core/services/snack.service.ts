@@ -16,18 +16,20 @@ export class SnackService {
    * @param action action button text
    */
   error(
-    error: HttpErrorResponse | string | unknown,
+    error: HttpErrorResponse | Error | string | unknown,
     action: string = this.translateService.instant('GENERAL.CLOSE')
   ): void {
     let message: string = '';
     if (error instanceof HttpErrorResponse) {
-      message += this.translateService.instant('GENERAL.REQUEST_ERROR');
+      message = this.translateService.instant('GENERAL.REQUEST_ERROR');
       message += `: ${error.status} ${error.statusText}`;
+    } else if (error instanceof Error) {
+      message = error.message;
     } else if (typeof error === 'string') {
       message = error;
     } else {
       try {
-        message += JSON.stringify(error);
+        message = JSON.stringify(error);
       } catch (e) {
         message = this.translateService.instant('GENERAL.UNKNOWN_ERROR');
         console.error(e);

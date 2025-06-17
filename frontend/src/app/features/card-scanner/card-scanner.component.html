@@ -9,8 +9,8 @@
     mat-button
     (click)="onClickSelectDevice()">
     <mat-icon>videocam_outlined</mat-icon>
-    @if (deviceControl.value) {
-    {{ deviceControl.value.label }}
+    @if (selectedDevice$ | async; as device) {
+    {{ device.label ?? device.deviceId }}
     } @else {
     {{ 'CARDS.CARD.SCAN.SELECT_SOURCE' | translate }}
     }

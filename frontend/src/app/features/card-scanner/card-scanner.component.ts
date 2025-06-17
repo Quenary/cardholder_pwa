@@ -8,11 +8,11 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import { BrowserMultiFormatReader, BarcodeFormat } from '@zxing/browser';
 import type { Result } from '@zxing/library';
 import {
+  BehaviorSubject,
   catchError,
   first,
   from,
@@ -20,15 +20,11 @@ import {
   Observable,
   retry,
   shareReplay,
-  startWith,
-  Subject,
   Subscription,
   switchMap,
-  tap,
   throwError,
 } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   MatDialogActions,
   MatDialogContent,
@@ -46,6 +42,7 @@ import {
   MatBottomSheetRef,
 } from '@angular/material/bottom-sheet';
 import { SnackService } from 'src/app/core/services/snack.service';
+import { AsyncPipe } from '@angular/common';
 
 export interface ICardScannerResult {
   text: string;
@@ -70,6 +67,7 @@ export interface ICardScannerResult {
 export class CardScannerDeviceSheetComponent {
   private readonly matBottomSheetRef = inject(MatBottomSheetRef);
   private readonly data = inject(MAT_BOTTOM_SHEET_DATA);
+
   public readonly devices: MediaDeviceInfo[] = this.data.devices ?? [];
 
   onSelectDevice(device: MediaDeviceInfo): void {
@@ -82,12 +80,10 @@ export class CardScannerDeviceSheetComponent {
   imports: [
     MatButton,
     TranslateModule,
-    ReactiveFormsModule,
-    MatButton,
     MatIcon,
-    MatButton,
     MatDialogActions,
     MatDialogContent,
+    AsyncPipe,
   ],
   templateUrl: './card-scanner.component.html',
   styleUrl: './card-scanner.component.scss',
@@ -99,15 +95,15 @@ export class CardScannerComponent implements OnInit, OnDestroy {
   private readonly ngZone = inject(NgZone);
   private readonly matBottomSheet = inject(MatBottomSheet);
   private readonly snackService = inject(SnackService);
+  private readonly translateService = inject(TranslateService);
 
-  private readonly onScanStarts$ = new Subject<void>();
-  public readonly devices$: Observable<MediaDeviceInfo[]> =
-    this.onScanStarts$.pipe(
-      startWith(null),
-      switchMap(() => from(BrowserMultiFormatReader.listVideoInputDevices())),
-      shareReplay(1)
-    );
-  public readonly deviceControl = new FormControl<MediaDeviceInfo>(null);
+  private readonly devices$: Observable<MediaDeviceInfo[]> = from(
+    navigator.mediaDevices.getUserMedia({ video: true })
+  ).pipe(
+    switchMap(() => from(BrowserMultiFormatReader.listVideoInputDevices())),
+    shareReplay(1)
+  );
+  public readonly selectedDevice$ = new BehaviorSubject<MediaDeviceInfo>(null);
   @ViewChild('video', { static: true, read: ElementRef<HTMLVideoElement> })
   private readonly videoElementRef: ElementRef<HTMLVideoElement>;
 
@@ -119,14 +115,15 @@ export class CardScannerComponent implements OnInit, OnDestroy {
         first(),
         map((list) => this.getDefaultDeviceByLabel(list))
       )
-      .subscribe((device) => {
-        this.deviceControl.setValue(device, { emitEvent: false });
-        this.onSelectSource(device);
-      });
-    this.deviceControl.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((device) => {
-        this.onSelectSource(device);
+      .subscribe({
+        next: (device) => {
+          this.onSelectSource(device);
+        },
+        error: () => {
+          this.snackService.error(
+            this.translateService.instant('CARDS.CARD.SCAN.PERMISSION_ERROR')
+          );
+        },
       });
   }
 
@@ -176,25 +173,19 @@ export class CardScannerComponent implements OnInit, OnDestroy {
 
   /**
    * Start scan on video source selection
-   * @param $event
+   * @param device
    */
-  public onSelectSource($event: MediaDeviceInfo) {
+  private onSelectSource(device: MediaDeviceInfo) {
     this.scanSubscription?.unsubscribe();
-    if (!!$event) {
-      let first = true;
-      this.scanSubscription = this.startScanning($event.deviceId)
+    this.selectedDevice$.next(device);
+    if (!!device) {
+      this.scanSubscription = this.startScanning(device.deviceId)
         .pipe(
-          tap(() => {
-            if (first) {
-              this.onScanStarts$.next();
-              first = false;
-            }
-          }),
           catchError((error) => {
-            this.onError(error);
+            this.snackService.error(error);
             return throwError(() => error);
           }),
-          retry({ count: 2, delay: 1000 })
+          retry({ count: 1, delay: 1000 })
         )
         .subscribe({
           next: (res) => {
@@ -202,14 +193,6 @@ export class CardScannerComponent implements OnInit, OnDestroy {
           },
         });
     }
-  }
-
-  /**
-   * Callback to scanner error
-   * @param error
-   */
-  private onError(error: any) {
-    this.snackService.error(error);
   }
 
   /**
@@ -252,7 +235,7 @@ export class CardScannerComponent implements OnInit, OnDestroy {
           this.onResult(res);
         })
         .catch((error) => {
-          this.onError(error);
+          this.snackService.error(error);
         });
     };
     reader.readAsDataURL(file);
@@ -271,9 +254,9 @@ export class CardScannerComponent implements OnInit, OnDestroy {
           },
         })
         .afterDismissed()
-        .subscribe((data) => {
+        .subscribe((data?: { device: MediaDeviceInfo }) => {
           if (data?.device) {
-            this.deviceControl.setValue(data.device);
+            this.onSelectSource(data.device);
           }
         });
     });
