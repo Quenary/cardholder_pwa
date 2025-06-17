@@ -2,7 +2,8 @@ from .base import Base
 from sqlalchemy import Integer, String, DateTime
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from datetime import datetime
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING
+from app.helpers import now
 
 if TYPE_CHECKING:
     from .card import Card
@@ -16,9 +17,11 @@ class User(Base):
     username: Mapped[str] = mapped_column(String, unique=True, index=True)
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime,
+        default=now,
+        onupdate=now,
     )
     cards: Mapped[list["Card"]] = relationship("Card", back_populates="user")
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(

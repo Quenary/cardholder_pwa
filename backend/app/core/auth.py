@@ -1,7 +1,8 @@
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
-from datetime import datetime, timedelta
+from datetime import timedelta, datetime
+from app.helpers import now
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 import app.schemas as schemas, app.db as db, app.db.models as models
@@ -24,11 +25,13 @@ def get_password_hash(password: str) -> str:
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + (
+    expire = now() + (
         expires_delta or timedelta(minutes=Config.ACCESS_TOKEN_LIFETIME_MIN)
     )
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, Config.JWT_SECRET_KEY, algorithm=Config.JWT_ALGORITHM)
+    encoded_jwt = jwt.encode(
+        to_encode, Config.JWT_SECRET_KEY, algorithm=Config.JWT_ALGORITHM
+    )
     return encoded_jwt, expire
 
 
@@ -36,7 +39,7 @@ def create_refresh_token(
     user_id: int, db: Session, user_agent: str | None = None, ip: str | None = None
 ):
     token = secrets.token_urlsafe(32)
-    expires_at = datetime.utcnow() + timedelta(minutes=Config.REFRESH_TOKEN_LIFETIME_MIN)
+    expires_at = now() + timedelta(minutes=Config.REFRESH_TOKEN_LIFETIME_MIN)
     db_token = models.RefreshToken(
         token=token,
         user_id=user_id,
@@ -74,7 +77,7 @@ def build_token_response(
     return schemas.TokenResponse(
         access_token=access_token,
         token_type="bearer",
-        expires_in=int((access_exp - datetime.utcnow()).total_seconds()),
+        expires_in=int((access_exp - now()).total_seconds()),
         refresh_token=refresh_token.token,
     )
 
@@ -85,7 +88,9 @@ async def get_current_user(
     """Get current user by token. Raise 401 on fail."""
     credentials_exception = HTTPException(status_code=401, detail="Invalid token")
     try:
-        payload = jwt.decode(token, Config.JWT_SECRET_KEY, algorithms=[Config.JWT_ALGORITHM])
+        payload = jwt.decode(
+            token, Config.JWT_SECRET_KEY, algorithms=[Config.JWT_ALGORITHM]
+        )
         username: str = cast(str, payload.get("sub"))
         if not username:
             raise credentials_exception

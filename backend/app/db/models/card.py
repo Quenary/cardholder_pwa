@@ -18,10 +18,8 @@ class Card(Base):
     description: Mapped[Optional[Text]] = mapped_column(Text, nullable=True)
     color: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+        DateTime, server_default=func.now(), onupdate=func.now()
     )
     user: Mapped["User"] = relationship("User", back_populates="cards")

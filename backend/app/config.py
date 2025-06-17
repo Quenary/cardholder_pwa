@@ -14,6 +14,7 @@ class Config:
     REFRESH_TOKEN_LIFETIME_MIN: ClassVar[float]
     PASSWORD_RECOVERY_CODE_LIFETIME_MIN: ClassVar[float]
     DB_URL: ClassVar[str]
+    DB_CLEANUP_INTERVAL_MIN: ClassVar[float]
     SMTP_USE_TLS: ClassVar[bool]
     SMTP_SERVER: ClassVar[str]
     SMTP_PORT: ClassVar[int]
@@ -41,6 +42,9 @@ class Config:
             )
             cls.DB_URL = (
                 os.getenv("DB_URL") or "sqlite:////cardholder_pwa/cardholder_pwa.db"
+            )
+            cls.DB_CLEANUP_INTERVAL_MIN = float(
+                os.getenv("DB_CLEANUP_INTERVAL_MIN") or 60
             )
             cls.SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "false").lower() == "true"
             defaultPort: int = 587 if cls.SMTP_USE_TLS else 25

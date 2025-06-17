@@ -4,7 +4,7 @@ import app.db.models as models, app.db as db, app.schemas as schemas, app.core.a
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import cast
 from starlette.datastructures import Address
-from datetime import datetime
+from app.helpers import now
 
 router = APIRouter(tags=["auth"])
 
@@ -43,7 +43,7 @@ def refresh_token(
         .filter_by(token=form.refresh_token, revoked=False)
         .first()
     )
-    if not db_token or db_token.expires_at < datetime.utcnow():
+    if not db_token or db_token.expires_at < now():
         raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
     user = db_token.user
     auth.revoke_refresh_token(db, db_token.token)

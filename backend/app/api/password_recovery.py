@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import update
 import app.db.models as models, app.db as db, app.schemas as schemas, app.core.auth as auth
-from datetime import datetime
 import secrets
-from datetime import datetime, timedelta
+from datetime import timedelta
+from app.helpers import now
 from app.core.smtp import EmailSender
 from app.config import Config
 
@@ -20,7 +20,7 @@ def code(
     user = db.query(models.User).filter_by(email=body.email).first()
     if user:
         code = secrets.token_urlsafe(8)
-        expires_at = datetime.utcnow() + timedelta(
+        expires_at = now() + timedelta(
             minutes=Config.PASSWORD_RECOVERY_CODE_LIFETIME_MIN
         )
 
@@ -53,7 +53,7 @@ def password(
         .filter_by(code=body.code, revoked=False)
         .first()
     )
-    if not db_code or db_code.expires_at < datetime.utcnow():
+    if not db_code or db_code.expires_at < now():
         raise HTTPException(status_code=401, detail="Invalid or expired code")
 
     db_code.revoked = True

@@ -11,7 +11,7 @@ You may also need following packages `pip3 install python-is-python3 python3-dev
 - create venv `python -m venv venv`
 - activate with `source venv/bin/activate` or `venv/scripts/activate`
 - install deps `pip install -r requirements.txt`
-- run app with ```python start.py```
+- run app with ```python dev.py``` or ```python start.py```
 
 ### Migrations
 
