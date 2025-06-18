@@ -1,5 +1,6 @@
 import subprocess
 import uvicorn
+import os
 
 
 def run_migrations():
@@ -13,4 +14,5 @@ def run_migrations():
 
 if __name__ == "__main__":
     run_migrations()
-    uvicorn.run("app.app:app", host="localhost", port=8000)
+    log_level = os.getenv("LOG_LEVEL") or "warning"
+    uvicorn.run("app.app:app", host="localhost", port=8000, log_level=log_level)
