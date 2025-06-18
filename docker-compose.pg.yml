@@ -1,5 +1,8 @@
 version: "3.9"
 
+networks:
+  cardholder_pwa:
+    driver: bridge
 services:
   db:
     image: postgres:16
@@ -13,7 +16,7 @@ services:
     networks:
       - cardholder_pwa
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U cardholder_user"]
+      test: ["CMD-SHELL", "pg_isready -U cardholder_user -d cardholder_db"]
       interval: 10s
       timeout: 5s
       retries: 5

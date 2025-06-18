@@ -1,5 +1,8 @@
 version: '3.8'
 
+networks:
+  cardholder_pwa:
+    driver: bridge
 services:
   app:
     image: quenary/cardholder_pwa:latest
