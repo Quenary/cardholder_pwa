@@ -42,6 +42,8 @@ quenary/cardholder_pwa:latest
 - Using docker-compose
 
 ```
-# copy docker-compose.prod.yml file to desired location (or in portainer)
-docker-compose -f docker-compose.prod.yml up -d
+# place one of the docker-compose files to desired location (or in Portainer)
+# docker-compose.sqlite.yml for local sqlite db
+# docker-compose.pg.yml for postgres db (separate container in app network by default)
+docker-compose -f <filename e.g. docker-compose.pg.yml> up -d
 ```

@@ -1,0 +1,20 @@
+version: '3.8'
+
+networks:
+  cardholder_pwa:
+    driver: bridge
+services:
+  app:
+    image: quenary/cardholder_pwa:latest
+    restart: unless-stopped
+    volumes:
+      - $HOME/.cardholder_pwa:/cardholder_pwa
+    networks:
+      - cardholder_pwa
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/system/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "80:80"

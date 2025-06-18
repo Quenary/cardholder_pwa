@@ -1,0 +1,40 @@
+version: "3.9"
+
+networks:
+  cardholder_pwa:
+    driver: bridge
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cardholder_db
+      POSTGRES_USER: cardholder_user
+      POSTGRES_PASSWORD: cardholder_pass
+    volumes:
+      - $HOME/.cardholder_pwa/postgres_data:/var/lib/postgresql/data
+    networks:
+      - cardholder_pwa
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cardholder_user -d cardholder_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    image: quenary/cardholder_pwa:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: postgresql+psycopg2://cardholder_user:cardholder_pass@db:5432/cardholder_db
+    networks:
+      - cardholder_pwa
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/system/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "80:80"
