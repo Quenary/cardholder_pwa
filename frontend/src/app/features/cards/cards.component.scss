@@ -1,50 +1,62 @@
-.cards-header {
-  width: 100%;
-  display: inline-flex;
-  gap: 16px;
+@use 'mixins' as mx;
 
-  .cards-header-search {
-    flex: 1;
-  }
-}
-.card-tile {
-  background-color: var(--mat-sys-surface-container);
-  color: var(--mat-sys-on-surface);
-  border-radius: 12px;
-  cursor: pointer;
+:host {
+  @include mx.component-host;
+  padding-top: 0;
 
-  &-content {
+  .cards-header {
+    padding-top: 16px;
     width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
+    display: inline-flex;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: var(--mat-sys-background);
 
-    &-header {
-      display: inline-flex;
-      width: 100%;
-      font-size: 20px;
-      padding: 16px 16px 8px 16px;
-
-      &-text {
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-
-      &-icon {
-        margin-left: auto;
-        color: var(--mat-sys-primary);
-        overflow: unset;
-      }
-    }
-
-    &-preview {
-      padding: 8px 16px 16px 16px;
-      width: 100%;
+    .cards-header-search {
       flex: 1;
-      align-self: center;
+    }
+  }
+  .card-tile {
+    background-color: var(--mat-sys-surface-container);
+    color: var(--mat-sys-on-surface);
+    border-radius: 12px;
+    cursor: pointer;
+
+    &-content {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+
+      &-header {
+        display: inline-flex;
+        width: 100%;
+        font-size: 20px;
+        padding: 16px 16px 8px 16px;
+
+        &-text {
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+
+        &-icon {
+          margin-left: auto;
+          color: var(--mat-sys-primary);
+          overflow: unset;
+        }
+      }
+
+      &-preview {
+        padding: 8px 16px 16px 16px;
+        width: 100%;
+        flex: 1;
+        align-self: center;
+      }
     }
   }
 }

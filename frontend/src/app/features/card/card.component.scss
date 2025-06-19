@@ -23,15 +23,15 @@
     }
   }
   &-field {
-    input[type="color"]{
+    input[type='color'] {
       height: 40px;
     }
   }
 
   &-buttons {
     width: 100%;
-    flex-basis: 100%;
     display: inline-flex;
     justify-content: flex-end;
+    flex-wrap: wrap;
   }
 }

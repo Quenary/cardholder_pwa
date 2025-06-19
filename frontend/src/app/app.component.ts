@@ -99,9 +99,9 @@ export class AppComponent {
       ])
     );
   /**
-   * Whether to show toolbar (side nav button, title)
+   * Whether to show authorized content (navigation, header, e.g.)
    */
-  public readonly showToolbar$ = this.store
+  public readonly isAuthorized$ = this.store
     .select(selectAuthTokenResponse)
     .pipe(map((res) => !!res));
   /**

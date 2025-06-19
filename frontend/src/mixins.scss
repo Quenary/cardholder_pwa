@@ -5,6 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 16px;
 }
 @mixin floating-card-surface {
   background-color: var(--mat-sys-surface-container);
@@ -19,4 +20,12 @@
   margin: unset;
   width: 100%;
   padding-bottom: 20px;
+}
+@mixin component-host {
+  display: block;
+  padding: 16px 16px 40px 16px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 100%;
+  position: relative;
 }

@@ -9,10 +9,9 @@ import {
 } from '@angular/material/list';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SystemApiService } from 'src/app/entities/system/system-api.service';
-import { version } from '../../../../package.json';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import { catchError, of, retry, share } from 'rxjs';
+import { catchError, from, of, retry, share } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 
 @Component({
@@ -43,7 +42,9 @@ export class AboutComponent {
       return of(null);
     })
   );
-  public readonly frontendVersion = version;
+  public readonly frontendVersion$ = from(
+    import('../../../../package.json').then((p) => p.version)
+  );
   public readonly smtpStatus$ = this.systemApiService.smtpStatus().pipe(
     retry({ count: 1, delay: 1000 }),
     catchError((error) => {

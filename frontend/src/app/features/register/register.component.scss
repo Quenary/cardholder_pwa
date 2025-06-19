@@ -1,10 +1,10 @@
-@import 'mixins';
+@use 'mixins' as mx;
 
 :host {
-  @include floating-card;
+  @include mx.floating-card;
 
   .register-component {
-    @include floating-card-surface;
+    @include mx.floating-card-surface;
 
     &-header {
       width: 100%;
@@ -12,7 +12,7 @@
     }
     &-form {
       &-password-hints {
-        @include form-password-hints;
+        @include mx.form-password-hints;
       }
       &-buttons {
         margin: 0 auto;

@@ -19,6 +19,9 @@
       flex-direction: column;
       align-items: flex-start;
       justify-content: flex-start;
+      height: 100%;
+      max-height: 100%;
+      overflow: hidden;
 
       &-toolbar {
         &-title {
@@ -34,8 +37,8 @@
       &-outlet {
         flex: 1;
         width: 100%;
-        padding: 16px 16px 50px 16px;
         display: block;
+        overflow: hidden;
       }
     }
   }

@@ -1,18 +1,22 @@
-@import 'mixins';
+@use 'mixins' as mx;
 
-.user-component {
-  &-form {
-    &-checkbox {
-      display: inline-flex;
-      width: 100%;
-    }
-    &-password-hints {
-      @include form-password-hints;
-    }
-    &-buttons {
-      width: 100%;
-      display: inline-flex;
-      justify-content: flex-end;
+:host {
+  @include mx.component-host;
+
+  .user-component {
+    &-form {
+      &-checkbox {
+        display: inline-flex;
+        width: 100%;
+      }
+      &-password-hints {
+        @include mx.form-password-hints;
+      }
+      &-buttons {
+        width: 100%;
+        display: inline-flex;
+        justify-content: flex-end;
+      }
     }
   }
 }

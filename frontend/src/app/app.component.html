@@ -1,3 +1,4 @@
+@if (isAuthorized$ | async) { @defer {
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav
     class="sidenav"
@@ -23,7 +24,6 @@
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content class="sidenav-container-content">
-    @if (showToolbar$ | async) {
     <mat-toolbar class="sidenav-container-content-toolbar">
       <button
         mat-icon-button
@@ -42,9 +42,11 @@
       </section>
       }
     </mat-toolbar>
-    }
     <section class="sidenav-container-content-outlet">
       <router-outlet></router-outlet>
     </section>
   </mat-sidenav-content>
 </mat-sidenav-container>
+} } @else {
+<router-outlet></router-outlet>
+}

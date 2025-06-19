@@ -1,7 +1,7 @@
-@import 'mixins';
+@use 'mixins' as mx;
 
 :host {
-  @include floating-card;
+  @include mx.floating-card;
 
   .auth-form {
     display: flex;
