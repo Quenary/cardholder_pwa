@@ -5,7 +5,7 @@ import {
   MatSidenav,
   MatSidenavContent,
 } from '@angular/material/sidenav';
-import { first, map, Observable } from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AsyncPipe } from '@angular/common';
 import { MatIconButton } from '@angular/material/button';
@@ -21,6 +21,7 @@ import { selectAuthTokenResponse } from './entities/auth/state/auth.selectors';
 import { AuthActions } from './entities/auth/state/auth.actions';
 import { selectAppIsOffline } from './state/app.selectors';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { selectUserIsAdmin } from './entities/user/state/user.selectors';
 
 interface INavItem {
   name: string;
@@ -59,45 +60,44 @@ export class AppComponent {
   /**
    * Items for side nav panel
    */
-  public readonly links$: Observable<INavItem[]> = this.translateService
-    .get('NAV')
-    .pipe(
-      map((translates) => [
-        {
-          name: translates.CARD,
-          icon: 'credit_card_outlined',
-          link: '/cards',
+  public readonly links$: Observable<INavItem[]> = combineLatest([
+    this.translateService.get('NAV'),
+    this.store.select(selectUserIsAdmin),
+  ]).pipe(
+    map(([translates, isAdmin]) => [
+      {
+        name: translates.CARD,
+        icon: 'credit_card_outlined',
+        link: '/cards',
+      },
+      {
+        name: translates.USER,
+        icon: 'person_outlined',
+        link: '/user',
+      },
+      ...(isAdmin
+        ? [
+            {
+              name: translates.ADMIN,
+              icon: 'admin_panel_settings',
+              link: '/admin',
+            },
+            {
+              name: translates.ABOUT,
+              icon: 'info_outlined',
+              link: '/about',
+            },
+          ]
+        : []),
+      {
+        name: translates.EXIT,
+        icon: 'logout',
+        onClick: () => {
+          this.store.dispatch(AuthActions.logout());
         },
-        {
-          name: translates.USER,
-          icon: 'person_outlined',
-          link: '/user',
-        },
-        {
-          name: translates.ABOUT,
-          icon: 'info_outlined',
-          link: '/about',
-        },
-        {
-          name: translates.EXIT,
-          icon: 'logout',
-          onClick: () => {
-            this.store
-              .select(selectAuthTokenResponse)
-              .pipe(first())
-              .subscribe({
-                next: (tokenResponse) => {
-                  this.store.dispatch(
-                    AuthActions.logout({
-                      refreshToken: tokenResponse.refresh_token,
-                    })
-                  );
-                },
-              });
-          },
-        },
-      ])
-    );
+      },
+    ])
+  );
   /**
    * Whether to show authorized content (navigation, header, e.g.)
    */

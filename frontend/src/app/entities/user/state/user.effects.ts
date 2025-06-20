@@ -12,6 +12,7 @@ import {
 import { AuthActions } from '../../auth/state/auth.actions';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { TranslateService } from '@ngx-translate/core';
+import { ELocalStorageKey } from 'src/app/app.consts';
 
 @Injectable()
 export class UserEffects {
@@ -54,6 +55,17 @@ export class UserEffects {
           this.snackService.success(
             this.translateService.instant('USER.SUCCESS.UPDATE')
           );
+        })
+      ),
+    { dispatch: false }
+  );
+
+  saveUser$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(UserActions.readSuccess, UserActions.updateSuccess),
+        tap((action) => {
+          localStorage.setItemJson(ELocalStorageKey.USER, action.info);
         })
       ),
     { dispatch: false }

@@ -1,0 +1,5 @@
+@use 'mixins' as mx;
+
+:host {
+  @include mx.component-host;
+}

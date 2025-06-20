@@ -25,6 +25,7 @@
         "PASSWORD_RECOVERY": "Password recovery",
         "CARD": "Cards",
         "USER": "User",
+        "ADMIN": "Admin panel",
         "ABOUT": "About",
         "EXIT": "Exit"
     },
@@ -90,6 +91,21 @@
         "SUCCESS": {
             "UPDATE": "User data updated",
             "DELETE": "User deleted"
+        }
+    },
+    "ADMIN": {
+        "SETTINGS": {
+            "TITLE": "Settings",
+            "KEY": "Key",
+            "VALUE": "Value",
+            "UPDATED_AT": "Date of update"
+        },
+        "USERS": {
+            "TITLE": "Users",
+            "ID": "ID",
+            "USERNAME": "Username",
+            "EMAIL": "E-mail",
+            "ROLE": "Role"
         }
     },
     "ABOUT": {

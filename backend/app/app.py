@@ -6,6 +6,7 @@ from app.api import (
     card_router,
     password_recovery_router,
     system_router,
+    admin_router,
 )
 import asyncio
 from app.db import cleanup
@@ -31,3 +32,4 @@ app.include_router(user_router)
 app.include_router(card_router)
 app.include_router(password_recovery_router)
 app.include_router(system_router)
+app.include_router(admin_router)

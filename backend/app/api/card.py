@@ -8,7 +8,7 @@ router = APIRouter(tags=["card"])
 @router.get("/cards", response_model=list[schemas.Card])
 def get_cards(
     db: Session = Depends(db.get_db),
-    user: models.User = Depends(auth.get_current_user),
+    user: models.User = Depends(auth.is_user),
 ):
     return db.query(models.Card).filter(models.Card.user_id == user.id).all()
 
@@ -17,7 +17,7 @@ def get_cards(
 def get_card(
     card_id: int,
     db: Session = Depends(db.get_db),
-    user=Depends(auth.get_current_user),
+    user=Depends(auth.is_user),
 ):
     card = db.query(models.Card).filter_by(id=card_id, user_id=user.id).first()
     if not card:
@@ -29,7 +29,7 @@ def get_card(
 def create_card(
     card: schemas.CardCreate,
     db: Session = Depends(db.get_db),
-    user=Depends(auth.get_current_user),
+    user=Depends(auth.is_user),
 ):
     new_card = models.Card(**card.dict(), user_id=user.id)
     db.add(new_card)
@@ -43,7 +43,7 @@ def update_card(
     card_id: int,
     updated: schemas.CardCreate,
     db: Session = Depends(db.get_db),
-    user=Depends(auth.get_current_user),
+    user=Depends(auth.is_user),
 ):
     card = db.query(models.Card).filter_by(id=card_id, user_id=user.id).first()
     if not card:
@@ -59,7 +59,7 @@ def update_card(
 def delete_card(
     card_id: int,
     db: Session = Depends(db.get_db),
-    user=Depends(auth.get_current_user),
+    user=Depends(auth.is_user),
 ):
     card = db.query(models.Card).filter_by(id=card_id, user_id=user.id).first()
     if not card:

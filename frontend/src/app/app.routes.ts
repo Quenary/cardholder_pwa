@@ -7,11 +7,10 @@ import { CardsEffects } from './entities/cards/state/cards.effects';
 import { inject } from '@angular/core';
 import { selectCardsActiveHasChanges } from './entities/cards/state/cards.selectors';
 import { canDeactivateWithDialogGuard } from './core/guards/can-deactivate-with-dialog.guard';
-import { userReducer } from './entities/user/state/user.reducers';
-import { UserEffects } from './entities/user/state/user.effects';
 import { isOnlineGuard } from './core/guards/is-online.guard';
 import { TranslateService } from '@ngx-translate/core';
 import { selectUserHasChanges } from './entities/user/state/user.selectors';
+import { adminGuard } from './core/guards/admin.guard';
 
 const titleTranslate = (titleKey: string) => () => {
   const translateService = inject(TranslateService);
@@ -79,7 +78,6 @@ export const routes: Routes = [
     title: titleTranslate('NAV.USER'),
     loadComponent: () =>
       import('./features/user/user.component').then((c) => c.UserComponent),
-    providers: [provideState('user', userReducer), provideEffects(UserEffects)],
   },
   {
     path: 'password-recovery',
@@ -106,5 +104,12 @@ export const routes: Routes = [
     title: titleTranslate('NAV.ABOUT'),
     loadComponent: () =>
       import('./features/about/about.component').then((c) => c.AboutComponent),
+  },
+  {
+    path: 'admin',
+    title: titleTranslate('NAV.ADMIN'),
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () =>
+      import('./features/admin/admin.component').then((c) => c.AdminComponent),
   },
 ];

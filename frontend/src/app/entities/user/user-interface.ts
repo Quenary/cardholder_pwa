@@ -2,6 +2,7 @@ export interface IUser {
   id: number;
   username: string;
   email: string;
+  role_code: EUserRole;
 }
 export interface IUserCreate {
   username: string;
@@ -14,4 +15,9 @@ export interface IUserUpdate {
   email: string;
   password?: string;
   confirm_password?: string;
+}
+export enum EUserRole {
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
+  MEMBER = 'MEMBER',
 }

@@ -3,6 +3,7 @@
  */
 export enum ELocalStorageKey {
   TOKEN_RESPONSE = 'cardholder-token-response',
+  USER = 'cardholder-user',
 }
 /**
  * Enum of useful regexp

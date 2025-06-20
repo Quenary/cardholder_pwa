@@ -1,0 +1,9 @@
+@use 'mixins' as mx;
+:host {
+  @include mx.mat-table;
+
+  .functions-cell {
+    padding: 8px;
+    width: 56px;
+  }
+}

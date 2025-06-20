@@ -2,10 +2,21 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AuthActions } from './auth.actions';
 import { AuthApiService } from 'src/app/entities/auth/auth-api.service';
-import { catchError, finalize, map, of, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  finalize,
+  map,
+  of,
+  switchMap,
+  tap,
+  withLatestFrom,
+} from 'rxjs';
 import { ELocalStorageKey } from 'src/app/app.consts';
 import { Router } from '@angular/router';
 import { SnackService } from 'src/app/core/services/snack.service';
+import { selectAuthTokenResponse } from './auth.selectors';
+import { Store } from '@ngrx/store';
+import { UserActions } from '../../user/state/user.actions';
 
 @Injectable()
 export class AuthEffects {
@@ -13,6 +24,7 @@ export class AuthEffects {
   private readonly authApiService = inject(AuthApiService);
   private readonly router = inject(Router);
   private readonly snackService = inject(SnackService);
+  private readonly store = inject(Store);
 
   token$ = createEffect(() =>
     this.actions$.pipe(
@@ -46,6 +58,17 @@ export class AuthEffects {
     )
   );
 
+  getUserInfo = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.tokenSuccess),
+        tap(() => {
+          this.store.dispatch(UserActions.read());
+        })
+      ),
+    { dispatch: false }
+  );
+
   saveTokens$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -63,8 +86,9 @@ export class AuthEffects {
   logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.logout),
-      switchMap((action) =>
-        this.authApiService.logout(action.refreshToken).pipe(
+      withLatestFrom(this.store.select(selectAuthTokenResponse)),
+      switchMap(([action, tokens]) =>
+        this.authApiService.logout(tokens.refresh_token).pipe(
           map(() => AuthActions.logoutSuccess()),
           catchError((error) => of(AuthActions.logoutError({ error }))),
           finalize(() => {

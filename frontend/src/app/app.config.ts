@@ -30,6 +30,9 @@ import { appReducer } from './state/app.reducers';
 import { AppEffects } from './state/app.effects';
 import { NetworkService } from './core/services/network.service';
 import { UpdateService } from './core/services/update.service';
+import { userReducer } from './entities/user/state/user.reducers';
+import { UserEffects } from './entities/user/state/user.effects';
+import { userInitializer } from './core/app-initializers/user-initializer';
 
 function HttpLoaderFactory(httpClient: HttpClient) {
   return new TranslateHttpLoader(httpClient, '/i18n/', '.json');
@@ -42,7 +45,8 @@ export const appConfig: ApplicationConfig = {
     provideStore(),
     provideState('app', appReducer),
     provideState('auth', authReducer),
-    provideEffects([AppEffects, AuthEffects]),
+    provideState('user', userReducer),
+    provideEffects([AppEffects, AuthEffects, UserEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
     provideHttpClient(withInterceptors([getTokenInterceptor])),
     importProvidersFrom(
@@ -58,6 +62,7 @@ export const appConfig: ApplicationConfig = {
       translateInitializer(inject(EnvironmentInjector))
     ),
     provideAppInitializer(() => authInitializer(inject(Store))),
+    provideAppInitializer(() => userInitializer(inject(Store))),
     provideAppInitializer(() => {
       const networkService = inject(NetworkService);
       return networkService.init();

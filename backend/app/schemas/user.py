@@ -1,10 +1,12 @@
 from typing import Optional, Self
 from pydantic import BaseModel, EmailStr, field_validator, model_validator
 from .validators import password_validator
+from app.enums import EUserRole
 
 
 class UserCreate(BaseModel):
     """User create schema. Passwords required."""
+
     username: str
     email: EmailStr
     password: str
@@ -24,6 +26,7 @@ class UserCreate(BaseModel):
 
 class UserUpdate(BaseModel):
     """User update schema. Passwords optional"""
+
     username: str
     email: EmailStr
     password: Optional[str] = None
@@ -47,6 +50,7 @@ class User(BaseModel):
     id: int
     username: str
     email: EmailStr
+    role_code: EUserRole
 
     class Config:
         from_attributes = True

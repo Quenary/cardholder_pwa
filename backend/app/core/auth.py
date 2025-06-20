@@ -5,7 +5,7 @@ from datetime import timedelta, datetime
 from app.helpers import now
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
-import app.schemas as schemas, app.db as db, app.db.models as models
+import app.schemas as schemas, app.db as db, app.db.models as models, app.enums as enums
 from typing import cast
 import secrets
 from app.config import Config
@@ -60,12 +60,8 @@ def revoke_refresh_token(db: Session, token: str):
         db.commit()
 
 
-def get_user_by_username(db: Session, username: str):
-    return db.query(models.User).filter(models.User.username == username).first()
-
-
 def authenticate_user(db: Session, username: str, password: str):
-    user = get_user_by_username(db, username)
+    user = db.query(models.User).filter_by(username=username).first()
     if not user or not verify_password(password, user.hashed_password):
         return None
     return user
@@ -82,10 +78,14 @@ def build_token_response(
     )
 
 
-async def get_current_user(
+def is_user(
     token: str = Depends(oauth2_scheme), db: Session = Depends(db.get_db)
 ) -> models.User:
-    """Get current user by token. Raise 401 on fail."""
+    """
+    Check if the request credentials is valid.
+    Returns user.
+    Raise 401 on fail
+    """
     credentials_exception = HTTPException(status_code=401, detail="Invalid token")
     try:
         payload = jwt.decode(
@@ -100,3 +100,30 @@ async def get_current_user(
     if not user:
         raise credentials_exception
     return user
+
+
+def is_user_admin(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(db.get_db)
+) -> models.User:
+    """
+    Check if the request credentials is valid and match admin/owner.
+    Returns user.
+    Raise 403 on fail.
+    """
+    user = is_user(token, db)
+    roles: list[enums.EUserRole] = [enums.EUserRole.OWNER, enums.EUserRole.ADMIN]
+    if user.role_code in roles:
+        return user
+    raise HTTPException(403, "Not admin user")
+
+
+def allow_registration(db: Session = Depends(db.get_db)) -> bool:
+    """Check if user registration is allowed. Raise  403 on fail."""
+    setting = (
+        db.query(models.Setting)
+        .filter_by(key=enums.ESettingKey.ALLOW_REGISTRATION)
+        .first()
+    )
+    if not setting or setting.value.lower() != "true":
+        raise HTTPException(403, "Registration now allowed")
+    return True
