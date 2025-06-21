@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from datetime import timedelta, datetime
 from app.helpers import now
-from passlib.context import CryptContext
+import bcrypt
 from sqlalchemy.orm import Session
 import app.schemas as schemas, app.db as db, app.db.models as models, app.enums as enums
 from typing import cast
@@ -12,15 +12,19 @@ from app.config import Config
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def verify_password(plain: str, hashed) -> bool:
-    return pwd_context.verify(plain, hashed)
+def verify_password(plain: str, hashed: str) -> bool:
+    plain_bytes = plain.encode("utf-8")
+    hashed_bytes = hashed.encode("utf-8")
+    return bcrypt.checkpw(plain_bytes, hashed_bytes)
 
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    pwd_bytes = password.encode("utf-8")
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password=pwd_bytes, salt=salt)
+    return hashed_password.decode("utf-8")
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
