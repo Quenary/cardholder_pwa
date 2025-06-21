@@ -14,6 +14,7 @@ async def cleanup():
     """
     while True:
         async with _async_session_maker() as session:
+            print('CLEANUP')
             await _cleanup(session)
         await asyncio.sleep(Config.DB_CLEANUP_INTERVAL_MIN * 60)
 

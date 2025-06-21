@@ -6,53 +6,29 @@ from typing import Generator, AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-def _get_db_url(is_async: bool) -> str:
+def _get_async_url() -> str:
     url = Config.DB_URL
-    if is_async:
+    if url.startswith("sqlite:"):
         url = url.replace("sqlite:", "sqlite+aiosqlite:")
+    elif url.startswith("postgresql+psycopg2:"):
         url = url.replace("postgresql+psycopg2:", "postgresql+asyncpg:")
-    else:
-        url = url.replace("sqlite+aiosqlite:", "sqlite:")
-        url = url.replace("postgresql+asyncpg:", "postgresql+psycopg2:")
+    elif url.startswith("mysql+pymysql:"):
+        url = url.replace("mysql+pymysql:", "mysql+asyncmy:")
+    elif url.startswith("mysql:"):
+        url = url.replace("mysql:", "mysql+asyncmy:")
     return url
 
 
 def _get_connect_args(
     url: str,
 ) -> dict:
-    if "sqlite:" in url:
-        return {"check_same_thread": False, "timeout": 15}
-    elif "sqlite+aiosqlite:" in url:
+    if "sqlite+aiosqlite:" in url:
         return {"timeout": 15}
     return {}
 
 
-sync_url = _get_db_url(False)
-engine = engine = create_engine(
-    sync_url,
-    connect_args=_get_connect_args(sync_url),
-    pool_pre_ping=True,
-    pool_recycle=1800,
-    echo=False,
-)
-_session_maker = sessionmaker(
-    bind=engine,
-    autoflush=False,
-    autocommit=False,
-    expire_on_commit=False,
-)
-
-
-def get_db() -> Generator[Session, None, None]:
-    db = _session_maker()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-async_url = _get_db_url(True)
-async_engine = async_engine = create_async_engine(
+async_url = _get_async_url()
+async_engine = create_async_engine(
     async_url,
     connect_args=_get_connect_args(async_url),
     pool_pre_ping=True,
@@ -66,6 +42,6 @@ _async_session_maker = async_sessionmaker(
 )
 
 
-async def get_async_db() -> AsyncGenerator[AsyncSession, None]:
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with _async_session_maker() as session:
         yield session

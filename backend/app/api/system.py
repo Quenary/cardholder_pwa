@@ -3,7 +3,7 @@ from app.schemas import Version
 import tomllib
 import os
 import app.core.auth as auth
-from app.db import get_async_db
+from app.db import get_async_session
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.models import User
@@ -22,9 +22,9 @@ def get_version(_: User = Depends(auth.is_user)):
 
 
 @router.get("/health")
-async def health(db: AsyncSession = Depends(get_async_db)):
+async def health(session: AsyncSession = Depends(get_async_session)):
     try:
-        await db.execute(text("SELECT 1"))
+        await session.execute(text("SELECT 1"))
         return "OK"
     except Exception:
         raise HTTPException(503, "db_error")

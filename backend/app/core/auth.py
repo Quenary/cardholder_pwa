@@ -4,11 +4,12 @@ from jose import jwt, JWTError
 from datetime import timedelta, datetime
 from app.helpers import now
 import bcrypt
-from sqlalchemy.orm import Session
 import app.schemas as schemas, app.db as db, app.db.models as models, app.enums as enums
 from typing import cast
 import secrets
 from app.config import Config
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, or_
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
@@ -39,8 +40,11 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt, expire
 
 
-def create_refresh_token(
-    user_id: int, db: Session, user_agent: str | None = None, ip: str | None = None
+async def create_refresh_token(
+    user_id: int,
+    session: AsyncSession,
+    user_agent: str | None = None,
+    ip: str | None = None,
 ):
     token = secrets.token_urlsafe(32)
     expires_at = now() + timedelta(minutes=Config.REFRESH_TOKEN_LIFETIME_MIN)
@@ -51,21 +55,16 @@ def create_refresh_token(
         user_agent=user_agent,
         ip_address=ip,
     )
-    db.add(db_token)
-    db.commit()
-    db.refresh(db_token)
+    session.add(db_token)
+    await session.commit()
+    await session.refresh(db_token)
     return db_token
 
 
-def revoke_refresh_token(db: Session, token: str):
-    db_token = db.query(models.RefreshToken).filter_by(token=token).first()
-    if db_token:
-        db_token.revoked = True
-        db.commit()
-
-
-def authenticate_user(db: Session, username: str, password: str):
-    user = db.query(models.User).filter_by(username=username).first()
+async def authenticate_user(session: AsyncSession, username: str, password: str):
+    stmt = select(models.User).where(models.User.username == username).limit(1)
+    result = await session.execute(stmt)
+    user = result.scalar_one_or_none()
     if not user or not verify_password(password, user.hashed_password):
         return None
     return user
@@ -82,8 +81,9 @@ def build_token_response(
     )
 
 
-def is_user(
-    token: str = Depends(oauth2_scheme), db: Session = Depends(db.get_db)
+async def is_user(
+    token: str = Depends(oauth2_scheme),
+    session: AsyncSession = Depends(db.get_async_session),
 ) -> models.User:
     """
     Check if the request credentials is valid.
@@ -100,48 +100,74 @@ def is_user(
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = db.query(models.User).filter(models.User.username == username).first()
+    stmt = select(models.User).where(models.User.username == username).limit(1)
+    result = await session.execute(stmt)
+    user = result.scalar_one_or_none()
     if not user:
         raise credentials_exception
     return user
 
 
-def is_user_admin(
-    token: str = Depends(oauth2_scheme), db: Session = Depends(db.get_db)
+async def is_user_admin(
+    token: str = Depends(oauth2_scheme),
+    session: AsyncSession = Depends(db.get_async_session),
 ) -> models.User:
     """
     Check if the request credentials is valid and match admin/owner.
     Returns user.
     Raise 403 on fail.
     """
-    user = is_user(token, db)
+    user = await is_user(token, session)
     roles: list[enums.EUserRole] = [enums.EUserRole.OWNER, enums.EUserRole.ADMIN]
     if user.role_code in roles:
         return user
     raise HTTPException(403, "Not admin user")
 
 
-def is_user_owner(
-    token: str = Depends(oauth2_scheme), db: Session = Depends(db.get_db)
+async def is_user_owner(
+    token: str = Depends(oauth2_scheme),
+    session: AsyncSession = Depends(db.get_async_session),
 ) -> models.User:
     """
     Check if the request credentials is valid and match owner.
     Returns user.
     Raise 403 on fail.
     """
-    user = is_user(token, db)
+    user = await is_user(token, session)
     if user.role_code == enums.EUserRole.OWNER:
         return user
     raise HTTPException(403, "Not owner user")
 
 
-def allow_registration(db: Session = Depends(db.get_db)) -> bool:
+async def allow_registration(session: AsyncSession = Depends(db.get_async_session)):
     """Check if user registration is allowed. Raise  403 on fail."""
-    setting = (
-        db.query(models.Setting)
-        .filter_by(key=enums.ESettingKey.ALLOW_REGISTRATION)
-        .first()
+    stmt = (
+        select(models.Setting)
+        .where(models.Setting.key == enums.ESettingKey.ALLOW_REGISTRATION)
+        .limit(1)
     )
+    result = await session.execute(stmt)
+    setting = result.scalar_one_or_none()
     if not setting or setting.value.lower() != "true":
-        raise HTTPException(403, "Registration now allowed")
+        raise HTTPException(403, "registration feature disabled in app settings")
     return True
+
+
+async def is_creds_taken(
+    session: AsyncSession, username: str, email: str, user_id: int | None
+):
+    """
+    Check if user credentials already taken by
+    another user.
+    """
+    stmt = (
+        select(models.User)
+        .where(
+            or_(models.User.username == username, models.User.email == email),
+            models.User.id != user_id,
+        )
+        .limit(1)
+    )
+    result = await session.execute(stmt)
+    user = result.scalar_one_or_none()
+    return user is not None

@@ -3,20 +3,28 @@ version: "3.9"
 networks:
   cardholder_pwa:
     driver: bridge
+
 services:
   db:
-    image: postgres:16
+    image: mysql:8.3
+    # image: mariadb:11.3
     restart: unless-stopped
     environment:
-      POSTGRES_DB: cardholder_db
-      POSTGRES_USER: cardholder_user
-      POSTGRES_PASSWORD: cardholder_pass
+      MYSQL_DATABASE: cardholder_db
+      MYSQL_USER: cardholder_user
+      MYSQL_PASSWORD: cardholder_pass
+      MYSQL_ROOT_PASSWORD: root_pass
+      # MARIADB_DATABASE: cardholder_db
+      # MARIADB_USER: cardholder_user
+      # MARIADB_PASSWORD: cardholder_pass
+      # MARIADB_ROOT_PASSWORD: root_pass
     volumes:
-      - $HOME/.cardholder_pwa/postgres_data:/var/lib/postgresql/data
+      - $HOME/.cardholder_pwa/mysql_data:/var/lib/mysql
+      # - $HOME/.cardholder_pwa/mariadb_data:/var/lib/mysql
     networks:
       - cardholder_pwa
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U cardholder_user -d cardholder_db"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "cardholder_user", "-pcardholder_pass"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,7 +36,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DB_URL: postgresql+asyncpg://cardholder_user:cardholder_pass@db:5432/cardholder_db
+      DB_URL: mysql+asyncmy://cardholder_user:cardholder_pass@db:3306/cardholder_db
     networks:
       - cardholder_pwa
     healthcheck:

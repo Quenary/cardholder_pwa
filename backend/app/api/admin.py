@@ -2,25 +2,29 @@ from fastapi import APIRouter, Depends, HTTPException
 import app.schemas as schemas, app.enums as enums
 from app.db import models
 from app.core import auth
-from sqlalchemy.orm import Session
-from app.db import get_db
+from app.db import get_async_session
 from app.core.user import delete_user
 from app.core.smtp import EmailSender
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 router = APIRouter(tags=["admin"], prefix="/admin")
 
 
 @router.get("/users", response_model=list[schemas.User])
-def get_users_list(
-    db: Session = Depends(get_db), admin: models.User = Depends(auth.is_user_admin)
+async def get_users_list(
+    session: AsyncSession = Depends(get_async_session),
+    _: models.User = Depends(auth.is_user_admin),
 ):
-    return db.query(models.User).all()
+    stmt = select(models.User)
+    result = await session.execute(stmt)
+    return result.scalars().all()
 
 
 @router.delete("/users/{user_id}")
-def admin_delete_user(
+async def admin_delete_user(
     user_id: int,
-    db: Session = Depends(get_db),
+    session: AsyncSession = Depends(get_async_session),
     admin: models.User = Depends(auth.is_user_admin),
 ):
     if user_id == admin.id:
@@ -28,45 +32,61 @@ def admin_delete_user(
             403, "Admin cannot delete his own account with this function."
         )
 
-    user = db.query(models.User).filter_by(id=user_id).first()
+    stmt = select(models.User).where(models.User.id == user_id).limit(1)
+    result = await session.execute(stmt)
+    user = result.scalar_one_or_none()
+
     if not user:
         raise HTTPException(404, "User not found")
 
-    return delete_user(db, user)
+    if (
+        admin.role_code == enums.EUserRole.ADMIN
+        and user.role_code == enums.EUserRole.ADMIN
+    ):
+        raise HTTPException(403, "Admin cannot delete admin.")
+
+    return await delete_user(session, user)
 
 
 @router.put(
     "/users/role", description="Change the user role. Only owner can change roles."
 )
-def owner_change_user_role(
+async def owner_change_user_role(
     user_id: int,
     role_code: enums.EUserRole,
-    db: Session = Depends(get_db),
-    admin: models.User = Depends(auth.is_user_owner),
+    session: AsyncSession = Depends(get_async_session),
+    owner: models.User = Depends(auth.is_user_owner),
 ):
+    owner_assign_error = HTTPException(403, "Owner role cannot be reassigned.")
+
     if role_code == enums.EUserRole.OWNER:
-        raise HTTPException(403, "Owner role cannot be assigned.")
+        raise owner_assign_error
 
-    if user_id == admin.id:
-        raise HTTPException(403, "Owner cannot change his own role.")
+    if user_id == owner.id:
+        raise owner_assign_error
 
-    user = db.query(models.User).filter_by(id=user_id).first()
+    stmt = select(models.User).where(models.User.id == user_id).limit(1)
+    result = await session.execute(stmt)
+    user = result.scalar_one_or_none()
+
     if not user:
         raise HTTPException(404, "User not found")
 
-    if user.role_code == enums.EUserRole.OWNER:
-        raise HTTPException(403, "Owner role cannot be reassigned.")
-
     user.role_code = role_code
-    db.commit()
+    await session.commit()
+    await session.refresh(user)
+    return {"detail": "User role has been changed"}
 
 
 @router.get("/settings", response_model=schemas.GetSettingsRequest)
-def get_system_settings(
-    db: Session = Depends(get_db), admin: models.User = Depends(auth.is_user_admin)
+async def get_system_settings(
+    session: AsyncSession = Depends(get_async_session),
+    _: models.User = Depends(auth.is_user_admin),
 ):
-    settings = db.query(models.Setting).all()
-    result = []
+    stmt = select(models.Setting)
+    result = await session.execute(stmt)
+    settings = result.scalars()
+    res = []
     for s in settings:
         val = s.value
         try:
@@ -79,7 +99,7 @@ def get_system_settings(
         except Exception:
             pass
 
-        result.append(
+        res.append(
             {
                 "key": s.key,
                 "value": val,
@@ -88,17 +108,19 @@ def get_system_settings(
             }
         )
 
-    return result
+    return res
 
 
 @router.patch("/settings")
-def change_system_settings(
+async def change_system_settings(
     request: list[schemas.PatchSettingsRequestItem],
-    db: Session = Depends(get_db),
-    admin: models.User = Depends(auth.is_user_admin),
+    session: AsyncSession = Depends(get_async_session),
+    _: models.User = Depends(auth.is_user_admin),
 ):
     for s in request:
-        setting = db.query(models.Setting).filter_by(key=s.key).first()
+        stmt = select(models.Setting).where(models.Setting.key == s.key).limit(1)
+        result = await session.execute(stmt)
+        setting = result.scalar_one_or_none()
         if not setting:
             raise HTTPException(status_code=404, detail=f"Setting '{s.key}' not found")
         if setting.value_type != type(s.value).__name__:
@@ -108,17 +130,17 @@ def change_system_settings(
 
         setting.value = str(s.value)
 
-    db.commit()
+    await session.commit()
     return {"status": "updated", "count": len(request)}
 
 
 @router.get("/smtp/status", response_model=bool)
-def get_smtp_status(_: models.User = Depends(auth.is_user_admin)):
+async def get_smtp_status(_: models.User = Depends(auth.is_user_admin)):
     return EmailSender.status()
 
 
 @router.post("/smtp/test")
-def send_test_email(admin: models.User = Depends(auth.is_user_admin)):
+async def send_test_email(admin: models.User = Depends(auth.is_user_admin)):
     EmailSender.send_email(
         admin.email,
         "Test email from Cardholder PWA",
