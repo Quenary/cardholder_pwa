@@ -1,19 +1,21 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import delete
 from fastapi import HTTPException
-import app.db.models as models
+from app.db.models import User, Card, RefreshToken, PasswordRecoveryCode
 import app.enums as enums
 
 
-def delete_user(
-    db: Session,
-    user: models.User,
+async def delete_user(
+    db: AsyncSession,
+    user: User,
 ):
     if user.role_code == enums.EUserRole.OWNER:
         raise HTTPException(403, "Owner cannot be deleted")
-
-    db.query(models.Card).filter_by(user_id=user.id).delete()
-    db.query(models.RefreshToken).filter_by(user_id=user.id).delete()
-    db.query(models.PasswordRecoveryCode).filter_by(user_id=user.id).delete()
-    db.delete(user)
-    db.commit()
+    await db.execute(delete(Card).where(Card.user_id == user.id))
+    await db.execute(delete(RefreshToken).where(RefreshToken.user_id == user.id))
+    await db.execute(
+        delete(PasswordRecoveryCode).where(PasswordRecoveryCode.user_id == user.id)
+    )
+    await db.delete(user)
+    await db.commit()
     return {"detail": "User and all related data deleted"}

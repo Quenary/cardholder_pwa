@@ -43,10 +43,11 @@ class Config:
                 os.getenv("PASSWORD_RECOVERY_CODE_LIFETIME_MIN") or 15
             )
             cls.DB_URL = (
-                os.getenv("DB_URL") or "sqlite:////cardholder_pwa/cardholder_pwa.db"
+                os.getenv("DB_URL")
+                or "sqlite+aiosqlite:////cardholder_pwa/cardholder_pwa.db"
             )
             cls.DB_CLEANUP_INTERVAL_MIN = float(
-                os.getenv("DB_CLEANUP_INTERVAL_MIN") or 60
+                os.getenv("DB_CLEANUP_INTERVAL_MIN") or 360
             )
             cls.SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "false").lower() == "true"
             defaultPort: int = 587 if cls.SMTP_USE_TLS else 25

@@ -7,7 +7,7 @@ You may also need following packages `pip3 install python-is-python3 python3-dev
 
 ### Run the app
 
-- create .env file (next to that readme, in /backend directory) with at least this variable `DB_URL=sqlite:///./cardholder_pwa.db`
+- create .env file (next to that readme, in /backend directory) with at least this variable `DB_URL=sqlite+aiosqlite:///./cardholder_pwa.db`
 - create venv `python -m venv venv`
 - activate with `source venv/bin/activate` or `venv/scripts/activate`
 - install deps `pip install -r requirements.txt`
