@@ -43,3 +43,7 @@
     }
   }
 }
+@mixin mat-dialog-actions {
+  margin-top: auto;
+  gap: 8px;
+}

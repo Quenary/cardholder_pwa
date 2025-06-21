@@ -117,6 +117,20 @@ def is_user_admin(
     raise HTTPException(403, "Not admin user")
 
 
+def is_user_owner(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(db.get_db)
+) -> models.User:
+    """
+    Check if the request credentials is valid and match owner.
+    Returns user.
+    Raise 403 on fail.
+    """
+    user = is_user(token, db)
+    if user.role_code == enums.EUserRole.OWNER:
+        return user
+    raise HTTPException(403, "Not owner user")
+
+
 def allow_registration(db: Session = Depends(db.get_db)) -> bool:
     """Check if user registration is allowed. Raise  403 on fail."""
     setting = (

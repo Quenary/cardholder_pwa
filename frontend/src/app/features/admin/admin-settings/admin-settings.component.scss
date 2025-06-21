@@ -1,4 +1,10 @@
 @use 'mixins' as mx;
 :host {
   @include mx.mat-table;
+  th,
+  td {
+    &:nth-child(3) {
+      width: 25%;
+    }
+  }
 }

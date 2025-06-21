@@ -3,6 +3,7 @@ import { IUserState } from './user.reducers';
 import { EUserRole } from '../user-interface';
 
 const _selectUser = createFeatureSelector<IUserState>('user');
+export const selectUser = createSelector(_selectUser, (state) => state);
 export const selectUserIsLoading = createSelector(
   _selectUser,
   (state) => state.isLoading
@@ -17,4 +18,8 @@ export const selectUserInfo = createSelector(
 );
 export const selectUserIsAdmin = createSelector(selectUserInfo, (info) =>
   [EUserRole.OWNER, EUserRole.ADMIN].includes(info?.role_code)
+);
+export const selectUserIsOwner = createSelector(
+  selectUserInfo,
+  (info) => EUserRole.OWNER == info.role_code
 );

@@ -5,22 +5,24 @@
   <ng-container matColumnDef="key">
     <th
       mat-header-cell
-      *matHeaderCellDef
-      >{{ 'ADMIN.SETTINGS.KEY' | translate }}</th
-    >
+      *matHeaderCellDef>
+      {{ 'ADMIN.SETTINGS.KEY' | translate }}
+    </th>
     <td
       mat-cell
       *matCellDef="let entry"
-      >{{ entry.key }}</td
-    >
+      [matTooltip]="entry.key"
+      matTooltipPosition="above">
+      {{ keysTranslates[entry.key] }}
+    </td>
   </ng-container>
 
   <ng-container matColumnDef="value">
     <th
       mat-header-cell
-      *matHeaderCellDef
-      >{{ 'ADMIN.SETTINGS.VALUE' | translate }}</th
-    >
+      *matHeaderCellDef>
+      {{ 'ADMIN.SETTINGS.VALUE' | translate }}
+    </th>
     <td
       mat-cell
       *matCellDef="let entry">
@@ -60,14 +62,14 @@
   <ng-container matColumnDef="updated_at">
     <th
       mat-header-cell
-      *matHeaderCellDef
-      >{{ 'ADMIN.SETTINGS.UPDATED_AT' | translate }}</th
-    >
+      *matHeaderCellDef>
+      {{ 'ADMIN.SETTINGS.UPDATED_AT' | translate }}
+    </th>
     <td
       mat-cell
-      *matCellDef="let entry"
-      >{{ entry.updated_at | date : 'dd.MM.YYYY HH:mm:ss' }}</td
-    >
+      *matCellDef="let entry">
+      {{ entry.updated_at | naiveDate | date : 'medium' }}
+    </td>
   </ng-container>
 
   <tr

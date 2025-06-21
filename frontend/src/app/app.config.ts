@@ -1,9 +1,9 @@
 import {
   ApplicationConfig,
-  EnvironmentInjector,
   importProvidersFrom,
   inject,
   isDevMode,
+  LOCALE_ID,
   provideAppInitializer,
   provideZoneChangeDetection,
 } from '@angular/core';
@@ -33,10 +33,7 @@ import { UpdateService } from './core/services/update.service';
 import { userReducer } from './entities/user/state/user.reducers';
 import { UserEffects } from './entities/user/state/user.effects';
 import { userInitializer } from './core/app-initializers/user-initializer';
-
-function HttpLoaderFactory(httpClient: HttpClient) {
-  return new TranslateHttpLoader(httpClient, '/i18n/', '.json');
-}
+import { localeInitializer } from './core/app-initializers/locale-initializer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -53,16 +50,23 @@ export const appConfig: ApplicationConfig = {
       TranslateModule.forRoot({
         loader: {
           provide: TranslateLoader,
-          useFactory: HttpLoaderFactory,
+          useFactory: (httpClient: HttpClient) =>
+            new TranslateHttpLoader(httpClient, '/i18n/', '.json'),
           deps: [HttpClient],
         },
       })
     ),
-    provideAppInitializer(() =>
-      translateInitializer(inject(EnvironmentInjector))
-    ),
-    provideAppInitializer(() => authInitializer(inject(Store))),
-    provideAppInitializer(() => userInitializer(inject(Store))),
+    {
+      provide: LOCALE_ID,
+      useFactory: () => {
+        const locale = navigator.language || 'en-US';
+        return locale;
+      },
+    },
+    provideAppInitializer(() => translateInitializer()),
+    provideAppInitializer(() => localeInitializer()),
+    provideAppInitializer(() => authInitializer()),
+    provideAppInitializer(() => userInitializer()),
     provideAppInitializer(() => {
       const networkService = inject(NetworkService);
       return networkService.init();

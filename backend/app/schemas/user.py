@@ -2,6 +2,7 @@ from typing import Optional, Self
 from pydantic import BaseModel, EmailStr, field_validator, model_validator
 from .validators import password_validator
 from app.enums import EUserRole
+from datetime import datetime
 
 
 class UserCreate(BaseModel):
@@ -50,6 +51,8 @@ class User(BaseModel):
     id: int
     username: str
     email: EmailStr
+    created_at: datetime
+    updated_at: datetime
     role_code: EUserRole
 
     class Config:

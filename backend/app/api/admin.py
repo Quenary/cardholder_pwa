@@ -5,6 +5,7 @@ from app.core import auth
 from sqlalchemy.orm import Session
 from app.db import get_db
 from app.core.user import delete_user
+from app.core.smtp import EmailSender
 
 router = APIRouter(tags=["admin"], prefix="/admin")
 
@@ -32,6 +33,32 @@ def admin_delete_user(
         raise HTTPException(404, "User not found")
 
     return delete_user(db, user)
+
+
+@router.put(
+    "/users/role", description="Change the user role. Only owner can change roles."
+)
+def owner_change_user_role(
+    user_id: int,
+    role_code: enums.EUserRole,
+    db: Session = Depends(get_db),
+    admin: models.User = Depends(auth.is_user_owner),
+):
+    if role_code == enums.EUserRole.OWNER:
+        raise HTTPException(403, "Owner role cannot be assigned.")
+
+    if user_id == admin.id:
+        raise HTTPException(403, "Owner cannot change his own role.")
+
+    user = db.query(models.User).filter_by(id=user_id).first()
+    if not user:
+        raise HTTPException(404, "User not found")
+
+    if user.role_code == enums.EUserRole.OWNER:
+        raise HTTPException(403, "Owner role cannot be reassigned.")
+
+    user.role_code = role_code
+    db.commit()
 
 
 @router.get("/settings", response_model=schemas.GetSettingsRequest)
@@ -83,3 +110,17 @@ def change_system_settings(
 
     db.commit()
     return {"status": "updated", "count": len(request)}
+
+
+@router.get("/smtp/status", response_model=bool)
+def get_smtp_status(_: models.User = Depends(auth.is_user_admin)):
+    return EmailSender.status()
+
+
+@router.post("/smtp/test")
+def send_test_email(admin: models.User = Depends(auth.is_user_admin)):
+    EmailSender.send_email(
+        admin.email,
+        "Test email from Cardholder PWA",
+        "This is body of the test email.\nGood day!\n",
+    )

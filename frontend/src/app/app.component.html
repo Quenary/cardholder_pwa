@@ -24,7 +24,7 @@
   </mat-sidenav>
   <mat-sidenav-content class="sidenav-container-content">
     @if (isAuthorized$ | async) { @defer {
-    <mat-toolbar class="sidenav-container-content-toolbar">
+    <mat-toolbar class="mat-toolbar sidenav-container-content-toolbar">
       <button
         mat-icon-button
         (click)="sidenavOpened = !sidenavOpened">

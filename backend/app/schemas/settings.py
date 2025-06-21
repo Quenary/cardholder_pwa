@@ -1,5 +1,6 @@
 from pydantic import BaseModel, RootModel
 from typing import Union
+from datetime import datetime
 
 
 class PatchSettingsRequestItem(BaseModel):
@@ -9,7 +10,7 @@ class PatchSettingsRequestItem(BaseModel):
 
 class GetSettingsRequestItem(PatchSettingsRequestItem):
     value_type: str
-    updated_at: str
+    updated_at: datetime
 
 
 class GetSettingsRequest(RootModel[list[GetSettingsRequestItem]]):

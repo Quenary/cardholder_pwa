@@ -2,15 +2,4 @@
 
 :host {
   @include mx.component-host;
-
-  .about-component {
-    a {
-      color: var(--mat-sys-primary);
-    }
-    .row-line {
-      display: inline-flex;
-      gap: 8px;
-      align-items: center;
-    }
-  }
 }

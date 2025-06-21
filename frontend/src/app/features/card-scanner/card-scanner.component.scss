@@ -1,3 +1,5 @@
+@use 'mixins' as mx;
+
 :host {
   .mat-dialog-content {
     overflow: hidden;
@@ -10,7 +12,6 @@
   }
 
   .mat-dialog-actions {
-    margin-top: auto;
-    gap: 8px;
+    @include mx.mat-dialog-actions;
   }
 }

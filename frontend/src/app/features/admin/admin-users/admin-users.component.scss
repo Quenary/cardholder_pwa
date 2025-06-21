@@ -2,8 +2,10 @@
 :host {
   @include mx.mat-table;
 
-  .functions-cell {
-    padding: 8px;
-    width: 56px;
+  th,
+  td {
+    &:nth-child(3) {
+      width: 25%;
+    }
   }
 }

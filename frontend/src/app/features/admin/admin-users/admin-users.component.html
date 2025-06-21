@@ -2,21 +2,6 @@
 <table
   mat-table
   [dataSource]="users$ | async">
-  <ng-container matColumnDef="id">
-    <th
-      width="10%"
-      mat-header-cell
-      *matHeaderCellDef
-      >{{ 'ADMIN.USERS.ID' | translate }}</th
-    >
-    <td
-      width="10%"
-      mat-cell
-      *matCellDef="let entry"
-      >{{ entry.id }}</td
-    >
-  </ng-container>
-
   <ng-container matColumnDef="username">
     <th
       mat-header-cell
@@ -30,19 +15,6 @@
     >
   </ng-container>
 
-  <ng-container matColumnDef="email">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      >{{ 'ADMIN.USERS.EMAIL' | translate }}</th
-    >
-    <td
-      mat-cell
-      *matCellDef="let entry"
-      >{{ entry.email }}</td
-    >
-  </ng-container>
-
   <ng-container matColumnDef="role_code">
     <th
       mat-header-cell
@@ -52,11 +24,11 @@
     <td
       mat-cell
       *matCellDef="let entry"
-      >{{ entry.role_code }}</td
+      >{{ rolesTranslates[entry.role_code] }}</td
     >
   </ng-container>
 
-  <ng-container matColumnDef="delete_user">
+  <ng-container matColumnDef="open_user">
     <th
       class="functions-cell header"
       mat-header-cell
@@ -67,8 +39,8 @@
       *matCellDef="let entry">
       <button
         mat-icon-button
-        (click)="deleteUser(entry)">
-        <mat-icon>delete</mat-icon>
+        (click)="openUserDialog(entry)">
+        <mat-icon>manage_accounts</mat-icon>
       </button>
     </td>
   </ng-container>

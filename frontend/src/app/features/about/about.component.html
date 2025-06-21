@@ -10,7 +10,6 @@
       </span>
       <mat-icon matListItemIcon>open_in_new</mat-icon>
     </a>
-    <mat-divider></mat-divider>
     @if (version$ | async; as version) {
     <mat-list-item role="">
       <span matListItemTitle>
@@ -25,31 +24,8 @@
     }
     <mat-list-item>
       <span matListItemTitle>
-        {{ 'ABOUT.FRONTEND_VERSION' | translate }} {{ frontendVersion$ | async }}
-      </span>
-    </mat-list-item>
-    <mat-divider></mat-divider>
-    <mat-list-item>
-      @if (smtpStatus$ | async) {
-      <mat-icon matListItemIcon>check_circle</mat-icon>
-      } @else {
-      <mat-icon
-        matListItemIcon
-        [style.color]="'var(--mat-sys-error)'">
-        warning_outlined
-      </mat-icon>
-      }
-      <span
-        matListItemTitle
-        class="row-line">
-        {{ 'ABOUT.SMTP_STATUS' | translate }}
-        <button
-          mat-button
-          [disabled]="!(smtpStatus$ | async)"
-          (click)="onSmtpTest()">
-          <mat-icon>mail</mat-icon>
-          {{ 'ABOUT.SMTP_TEST' | translate }}
-        </button>
+        {{ 'ABOUT.FRONTEND_VERSION' | translate }}
+        {{ frontendVersion$ | async }}
       </span>
     </mat-list-item>
   </mat-list>

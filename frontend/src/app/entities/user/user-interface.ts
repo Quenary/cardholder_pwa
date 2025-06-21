@@ -3,6 +3,8 @@ export interface IUser {
   username: string;
   email: string;
   role_code: EUserRole;
+  created_at: string;
+  updated_at: string;
 }
 export interface IUserCreate {
   username: string;
