@@ -2,7 +2,6 @@ import { AsyncPipe, DatePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
-import { MatCheckbox } from '@angular/material/checkbox';
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
@@ -13,10 +12,19 @@ import {
 } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
+import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { switchMap, finalize, EMPTY, BehaviorSubject, tap } from 'rxjs';
+import {
+  switchMap,
+  finalize,
+  EMPTY,
+  BehaviorSubject,
+  tap,
+  Observable,
+} from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { AdminApiService } from 'src/app/entities/admin/admin-api.service';
+import { selectUserIsOwner } from 'src/app/entities/user/state/user.selectors';
 import { EUserRole, IUser } from 'src/app/entities/user/user-interface';
 import {
   ConfirmDialogComponent,
@@ -51,9 +59,12 @@ export class AdminUserDialogComponent {
   private readonly snackService = inject(SnackService);
   private readonly matDialog = inject(MatDialog);
   private readonly matDialogRef = inject(MatDialogRef);
-  public readonly data: IAdminUserDialogData = inject(MAT_DIALOG_DATA);
+  private readonly data: IAdminUserDialogData = inject(MAT_DIALOG_DATA);
   private readonly translateService = inject(TranslateService);
+  private readonly store = inject(Store);
 
+  public readonly isOwner$: Observable<boolean> =
+    this.store.select(selectUserIsOwner);
   public readonly EUserRole = EUserRole;
   public readonly rolesTranslates =
     this.translateService.instant('ADMIN.USERS.ROLES');

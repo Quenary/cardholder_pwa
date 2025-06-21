@@ -48,7 +48,14 @@ quenary/cardholder_pwa:latest
 docker-compose -f <filename e.g. docker-compose.pg.yml> up -d
 ```
 
-### Important notes
+### Account roles
 
 - The first registered user (after deployment or migration from version 0.0.13) will be assigned to the owner role. For now this account cannot be deleted and owner role cannot be reassigned in a convenient way.
-- The owner can change some application settings from the interface or delete other users.
+- Might be an overkill, but just in case, i also added admin and member roles.
+- The owner can:
+  * Change some app settings from the ui
+  * Assign admin role to other members
+  * Delete admins or members accounts
+- The admin can:
+  * Change some app settings from the ui
+  * Delete members accounts
