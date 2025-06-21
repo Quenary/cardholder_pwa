@@ -29,3 +29,21 @@
   max-height: 100%;
   position: relative;
 }
+@mixin mat-table {
+  table {
+    width: 100%;
+    table-layout: fixed;
+
+    th,
+    td {
+      padding: 0 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+@mixin mat-dialog-actions {
+  margin-top: auto;
+  gap: 8px;
+}

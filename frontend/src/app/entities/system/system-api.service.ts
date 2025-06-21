@@ -14,13 +14,7 @@ export class SystemApiService {
     return this.httpClient.get<IVersion>(`${environment.api}/system/version`);
   }
 
-  smtpStatus(): Observable<boolean> {
-    return this.httpClient.get<boolean>(
-      `${environment.api}/system/smtp/status`
-    );
-  }
-
-  smtpTest(): Observable<any> {
-    return this.httpClient.post(`${environment.api}/system/smtp/test`, {});
+  health(): Observable<any> {
+    return this.httpClient.get(`${environment.api}/system/health`);
   }
 }

@@ -23,6 +23,9 @@ export class SnackService {
     if (error instanceof HttpErrorResponse) {
       message = this.translateService.instant('GENERAL.REQUEST_ERROR');
       message += `: ${error.status} ${error.statusText}`;
+      if (typeof error.error?.detail === 'string') {
+        message += ` - ${error.error.detail}`;
+      }
     } else if (error instanceof Error) {
       message = error.message;
     } else if (typeof error === 'string') {

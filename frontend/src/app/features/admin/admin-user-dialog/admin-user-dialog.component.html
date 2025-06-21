@@ -1,0 +1,71 @@
+<h2 mat-dialog-title>
+  {{ user.username }}
+</h2>
+<mat-dialog-content>
+  <mat-list>
+    <mat-list-item>
+      <span matListItemTitle>{{ 'ADMIN.USERS.ID' | translate }}</span>
+      <span matListItemLine>{{ user.id }}</span>
+    </mat-list-item>
+    <mat-list-item>
+      <span matListItemTitle>{{ 'ADMIN.USERS.USERNAME' | translate }}</span>
+      <span matListItemLine>{{ user.username }}</span>
+    </mat-list-item>
+    <mat-list-item>
+      <span matListItemTitle>{{ 'ADMIN.USERS.EMAIL' | translate }}</span>
+      <span matListItemLine>{{ user.email }}</span>
+    </mat-list-item>
+    <mat-list-item>
+      <span matListItemTitle>{{ 'ADMIN.USERS.ROLE' | translate }}</span>
+      <span matListItemLine>{{ rolesTranslates[user.role_code] }}</span>
+    </mat-list-item>
+    <mat-list-item>
+      <span matListItemTitle>{{ 'ADMIN.USERS.CREATED_AT' | translate }}</span>
+      <span matListItemLine>{{
+        user.created_at | naiveDate | date : 'medium'
+      }}</span>
+    </mat-list-item>
+    <mat-list-item>
+      <span matListItemTitle>{{ 'ADMIN.USERS.UPDATED_AT' | translate }}</span>
+      <span matListItemLine>{{
+        user.updated_at | naiveDate | date : 'medium'
+      }}</span>
+    </mat-list-item>
+  </mat-list>
+</mat-dialog-content>
+
+<mat-dialog-actions class="mat-dialog-actions">
+  @if (isOwner$ | async) { @if (user.role_code == EUserRole.ADMIN) {
+  <button
+    class="accent-color"
+    mat-button
+    [disabled]="isLoading$ | async"
+    (click)="changeUserRole(EUserRole.MEMBER)">
+    <mat-icon>remove_moderator</mat-icon>
+    {{ 'ADMIN.USERS.CHANGE_ROLE.TO_MEMBER' | translate }}
+  </button>
+  } @else {
+  <button
+    class="accent-color"
+    mat-button
+    [disabled]="isLoading$ | async"
+    (click)="changeUserRole(EUserRole.ADMIN)">
+    <mat-icon>add_moderator</mat-icon>
+    {{ 'ADMIN.USERS.CHANGE_ROLE.TO_ADMIN' | translate }}
+  </button>
+  } } @if(user.role_code == EUserRole.MEMBER || (isOwner$ | async)) {
+  <button
+    class="warn-color"
+    mat-button
+    [disabled]="isLoading$ | async"
+    (click)="deleteUser()">
+    {{ 'GENERAL.DELETE' | translate }}
+  </button>
+  }
+  <button
+    mat-flat-button
+    [disabled]="isLoading$ | async"
+    (click)="close()">
+    {{ 'GENERAL.CLOSE' | translate }}
+  </button>
+</mat-dialog-actions>

@@ -25,6 +25,7 @@
         "PASSWORD_RECOVERY": "Восстановление пароля",
         "CARD": "Карты",
         "USER": "Пользователь",
+        "ADMIN": "Администратор",
         "ABOUT": "О приложении",
         "EXIT": "Выход"
     },
@@ -92,13 +93,45 @@
             "DELETE": "Пользователь удален"
         }
     },
+    "ADMIN": {
+        "HEALTH": "Статус приложения",
+        "SMTP_STATUS": "Статус SMTP",
+        "SMTP_TEST": "Тест",
+        "SMTP_TEST_SUCCESS": "E-mail отправлен",
+        "SETTINGS": {
+            "TITLE": "Настройки",
+            "KEY": "Ключ",
+            "VALUE": "Значение",
+            "UPDATED_AT": "Дата изменения",
+            "KEYS": {
+                "ALLOW_REGISTRATION": "Разрешить регистрацию"
+            }
+        },
+        "USERS": {
+            "TITLE": "Пользователи",
+            "ID": "ID",
+            "USERNAME": "Имя пользователя",
+            "EMAIL": "E-mail",
+            "ROLE": "Роль",
+            "CREATED_AT": "Дата создания",
+            "UPDATED_AT": "Дата изменения",
+            "ROLES": {
+                "OWNER": "Владелец",
+                "ADMIN": "Администратор",
+                "MEMBER": "Участник"
+            },
+            "CHANGE_ROLE": {
+                "TO_ADMIN": "Сделать администратором",
+                "TO_MEMBER": "Сделать участником",
+                "CONFIRM": "Смена роли",
+                "CONFIRM_SUBTITLE": "Подтвердите изменение роли пользователя на: {{role}}"
+            }
+        }
+    },
     "ABOUT": {
         "HOMEPAGE": "Домашняя страница",
         "IMAGE_VERSION": "Версия Docker-образа",
         "BACKEND_VERSION": "Версия API-приложения",
-        "FRONTEND_VERSION": "Версия WEB-приложения",
-        "SMTP_STATUS": "Статус SMTP",
-        "SMTP_TEST": "Тест",
-        "SMTP_TEST_SUCCESS": "E-mail отправлен"
+        "FRONTEND_VERSION": "Версия WEB-приложения"
     }
 }

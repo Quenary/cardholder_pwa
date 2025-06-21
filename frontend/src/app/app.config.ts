@@ -1,9 +1,9 @@
 import {
   ApplicationConfig,
-  EnvironmentInjector,
   importProvidersFrom,
   inject,
   isDevMode,
+  LOCALE_ID,
   provideAppInitializer,
   provideZoneChangeDetection,
 } from '@angular/core';
@@ -30,10 +30,10 @@ import { appReducer } from './state/app.reducers';
 import { AppEffects } from './state/app.effects';
 import { NetworkService } from './core/services/network.service';
 import { UpdateService } from './core/services/update.service';
-
-function HttpLoaderFactory(httpClient: HttpClient) {
-  return new TranslateHttpLoader(httpClient, '/i18n/', '.json');
-}
+import { userReducer } from './entities/user/state/user.reducers';
+import { UserEffects } from './entities/user/state/user.effects';
+import { userInitializer } from './core/app-initializers/user-initializer';
+import { localeInitializer } from './core/app-initializers/locale-initializer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -42,22 +42,31 @@ export const appConfig: ApplicationConfig = {
     provideStore(),
     provideState('app', appReducer),
     provideState('auth', authReducer),
-    provideEffects([AppEffects, AuthEffects]),
+    provideState('user', userReducer),
+    provideEffects([AppEffects, AuthEffects, UserEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
     provideHttpClient(withInterceptors([getTokenInterceptor])),
     importProvidersFrom(
       TranslateModule.forRoot({
         loader: {
           provide: TranslateLoader,
-          useFactory: HttpLoaderFactory,
+          useFactory: (httpClient: HttpClient) =>
+            new TranslateHttpLoader(httpClient, '/i18n/', '.json'),
           deps: [HttpClient],
         },
       })
     ),
-    provideAppInitializer(() =>
-      translateInitializer(inject(EnvironmentInjector))
-    ),
-    provideAppInitializer(() => authInitializer(inject(Store))),
+    {
+      provide: LOCALE_ID,
+      useFactory: () => {
+        const locale = navigator.language || 'en-US';
+        return locale;
+      },
+    },
+    provideAppInitializer(() => translateInitializer()),
+    provideAppInitializer(() => localeInitializer()),
+    provideAppInitializer(() => authInitializer()),
+    provideAppInitializer(() => userInitializer()),
     provideAppInitializer(() => {
       const networkService = inject(NetworkService);
       return networkService.init();

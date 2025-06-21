@@ -1,0 +1,44 @@
+<mat-list>
+  <mat-list-item>
+    <ng-container
+      matListItemIcon
+      [ngTemplateOutlet]="statusIconTemplate"
+      [ngTemplateOutletContext]="{
+        status: health$ | async
+      }">
+    </ng-container>
+    <span matListItemTitle>
+      {{ 'ADMIN.HEALTH' | translate }}
+    </span>
+  </mat-list-item>
+  <mat-list-item>
+    <ng-container
+      matListItemIcon
+      [ngTemplateOutlet]="statusIconTemplate"
+      [ngTemplateOutletContext]="{
+        status: smtpStatus$ | async
+      }">
+    </ng-container>
+    <span matListItemTitle>
+      {{ 'ADMIN.SMTP_STATUS' | translate }}
+      <button
+        class="mat-list-button"
+        mat-button
+        [disabled]="!(smtpStatus$ | async)"
+        (click)="onSmtpTest()">
+        <mat-icon>mail</mat-icon>
+        {{ 'ADMIN.SMTP_TEST' | translate }}
+      </button>
+    </span>
+  </mat-list-item>
+</mat-list>
+
+<ng-template
+  #statusIconTemplate
+  let-status="status">
+  <mat-icon
+    matListItemIcon
+    [style.color]="status ? null : 'var(--mat-sys-error)'">
+    @if (status) {check_circle} @else {warning_outlined}
+  </mat-icon>
+</ng-template>

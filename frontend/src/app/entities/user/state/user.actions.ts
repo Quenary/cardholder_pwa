@@ -5,6 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 export const UserActions = createActionGroup({
   source: '[USER]',
   events: {
+    init: props<{ info: IUser }>(),
     // GET
     read: emptyProps(),
     'read success': props<{ info: IUser }>(),

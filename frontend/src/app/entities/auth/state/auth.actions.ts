@@ -15,7 +15,7 @@ export const AuthActions = createActionGroup({
     'refresh token': props<{ refreshToken: string }>(),
     'refresh token success': props<{ tokenResponse: ITokenResponse }>(),
     'refresh token error': props<{ error: HttpErrorResponse }>(),
-    logout: props<{ refreshToken: string }>(),
+    logout: emptyProps(),
     'logout success': emptyProps(),
     'logout error': props<{ error: HttpErrorResponse }>(),
     /**

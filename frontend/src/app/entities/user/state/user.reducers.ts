@@ -7,15 +7,22 @@ export interface IUserState {
   form: IUserUpdate;
   hasChanges: boolean;
   isLoading: boolean;
+  init: boolean;
 }
 export const initialState: IUserState = {
   info: null,
   form: null,
   hasChanges: false,
   isLoading: false,
+  init: false,
 };
 export const userReducer = createReducer(
   initialState,
+  on(UserActions.init, (state, payload) => ({
+    ...state,
+    info: payload.info,
+    init: true,
+  })),
   on(
     UserActions.read,
     UserActions.update,

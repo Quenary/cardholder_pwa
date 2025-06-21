@@ -1,0 +1,7 @@
+@use 'mixins' as mx;
+
+:host {
+  .mat-dialog-actions {
+    @include mx.mat-dialog-actions;
+  }
+}
