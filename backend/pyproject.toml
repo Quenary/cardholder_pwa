@@ -1,18 +1,9 @@
 [project]
 name = "Cardholder_pwa"
-version = "0.0.9"
+version = "0.0.10"
 description = "This app allows you to store your discount cards in one place."
 authors = [
     {name = "Eugene Savin", email = "evgeny.savin.ad@gmail.com"}
-]
-dependencies = [
-    "fastapi[standard]",
-    "uvicorn[standard]",
-    "sqlalchemy",
-    "passlib[bcrypt]",
-    "python-jose[cryptography]",
-    "pydantic[email]",
-    "python-multipart"
 ]
 license = {text = "MIT"}
 readme = "README.md"
