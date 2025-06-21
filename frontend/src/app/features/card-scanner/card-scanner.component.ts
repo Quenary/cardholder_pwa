@@ -1,6 +1,5 @@
 import {
   Component,
-  DestroyRef,
   ElementRef,
   inject,
   NgZone,
@@ -91,14 +90,13 @@ export class CardScannerDeviceSheetComponent {
 export class CardScannerComponent implements OnInit, OnDestroy {
   private readonly matDialogRef = inject(MatDialogRef);
   private readonly reader = new BrowserMultiFormatReader();
-  private readonly destroyRef = inject(DestroyRef);
   private readonly ngZone = inject(NgZone);
   private readonly matBottomSheet = inject(MatBottomSheet);
   private readonly snackService = inject(SnackService);
   private readonly translateService = inject(TranslateService);
 
   private readonly devices$: Observable<MediaDeviceInfo[]> = from(
-    navigator.mediaDevices.getUserMedia({ video: true })
+    navigator?.mediaDevices?.getUserMedia({ video: true }) ?? Promise.reject()
   ).pipe(
     switchMap(() => from(BrowserMultiFormatReader.listVideoInputDevices())),
     shareReplay(1)
