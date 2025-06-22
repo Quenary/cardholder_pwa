@@ -34,40 +34,35 @@
   </button>
 </section>
 
-<mat-grid-list
-  [cols]="2"
-  rowHeight="4:3"
-  gutterSize="16px">
+<section class="cards-list">
   @if (isLoading$ | async) { @for (pc of cardsPlaceholder; track pc) {
-  <mat-grid-tile class="card-tile animated-placeholder"> </mat-grid-tile>
+  <div class="cards-list-item animated-placeholder"> </div>
   } } @else { @for (card of cards$ | async; track card) {
-  <mat-grid-tile
+  <div
+    class="cards-list-item"
     matRipple
-    class="card-tile"
     [routerLink]="['/cards', card.id]">
-    <div class="card-tile-content">
-      <section class="card-tile-content-header">
-        <span class="card-tile-content-header-text">
-          {{ card.name }}
-        </span>
-        <section class="card-tile-content-header-icons">
-          <mat-icon class="accent-color"> edit_note </mat-icon>
-          @if (card | isOldCodeType) {
-          <mat-icon class="warn-color"> warning </mat-icon>
-          }
-        </section>
+    <section class="cards-list-item-header">
+      <span class="cards-list-item-header-text">
+        {{ card.name }}
+      </span>
+      <section class="cards-list-item-header-icons">
+        <mat-icon class="accent-color"> edit_note </mat-icon>
+        @if (card | isOldCodeType) {
+        <mat-icon class="warn-color"> warning </mat-icon>
+        }
       </section>
-      @if (card | isValidCard) { @defer {
-      <app-card-code-viewer
-        class="card-tile-content-preview"
-        [style.background]="card.color"
-        [color]="card.color | getOnColor"
-        [card]="card"
-        (click)="$event.stopPropagation()">
-      </app-card-code-viewer>
-      } }
-    </div>
-  </mat-grid-tile>
+    </section>
+    @if (card | isValidCard) { @defer {
+    <app-card-code-viewer
+      class="cards-list-item-preview"
+      [style.background]="card.color"
+      [color]="card.color | getOnColor"
+      [card]="card"
+      (click)="$event.stopPropagation()">
+    </app-card-code-viewer>
+    } }
+  </div>
   } }
-</mat-grid-list>
+</section>
 }
