@@ -6,10 +6,8 @@
     "tabWidth": 2,
     "useTabs": false,
     "singleQuote": true,
-    "printWidth": 100,
     "embeddedLanguageFormatting": "off",
     "semi": true,
     "quoteProps": "preserve",
-    "bracketSpacing": false,
     "trailingComma": "all"
 }
