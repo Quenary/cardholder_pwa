@@ -12,7 +12,11 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MatButton, MatFabButton, MatIconButton } from '@angular/material/button';
+import {
+  MatButton,
+  MatFabButton,
+  MatIconButton,
+} from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import {
   MatInput,
@@ -38,7 +42,7 @@ import { AsyncPipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import type { ICardScannerResult } from '../card-scanner/card-scanner.component';
 import { CardCodeViewerComponent } from '../../shared/components/card-code-viewer/card-code-viewer.component';
-import { EBarcodeFormat } from 'src/app/entities/cards/cards-const';
+import { EBwipBcid } from 'src/app/entities/cards/cards-const';
 import {
   MatAutocomplete,
   MatAutocompleteTrigger,
@@ -47,6 +51,7 @@ import {
 import { map, Observable, startWith } from 'rxjs';
 import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
 import { ERegexp } from 'src/app/app.consts';
+import { IsOldCodeType } from 'src/app/shared/pipes/is-old-code-type.pipe';
 
 @Component({
   selector: 'app-card',
@@ -69,6 +74,7 @@ import { ERegexp } from 'src/app/app.consts';
     MatAutocompleteTrigger,
     IsValidCardPipe,
     MatSuffix,
+    IsOldCodeType,
   ],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss',
@@ -80,6 +86,7 @@ export class CardComponent implements OnInit, OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
   private readonly matDialog = inject(MatDialog);
 
+  public readonly card$ = this.store.select(selectCardsActiveInfo);
   public readonly isLoading$ = this.store.select(selectCardsIsLoading);
   public readonly canDelete$ = this.store.select(selectCardsActiveCanDelete);
   public readonly hasChanges$ = this.store.select(selectCardsActiveHasChanges);
@@ -91,7 +98,7 @@ export class CardComponent implements OnInit, OnDestroy {
     color: new FormControl<string>(null, [Validators.pattern(ERegexp.color)]),
   });
   private readonly codeTypeAutocompleteList: string[] =
-    Object.values(EBarcodeFormat);
+    Object.values(EBwipBcid);
   public readonly codeTypeAutocompleteList$: Observable<string[]> =
     this.form.controls.code_type.valueChanges.pipe(
       startWith(null),
@@ -99,7 +106,7 @@ export class CardComponent implements OnInit, OnDestroy {
         if (!value) {
           return this.codeTypeAutocompleteList;
         }
-        value = value.toUpperCase();
+        value = value.toLowerCase();
         return this.codeTypeAutocompleteList.filter((c) => c.includes(value));
       })
     );

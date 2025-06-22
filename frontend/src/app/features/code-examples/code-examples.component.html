@@ -1,0 +1,9 @@
+<section class="code-examples">
+  @for (item of barcodeExamples; track item; let last = $last) {
+  <div class="code-examples-item">
+    <h3>{{ item.name }}</h3>
+    <app-card-code-viewer [card]="item"></app-card-code-viewer>
+    @if (!last) { }
+  </div>
+  }
+</section>

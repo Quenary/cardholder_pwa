@@ -42,6 +42,7 @@ import {
 } from '@angular/material/bottom-sheet';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { AsyncPipe } from '@angular/common';
+import { ZxingToBwipMap } from 'src/app/entities/cards/cards-const';
 
 export interface ICardScannerResult {
   text: string;
@@ -127,6 +128,7 @@ export class CardScannerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.scanSubscription?.unsubscribe();
+    this.matBottomSheet.dismiss();
   }
 
   private getDefaultDeviceByLabel(devices: MediaDeviceInfo[]): MediaDeviceInfo {
@@ -204,9 +206,10 @@ export class CardScannerComponent implements OnInit, OnDestroy {
     }
     const text = res.getText();
     const intFormat = res.getBarcodeFormat();
-    const format = Object.entries(BarcodeFormat).find(
+    const zFormat = Object.entries(BarcodeFormat).find(
       ([key, value]) => value === intFormat
     )[0];
+    const format = ZxingToBwipMap[zFormat]
     this.close({
       text,
       format,

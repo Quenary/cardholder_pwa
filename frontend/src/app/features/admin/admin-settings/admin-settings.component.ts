@@ -1,5 +1,10 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatInput } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
@@ -24,10 +29,11 @@ import { MatTooltip } from '@angular/material/tooltip';
     TranslateModule,
     DatePipe,
     NaiveDatePipe,
-    MatTooltip
+    MatTooltip,
   ],
   templateUrl: './admin-settings.component.html',
   styleUrl: './admin-settings.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminSettingsComponent implements OnInit {
   private readonly adminApiService = inject(AdminApiService);

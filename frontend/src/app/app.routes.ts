@@ -23,6 +23,7 @@ export const routes: Routes = [
     redirectTo: '/cards',
     pathMatch: 'full',
   },
+  // UNAUTHORIZED
   {
     path: 'auth',
     title: titleTranslate('NAV.AUTH'),
@@ -37,6 +38,27 @@ export const routes: Routes = [
         (c) => c.RegisterComponent
       ),
   },
+  {
+    path: 'password-recovery',
+    title: titleTranslate('NAV.PASSWORD_RECOVERY'),
+    children: [
+      {
+        path: 'request',
+        loadComponent: () =>
+          import(
+            './features/password-recovery-request/password-recovery-request.component'
+          ).then((c) => c.PasswordRecoveryRequestComponent),
+      },
+      {
+        path: 'submit',
+        loadComponent: () =>
+          import(
+            './features/password-recovery-submit/password-recovery-submit.component'
+          ).then((c) => c.PasswordRecoverySubmitComponent),
+      },
+    ],
+  },
+  // AUTHORIZED
   {
     path: 'cards',
     canActivate: [authGuard],
@@ -80,36 +102,17 @@ export const routes: Routes = [
       import('./features/user/user.component').then((c) => c.UserComponent),
   },
   {
-    path: 'password-recovery',
-    title: titleTranslate('NAV.PASSWORD_RECOVERY'),
-    children: [
-      {
-        path: 'request',
-        loadComponent: () =>
-          import(
-            './features/password-recovery-request/password-recovery-request.component'
-          ).then((c) => c.PasswordRecoveryRequestComponent),
-      },
-      {
-        path: 'submit',
-        loadComponent: () =>
-          import(
-            './features/password-recovery-submit/password-recovery-submit.component'
-          ).then((c) => c.PasswordRecoverySubmitComponent),
-      },
-    ],
+    path: 'admin',
+    title: titleTranslate('NAV.ADMIN'),
+    canActivate: [authGuard, adminGuard, isOnlineGuard],
+    loadComponent: () =>
+      import('./features/admin/admin.component').then((c) => c.AdminComponent),
   },
   {
     path: 'about',
     title: titleTranslate('NAV.ABOUT'),
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/about/about.component').then((c) => c.AboutComponent),
-  },
-  {
-    path: 'admin',
-    title: titleTranslate('NAV.ADMIN'),
-    canActivate: [authGuard, adminGuard],
-    loadComponent: () =>
-      import('./features/admin/admin.component').then((c) => c.AdminComponent),
   },
 ];

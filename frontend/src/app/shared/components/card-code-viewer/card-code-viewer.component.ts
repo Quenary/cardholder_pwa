@@ -2,10 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  EventEmitter,
   inject,
   Input,
   OnChanges,
   OnInit,
+  Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -21,15 +23,19 @@ import {
 import { MatIcon } from '@angular/material/icon';
 import Bwip from '@bwip-js/browser';
 import { TranslateModule } from '@ngx-translate/core';
-import type { BarcodeFormat } from '@zxing/library';
 import { ZxingToBwipMap } from 'src/app/entities/cards/cards-const';
 import { ICardBase } from 'src/app/entities/cards/cards-interface';
+
+export type TCardCodeViewerCard = Pick<
+  ICardBase,
+  'code' | 'code_type' | 'name'
+>;
 
 export interface ICardCodeViewerData {
   /**
    * Card data
    */
-  card: Partial<ICardBase>;
+  card: TCardCodeViewerCard;
   /**
    * Scale of the code
    * @default 3
@@ -55,7 +61,7 @@ export class CardCodeViewerComponent
 {
   protected readonly matDialog = inject(MatDialog);
 
-  @Input() card: Partial<ICardBase> = null;
+  @Input() card: TCardCodeViewerCard = null;
   @Input() scale: number = 3;
   @Input('color') set _color(value: string) {
     if (value) {
@@ -68,6 +74,14 @@ export class CardCodeViewerComponent
    */
   @ViewChild('canvas', { read: ElementRef<HTMLCanvasElement>, static: true })
   private readonly canvasRef: ElementRef<HTMLCanvasElement>;
+  /**
+   * Event on new code type.
+   * @description
+   * Decided to use bwip code types instead of zxing.
+   * @deprecated
+   * Remove it somewhere in the future.
+   */
+  @Output() readonly OnNewType = new EventEmitter<string>();
 
   ngOnInit(): void {
     if (this.card) {
@@ -88,11 +102,14 @@ export class CardCodeViewerComponent
   }
 
   protected tryDrawCode(text: string, format: string, color: string): void {
+    if (format in ZxingToBwipMap) {
+      format = ZxingToBwipMap[format];
+      this.OnNewType.emit(format);
+    }
     const canvas = this.canvasRef.nativeElement;
     try {
-      const bcid = ZxingToBwipMap[format as keyof typeof BarcodeFormat];
       Bwip.toCanvas(canvas, {
-        bcid,
+        bcid: format,
         text,
         scale: 3,
         includetext: true,
@@ -144,7 +161,8 @@ export class CardCodeViewerComponent
       </canvas>
     </mat-dialog-content>
     <mat-dialog-actions class="mat-dialog-actions">
-      <button mat-button
+      <button
+        mat-button
         (click)="invert = !invert">
         <mat-icon>touch_app</mat-icon>
         {{ 'CARDS.VIEWER.INVERT' | translate }}

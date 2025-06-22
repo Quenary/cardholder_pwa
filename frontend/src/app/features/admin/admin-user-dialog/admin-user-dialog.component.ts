@@ -1,5 +1,5 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import {
@@ -53,6 +53,7 @@ export interface IAdminUserDialogData {
   ],
   templateUrl: './admin-user-dialog.component.html',
   styleUrl: './admin-user-dialog.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminUserDialogComponent {
   private readonly adminApiService = inject(AdminApiService);

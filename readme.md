@@ -20,6 +20,15 @@ Yet another card holder. There are many apps to accomplish this goal, but they a
 - Angular for frontend
 - Python with FastAPI and SQLAlchemy for backend
 
+### Supported codes
+
+- App relies on [zxing-js/browser](https://github.com/zxing-js/browser) for scanning and [bwip-js](https://github.com/metafloor/bwip-js) for displaying codes.
+- [Supported codes](https://github.com/zxing-js/library?tab=readme-ov-file#supported-formats) of `zxing-js`
+- [Supported codes](https://github.com/metafloor/bwip-js/wiki/BWIPP-Barcode-Types) of `bwip-js`
+- I plan to add [quagga2](https://github.com/ericblade/quagga2#:~:text=during%20the%20session.-,Possible%20values%20are,-%3A) to the project for better support of scanning 1D codes.
+- Technically you can enter value and type of code manually and `bwip-js` will display the code (if it is supported). But for scanning we are currently limited by `zxing-js`
+- I noticed that zxing has a hard time detecting light codes on dark backgrounds. Maybe other scanners are affected by this as well.
+
 ### Preparation
 
 - Environment variables are not required for the application to work, but you can still define some (in docker command, in .env file, or in docker-compose file). There is [.env.example](/.env.example) containing list of vars with description. I’d recommend setting up at least SMTP settings to enable password recovery.
@@ -53,9 +62,9 @@ docker-compose -f <filename e.g. docker-compose.pg.yml> up -d
 - The first registered user (after deployment or migration from version 0.0.13) will be assigned to the owner role. For now this account cannot be deleted and owner role cannot be reassigned in a convenient way.
 - Might be an overkill, but just in case, i also added admin and member roles.
 - The owner can:
-  * Change some app settings from the ui
-  * Assign admin role to other members
-  * Delete admins or members accounts
+  - Change some app settings from the ui
+  - Assign admin role to other members
+  - Delete admins or members accounts
 - The admin can:
-  * Change some app settings from the ui
-  * Delete members accounts
+  - Change some app settings from the ui
+  - Delete members accounts

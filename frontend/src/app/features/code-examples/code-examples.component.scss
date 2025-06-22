@@ -1,0 +1,38 @@
+:host {
+  .code-examples {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    overflow: hidden;
+    gap: 16px;
+
+    & > * {
+      width: 100%;
+    }
+
+    @media (width > 400px) {
+      & > * {
+        width: calc(50% - 8px);
+      }
+    }
+
+    .code-examples-item {
+      margin: 0;
+      gap: 8px;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--mat-sys-surface-container);
+      border-radius: 10px;
+      padding: 16px;
+      overflow: hidden;
+      h3 {
+        margin: 0;
+      }
+    }
+  }
+}
