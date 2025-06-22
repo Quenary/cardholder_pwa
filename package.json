@@ -1,0 +1,29 @@
+{
+  "name": "cardholder_pwa",
+  "version": "0.0.19",
+  "description": "Cardholder PWA is a self-hosted app for your loyalty and discount cards",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Quenary/cardholder_pwa.git"
+  },
+  "keywords": [
+    "cardholder",
+    "loyalty cards",
+    "discount cards",
+    "pwa",
+    "docker",
+    "self-hosted"
+  ],
+  "author": "Eugene Savin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Quenary/cardholder_pwa/issues"
+  },
+  "homepage": "https://github.com/Quenary/cardholder_pwa#readme",
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.3",
+    "semantic-release": "^24.2.5"
+  }
+}
