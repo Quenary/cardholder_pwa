@@ -17,7 +17,8 @@
             {
                 "assets": [
                     "CHANGELOG.md"
-                ]
+                ],
+                "message": "chore(release): v${nextRelease.version}"
             }
         ],
         "@semantic-release/github"
