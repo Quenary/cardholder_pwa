@@ -69,22 +69,24 @@
       </mat-icon>
     </mat-form-field>
     @if (changePasswordCheckbox.checked) {
-    <ul class="user-component-form-password-hints">
-      @for (item of 'USER.PASSWORD_HINTS' | translate; track item) {
-      <li>{{ item }}</li>
-      }
-    </ul>
+      <ul class="user-component-form-password-hints">
+        @for (item of 'USER.PASSWORD_HINTS' | translate; track item) {
+          <li>{{ item }}</li>
+        }
+      </ul>
     }
     <section class="user-component-form-buttons">
-      <button
-        class="warn-color"
-        mat-button
-        type="button"
-        [disabled]="isLoading$ | async"
-        (click)="onDelete()">
-        <mat-icon>delete</mat-icon>
-        {{ 'GENERAL.DELETE' | translate }}
-      </button>
+      @if (!(isOwner$ | async)) {
+        <button
+          class="warn-color"
+          mat-button
+          type="button"
+          [disabled]="isLoading$ | async"
+          (click)="onDelete()">
+          <mat-icon>delete</mat-icon>
+          {{ 'GENERAL.DELETE' | translate }}
+        </button>
+      }
       <button
         mat-flat-button
         type="submit"
@@ -92,9 +94,9 @@
         {{ 'GENERAL.SAVE' | translate }}
         <mat-icon>save</mat-icon>
         @if (isLoading$ | async) {
-        <mat-icon iconPositionEnd
-          ><mat-spinner [diameter]="15"></mat-spinner
-        ></mat-icon>
+          <mat-icon iconPositionEnd
+            ><mat-spinner [diameter]="15"></mat-spinner
+          ></mat-icon>
         }
       </button>
     </section>

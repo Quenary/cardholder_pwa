@@ -9,6 +9,7 @@ import {
   selectUserHasChanges,
   selectUserInfo,
   selectUserIsLoading,
+  selectUserIsOwner,
 } from 'src/app/entities/user/state/user.selectors';
 import { UserActions } from 'src/app/entities/user/state/user.actions';
 import { AsyncPipe } from '@angular/common';
@@ -58,6 +59,7 @@ export class UserComponent implements OnInit {
     return this.form.value as IUserUpdate;
   }
 
+  public readonly isOwner$ = this.store.select(selectUserIsOwner);
   public readonly isLoading$ = this.store.select(selectUserIsLoading);
   public readonly hasChanges$ = this.store.select(selectUserHasChanges);
   public hidePassword: boolean = true;
@@ -75,14 +77,14 @@ export class UserComponent implements OnInit {
       ]),
       confirm_password: new FormControl<string>(
         { value: null, disabled: true },
-        [Validators.pattern(ERegexp.password)]
+        [Validators.pattern(ERegexp.password)],
       ),
       email: new FormControl<string>(null, [
         Validators.required,
         Validators.email,
       ]),
     },
-    passwordMatchValidator()
+    passwordMatchValidator(),
   );
 
   onChangePasswordCheck($event: MatCheckboxChange) {
