@@ -1,0 +1,139 @@
+{
+    "GENERAL": {
+        "TITLE": "Cardholder",
+        "CONNECTION": "Connexion en cours",
+        "YES": "Oui",
+        "NO": "Non",
+        "SAVE": "Enregistrer",
+        "CLOSE": "Fermer",
+        "CANCEL": "Annuler",
+        "UNKNOWN_ERROR": "Erreur inconnue",
+        "REQUEST_ERROR": "Erreur de requête",
+        "UNSAVED_WARN": "Les données non enregistrées seront perdues",
+        "CONFIRM": "Confirmer",
+        "DELETE_WARN": "Confirmer la suppresion",
+        "DELETE": "Supprimer"
+    },
+    "UPDATE": {
+        "TITLE": "Mise à jour",
+        "SUBTITLE": "Une nouvelle version de l'application est disponible. Vous devez recharger la page pour mettre à jour.",
+        "RELOAD": "Recharger"
+    },
+    "NAV": {
+        "AUTH": "Connexion",
+        "REGISTER": "Inscription",
+        "PASSWORD_RECOVERY": "Récuperation de mot de passe",
+        "CARD": "Cartes",
+        "USER": "Utilisateur",
+        "ADMIN": "Panneau d'administration",
+        "ABOUT": "À propos",
+        "EXIT": "Quitter"
+    },
+    "AUTH": {
+        "WELCOME": "Bienvenue",
+        "USERNAME": "Nom d'utilisateur",
+        "PASSWORD": "Mot de passe",
+        "SIGNIN": "Se connecter",
+        "SIGNUP": "Vous n'avez pas de compte ?",
+        "PASSWORD_RECOVERY": "Récuperation de mot de passe"
+    },
+    "REGISTER": {
+        "NEW_ACCOUNT": "Nouveau compte",
+        "SIGNUP": "S'inscrire",
+        "SIGNIN": "Vous avez déjà un compte?",
+        "SUCCESS": "Compte créé !"
+    },
+    "PASSWORD_RECOVERY": {
+        "TITLE": "Récuperation de mot de passe",
+        "EMAIL": "E-mail",
+        "CODE": "Code",
+        "PASSWORD": "Mot de passe",
+        "CONFIRM_PASSWORD": "Confirmer le mot de passe",
+        "HAVE_CODE": "Vous avez le code ?",
+        "SENT": "Si l'utilisateur existe, des instructions vous seront envoyé par e-mail.",
+        "SUCCESS": "Récuperation de mot de passe complète"
+    },
+    "CARDS": {
+        "SEARCH": "Rechercher",
+        "SEARCH_PLACEHOLDER": "Nom",
+        "CARD": {
+            "CODE": "Code",
+            "CODE_TYPE": "Type de code",
+            "NAME": "Nom",
+            "DESCRIPTION": "Description",
+            "COLOR": "Couleur",
+            "CODE_FORMAT_WARN": "L'application utilise désormais des noms différents pour les types de codes. Enregistrez la carte avec le nouveau type de code.",
+            "SCAN": {
+                "PERMISSION_ERROR": "L'accès au périphérique vidéo est refusé ou la fonctionnalité n'est pas prise en charge.",
+                "SELECT_SOURCE": "Sélectionnez la source",
+                "FROM_FILE": "Ajouter depuis un fichier"
+            },
+            "SUCCESS": {
+                "SAVE": "Carte enregistrée",
+                "DELETE": "Carte supprimée"
+            }
+        },
+        "VIEWER": {
+            "INVERT": "Inverser les couleurs"
+        }
+    },
+    "USER": {
+        "USERNAME": "Nom d'utilisateur",
+        "EMAIL": "E-mail",
+        "CHANGE_PASSWORD": "Changer le mot de passe",
+        "PASSWORD": "Mot de passe",
+        "CONFIRM_PASSWORD": "Confirmer le mot de passe",
+        "PASSWORD_HINTS": [
+            "Au moins 8 caractères",
+            "Lettres majuscules et minuscules",
+            "Nombres"
+        ],
+        "DELETE_WARN": "Voulez-vous supprimer définitivement l'utilisateur et toutes les données associées ?",
+        "SUCCESS": {
+            "UPDATE": "Données utilisateur mises à jour",
+            "DELETE": "Données utilisateur supprimé"
+        }
+    },
+    "ADMIN": {
+        "HEALTH": "État de l'application",
+        "SMTP_STATUS": "État SMTP",
+        "SMTP_TEST": "Tester",
+        "SMTP_TEST_SUCCESS": "E-mail envoyé",
+        "SETTINGS": {
+            "TITLE": "Paramètres",
+            "KEY": "Clé",
+            "VALUE": "Valeur",
+            "UPDATED_AT": "Date de mise à jour",
+            "KEYS": {
+                "ALLOW_REGISTRATION": "Autoriser l'inscription"
+            }
+        },
+        "USERS": {
+            "TITLE": "Utilisateurs",
+            "ID": "ID",
+            "USERNAME": "Nom d'utilisateur",
+            "EMAIL": "E-mail",
+            "ROLE": "Role",
+            "CREATED_AT": "Date de création",
+            "UPDATED_AT": "Date de mise à jour",
+            "ROLES": {
+                "OWNER": "Propriétaire",
+                "ADMIN": "Administrateur",
+                "MEMBER": "Membre"
+            },
+            "CHANGE_ROLE": {
+                "TO_ADMIN": "Définir comme administrateur",
+                "TO_MEMBER": "Définir comme membre",
+                "CONFIRM": "Changement de rôle",
+                "CONFIRM_SUBTITLE": "Confirmer le changement de rôle de l'utilisateur en : {{role}}"
+            }
+        }
+    },
+    "ABOUT": {
+        "HOMEPAGE": "Page d'accueil",
+        "IMAGE_VERSION": "Version de l'image Docker",
+        "BACKEND_VERSION": "Version de l'API",
+        "FRONTEND_VERSION": "Version de l'application web",
+        "EXAMPLES": "Exemples de codes pris en charge"
+    }
+}
