@@ -2,7 +2,7 @@
 
 :host {
   .code-examples {
-    @include mx.flex-container(6);
+    @include mx.flex-container;
 
     .code-examples-item {
       margin: 0;

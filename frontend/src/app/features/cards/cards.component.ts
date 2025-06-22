@@ -8,7 +8,6 @@ import {
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
-import { MatGridList, MatGridTile } from '@angular/material/grid-list';
 import { AsyncPipe } from '@angular/common';
 import {
   combineLatest,
@@ -49,8 +48,6 @@ import { IsOldCodeType } from 'src/app/shared/pipes/is-old-code-type.pipe';
   selector: 'app-cards',
   imports: [
     RouterOutlet,
-    MatGridList,
-    MatGridTile,
     AsyncPipe,
     MatAutocomplete,
     MatOption,
@@ -78,7 +75,7 @@ export class CardsComponent implements OnInit {
   private readonly store = inject(Store);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
-  
+
   public readonly showParent$ = this.router.events.pipe(
     startWith(null),
     map(() => this.router.url === '/cards'),

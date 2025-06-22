@@ -1,4 +1,8 @@
+@use 'mixins' as mx;
+
 .card-form {
+  @include mx.flex-container(3, 600px);
+
   &-scan {
     display: flex;
     flex-direction: row;
@@ -29,9 +33,6 @@
   }
 
   &-buttons {
-    width: 100%;
-    display: inline-flex;
-    justify-content: flex-end;
-    flex-wrap: wrap;
+    @include mx.flex-container-buttons;
   }
 }

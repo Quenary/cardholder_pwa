@@ -52,8 +52,10 @@
   margin-top: auto;
   gap: 8px;
 }
-// Mixin for flexible containers e.g. forms, card, code-examples.
-@mixin flex-container($maxCols: 4) {
+// Mixin for flexible containers e.g. forms, card, code-examples,
+// that needs to be displayed as one/multiple "columns" on
+// different devices.
+@mixin flex-container($maxCols: 6, $breakpoint: 400px) {
   width: 100%;
   height: auto;
   max-height: 100%;
@@ -69,16 +71,24 @@
 
   & > * {
     width: 100%;
+    transition: width 0.15s ease-in-out;
   }
 
   @for $i from 1 through $maxCols - 1 {
     $cols: $i + 1;
-    $breakpoint: 400px + 300px * $i;
+    $_breakpoint: $breakpoint * $i;
 
-    @media (width > $breakpoint) {
+    @media (width > $_breakpoint) {
       & > * {
         width: calc(100% / #{$cols} - $gap * $i / $cols);
       }
     }
   }
+}
+// Mixin for buttons of flex-container
+@mixin flex-container-buttons {
+  flex-basis: 100%;
+  display: inline-flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
 }
