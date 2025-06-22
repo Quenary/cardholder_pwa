@@ -12,10 +12,17 @@
     @if (form.value | isValidCard) { @defer {
     <app-card-code-viewer
       class="card-form-scan-viewer"
-      [card]="form.value">
+      [card]="$any(form.value)"
+      (OnNewType)="form.controls.code_type.setValue($event)">
     </app-card-code-viewer>
     } }
   </section>
+
+  @if (card$ | async | isOldCodeType) {
+  <span [style.color]="'var(--mat-sys-error)'">
+    {{ 'CARDS.CARD.CODE_FORMAT_WARN' | translate }}
+  </span>
+  }
 
   <section class="card-form-codes">
     <mat-form-field class="card-form-field">

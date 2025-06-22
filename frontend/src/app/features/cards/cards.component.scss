@@ -42,12 +42,16 @@
           text-overflow: ellipsis;
           white-space: nowrap;
           overflow: hidden;
+          margin-right: auto;
         }
 
-        &-icon {
-          margin-left: auto;
-          color: var(--mat-sys-primary);
+        &-icons {
           overflow: unset;
+          display: inline-flex;
+          gap: 8px;
+          & > * {
+            color: var(--mat-sys-primary);
+          }
         }
       }
 

@@ -43,6 +43,7 @@ import { MatFabButton } from '@angular/material/button';
 import { CardCodeViewerComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
 import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
 import { GetOnColorPipe } from 'src/app/shared/pipes/get-on-color.pipe';
+import { IsOldCodeType } from 'src/app/shared/pipes/is-old-code-type.pipe';
 
 @Component({
   selector: 'app-cards',
@@ -67,6 +68,7 @@ import { GetOnColorPipe } from 'src/app/shared/pipes/get-on-color.pipe';
     IsValidCardPipe,
     RouterLink,
     GetOnColorPipe,
+    IsOldCodeType,
   ],
   templateUrl: './cards.component.html',
   styleUrl: './cards.component.scss',

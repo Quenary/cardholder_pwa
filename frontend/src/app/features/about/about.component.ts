@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   MatList,
   MatListItem,
@@ -11,6 +11,8 @@ import { SystemApiService } from 'src/app/entities/system/system-api.service';
 import { MatIcon } from '@angular/material/icon';
 import { catchError, from, of, retry } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
+import { CodeExamplesComponent } from '../code-examples/code-examples.component';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @Component({
   selector: 'app-about',
@@ -22,9 +24,12 @@ import { SnackService } from 'src/app/core/services/snack.service';
     MatIcon,
     MatListItemTitle,
     MatListItemIcon,
+    CodeExamplesComponent,
+    MatExpansionModule,
   ],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutComponent {
   private readonly systemApiService = inject(SystemApiService);

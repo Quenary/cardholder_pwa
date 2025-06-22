@@ -1,0 +1,21 @@
+@use 'mixins' as mx;
+
+:host {
+  .code-examples {
+    @include mx.flex-container(6);
+
+    .code-examples-item {
+      margin: 0;
+      gap: 8px;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--mat-sys-surface-container);
+      border-radius: 10px;
+      padding: 16px;
+      overflow: hidden;
+      h3 {
+        margin: 0;
+      }
+    }
+  }
+}

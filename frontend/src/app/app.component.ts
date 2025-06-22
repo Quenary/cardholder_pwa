@@ -82,13 +82,13 @@ export class AppComponent {
               icon: 'admin_panel_settings',
               link: '/admin',
             },
-            {
-              name: translates.ABOUT,
-              icon: 'info_outlined',
-              link: '/about',
-            },
           ]
         : []),
+      {
+        name: translates.ABOUT,
+        icon: 'info_outlined',
+        link: '/about',
+      },
       {
         name: translates.EXIT,
         icon: 'logout',

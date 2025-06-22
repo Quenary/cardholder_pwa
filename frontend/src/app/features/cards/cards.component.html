@@ -50,9 +50,12 @@
         <span class="card-tile-content-header-text">
           {{ card.name }}
         </span>
-        <mat-icon class="card-tile-content-header-icon accent-color">
-          edit_note
-        </mat-icon>
+        <section class="card-tile-content-header-icons">
+          <mat-icon class="accent-color"> edit_note </mat-icon>
+          @if (card | isOldCodeType) {
+          <mat-icon class="warn-color"> warning </mat-icon>
+          }
+        </section>
       </section>
       @if (card | isValidCard) { @defer {
       <app-card-code-viewer
