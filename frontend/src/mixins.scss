@@ -15,12 +15,15 @@
   width: 100%;
   max-width: 600px;
 }
+// Mixin for password hints list
 @mixin form-password-hints {
   padding-left: 20px;
   margin: unset;
   width: 100%;
   padding-bottom: 20px;
 }
+// Mixin for main components e.g. cards, user
+// presented in main router-outlet.
 @mixin component-host {
   display: block;
   padding: 16px 16px 40px 16px;
@@ -29,6 +32,7 @@
   max-height: 100%;
   position: relative;
 }
+// Mixin ofr tables in admin component
 @mixin mat-table {
   table {
     width: 100%;
@@ -43,7 +47,38 @@
     }
   }
 }
+// Mixin for buttons in mat-dialog
 @mixin mat-dialog-actions {
   margin-top: auto;
   gap: 8px;
+}
+// Mixin for flexible containers e.g. forms, card, code-examples.
+@mixin flex-container($maxCols: 4) {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  overflow: hidden;
+
+  $gap: 16px;
+  gap: $gap;
+
+  & > * {
+    width: 100%;
+  }
+
+  @for $i from 1 through $maxCols - 1 {
+    $cols: $i + 1;
+    $breakpoint: 400px + 300px * $i;
+
+    @media (width > $breakpoint) {
+      & > * {
+        width: calc(100% / #{$cols} - $gap * $i / $cols);
+      }
+    }
+  }
 }

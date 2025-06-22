@@ -1,25 +1,8 @@
+@use 'mixins' as mx;
+
 :host {
   .code-examples {
-    width: 100%;
-    height: auto;
-    max-height: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    overflow: hidden;
-    gap: 16px;
-
-    & > * {
-      width: 100%;
-    }
-
-    @media (width > 400px) {
-      & > * {
-        width: calc(50% - 8px);
-      }
-    }
+    @include mx.flex-container(6);
 
     .code-examples-item {
       margin: 0;
