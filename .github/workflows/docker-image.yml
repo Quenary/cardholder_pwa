@@ -4,6 +4,15 @@ on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Tag version to build (e.g. v1.2.3)'
+        required: false
+  workflow_run:
+    workflows: ["Semantic Release"]
+    types:
+      - completed
 
 jobs:
   build:
@@ -14,13 +23,29 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-    - name: Extract version from Git tag
-      id: extract_version
+    - name: Determine version
+      id: version
       run: |
-        echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
-        echo "version=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
+          VERSION="${{ github.event.inputs.version }}"
+        elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+          VERSION="${GITHUB_REF##*/}"
+        else
+          VERSION=$(git tag --sort=-creatordate | grep '^v[0-9]' | head -n 1)
+        fi
+
+        if [ -z "$VERSION" ]; then
+          echo "❌ ERROR: No version tag found. Aborting."
+          exit 1
+        fi
+
+        echo "✅ Using VERSION=$VERSION"
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Check if Docker tag already exists
       id: check_tag
@@ -37,7 +62,7 @@ jobs:
     - name: Stop if image already exists
       if: steps.check_tag.outputs.exists == 'true'
       run: |
-        echo "Image tag ${{ env.VERSION }} already exists in Docker Hub. Aborting."
+        echo "⛔ Image tag ${{ env.VERSION }} already exists in Docker Hub. Aborting."
         exit 1
 
     - name: Log in to Docker Hub
