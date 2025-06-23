@@ -15,9 +15,11 @@ on:
       - completed
 
 jobs:
-  build:
+  check-tag:
     runs-on: ubuntu-latest
-
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      exists: ${{ steps.check_tag.outputs.exists }}
     env:
       IMAGE_NAME: quenary/cardholder_pwa
 
@@ -51,7 +53,7 @@ jobs:
       id: check_tag
       run: |
         STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-          https://hub.docker.com/v2/repositories/${{ env.IMAGE_NAME }}/tags/${{ env.VERSION }}/)
+          https://hub.docker.com/v2/repositories/${{ env.IMAGE_NAME }}/tags/${{ steps.version.outputs.version }}/)
         echo "Status: $STATUS"
         if [ "$STATUS" = "200" ]; then
           echo "exists=true" >> $GITHUB_OUTPUT
@@ -59,11 +61,17 @@ jobs:
           echo "exists=false" >> $GITHUB_OUTPUT
         fi
 
-    - name: Stop if image already exists
-      if: steps.check_tag.outputs.exists == 'true'
-      run: |
-        echo "⛔ Image tag ${{ env.VERSION }} already exists in Docker Hub. Aborting."
-        exit 0
+  build:
+    needs: check-tag
+    if: needs.check-tag.outputs.version != '' && needs.check-tag.outputs.exists == 'false'
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: quenary/cardholder_pwa
+      VERSION: ${{ needs.check-tag.outputs.version }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
