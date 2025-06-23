@@ -5,11 +5,13 @@ from app.helpers import now
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
+from app.helpers import delay_to_minimum
 
 router = APIRouter(tags=["auth"])
 
 
 @router.post("/token", response_model=schemas.TokenResponse)
+@delay_to_minimum(1)
 async def login(
     request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),

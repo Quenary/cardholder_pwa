@@ -9,11 +9,14 @@ from app.core.smtp import EmailSender
 from app.config import Config
 from sqlalchemy import select, desc
 from sqlalchemy.orm import selectinload
+import asyncio
+from app.helpers import delay_to_minimum
 
 router = APIRouter(tags=["password recovery"], prefix="/recovery")
 
 
 @router.post("/code", description="Request password recovery code")
+@delay_to_minimum(1)
 async def code(
     request: Request,
     body: schemas.PasswordRecoveryCodeBody,
@@ -26,29 +29,33 @@ async def code(
     if user:
         recent_code_stmt = (
             select(models.PasswordRecoveryCode)
-            .where(models.PasswordRecoveryCode.user_id == user.id)
+            .where(
+                models.PasswordRecoveryCode.user_id == user.id,
+                models.PasswordRecoveryCode.created_at > now() - timedelta(minutes=1),
+            )
             .order_by(desc(models.PasswordRecoveryCode.created_at))
             .limit(1)
         )
         code_result = await session.execute(recent_code_stmt)
         last_code = code_result.scalar_one_or_none()
-        if last_code and last_code.created_at > now() - timedelta(minutes=1):
-            raise HTTPException(429, "You can request a new code only once per minute.")
+        if last_code:
+            return {}
 
         code = secrets.token_urlsafe(8)
         expires_at = now() + timedelta(
             minutes=Config.PASSWORD_RECOVERY_CODE_LIFETIME_MIN
         )
 
-        try:
-            reset_url = None
-            host = request.headers.get("host", "")
-            scheme = request.scope["scheme"]
-            if host and scheme:
-                reset_url = f"{scheme}://{host}/password-recovery/submit?code={code}"
-            EmailSender.send_password_reset_email(body.email, code, reset_url)
-        except Exception as e:
-            raise HTTPException(500, "Unable to send email. Try again later.")
+        reset_url = None
+        host = request.headers.get("host", "")
+        scheme = request.scope["scheme"]
+        if host and scheme:
+            reset_url = f"{scheme}://{host}/password-recovery/submit?code={code}"
+        asyncio.create_task(
+            asyncio.to_thread(
+                EmailSender.send_password_reset_email, body.email, code, reset_url
+            )
+        )
 
         db_code = models.PasswordRecoveryCode(
             code=code, expires_at=expires_at, user_id=user.id

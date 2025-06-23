@@ -3,11 +3,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import app.db.models as models, app.db as db, app.schemas as schemas, app.core.auth as auth, app.enums as enums
 from app.core.user import delete_user as _delete_user
 from sqlalchemy import select
+from app.helpers import delay_to_minimum
 
 router = APIRouter(tags=["user"])
 
 
 @router.post("/user", response_model=schemas.User)
+@delay_to_minimum(1)
 async def create_user(
     user: schemas.UserCreate,
     session: AsyncSession = Depends(db.get_async_session),
