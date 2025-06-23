@@ -26,16 +26,11 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ZxingToBwipMap } from 'src/app/entities/cards/cards-const';
 import { ICardBase } from 'src/app/entities/cards/cards-interface';
 
-export type TCardCodeViewerCard = Pick<
-  ICardBase,
-  'code' | 'code_type' | 'name'
->;
-
 export interface ICardCodeViewerData {
   /**
    * Card data
    */
-  card: TCardCodeViewerCard;
+  card: Partial<ICardBase>;
   /**
    * Scale of the code
    * @default 3
@@ -61,7 +56,7 @@ export class CardCodeViewerComponent
 {
   protected readonly matDialog = inject(MatDialog);
 
-  @Input() card: TCardCodeViewerCard = null;
+  @Input() card: Partial<ICardBase> = null;
   @Input() scale: number = 3;
   @Input('color') set _color(value: string) {
     if (value) {
@@ -97,7 +92,7 @@ export class CardCodeViewerComponent
 
   protected getCssVariableValue(variable: string): string {
     return getComputedStyle(document.documentElement).getPropertyValue(
-      variable
+      variable,
     );
   }
 
@@ -159,6 +154,9 @@ export class CardCodeViewerComponent
         #canvas
         (click)="invert = !invert">
       </canvas>
+      @if (card.description) {
+        <pre class="desc" [innerHTML]="card.description"></pre>
+      }
     </mat-dialog-content>
     <mat-dialog-actions class="mat-dialog-actions">
       <button
@@ -179,12 +177,19 @@ export class CardCodeViewerComponent
   :host {
     .mat-dialog-content {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       background-color: var(--mat-sys-surface);
 
       &.invert {
         filter: invert(1);
+      }
+
+      .desc {
+        font-family: unset;
+        margin: 0;
+        font-size: 1rem;
       }
     }
     .mat-dialog-actions {

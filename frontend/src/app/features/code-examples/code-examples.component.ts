@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import {
-  CardCodeViewerComponent,
-  TCardCodeViewerCard,
-} from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
+import { ICardBase } from 'src/app/entities/cards/cards-interface';
+import { CardCodeViewerComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
 
 @Component({
   selector: 'app-code-examples',
@@ -12,7 +10,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodeExamplesComponent {
-  public readonly barcodeExamples: TCardCodeViewerCard[] = [
+  public readonly barcodeExamples: Partial<ICardBase>[] = [
     { code: '01234567', code_type: 'azteccode', name: 'azteccode (AZTEC)' },
     {
       code: 'ABC1234567890',
