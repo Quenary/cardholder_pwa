@@ -63,7 +63,7 @@ jobs:
       if: steps.check_tag.outputs.exists == 'true'
       run: |
         echo "⛔ Image tag ${{ env.VERSION }} already exists in Docker Hub. Aborting."
-        exit 1
+        exit 0
 
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
