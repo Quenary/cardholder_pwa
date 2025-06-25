@@ -1,0 +1,54 @@
+<mat-dialog-content>
+  @if ('CARDS.CARD.SCAN.SCANNERS' | translate; as translates) {
+    <mat-list>
+      <mat-list-item>
+        <span matListItemTitle>
+          {{translates.GENERAL.TITLE}}
+        </span>
+        <span matListItemLine>
+          {{translates.GENERAL['0']}}
+        </span>
+        <span matListItemLine>
+          {{translates.GENERAL['1']}}
+        </span>
+        <span matListItemLine>
+          {{translates.GENERAL['2']}}
+        </span>
+      </mat-list-item>
+
+      <mat-list-item>
+        <span matListItemTitle>
+          {{translates.ZXING.TITLE}}
+        </span>
+        <span matListItemLine>
+          {{translates.ZXING['0']}}
+        </span>
+        <span matListItemLine>
+          {{translates.ZXING['1']}}
+        </span>
+      </mat-list-item>
+
+      <mat-list-item>
+        <span matListItemTitle>
+          {{translates.QUAGGA2.TITLE}}
+        </span>
+        <span matListItemLine>
+          {{translates.QUAGGA2['0']}}
+        </span>
+        <span matListItemLine>
+          {{translates.QUAGGA2['1']}}
+        </span>
+        <span matListItemLine>
+          {{translates.QUAGGA2['2']}}
+        </span>
+      </mat-list-item>
+    </mat-list>
+  }
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button
+    mat-flat-button
+    (click)="close()">
+    {{'GENERAL.CLOSE' | translate}}
+  </button>
+</mat-dialog-actions>

@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve --port=4207 --open",
     "start:sw": "ng serve --configuration=production --port=4207 --open",
+    "start:nohmr": "ng serve --port=4207 --open --no-hmr",
     "build": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -23,6 +24,7 @@
     "@angular/router": "^19.2.14",
     "@angular/service-worker": "^19.2.14",
     "@bwip-js/browser": "^4.6.0",
+    "@ericblade/quagga2": "^1.8.4",
     "@ngrx/effects": "^19.2.1",
     "@ngrx/store": "^19.2.1",
     "@ngrx/store-devtools": "^19.2.1",

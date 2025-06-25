@@ -17,6 +17,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
+            "allowedCommonJsDependencies": [
+              "@ericblade/quagga2"
+            ],
             "outputPath": "dist/cardholder_pwa",
             "index": "src/index.html",
             "browser": "src/main.ts",
@@ -53,8 +56,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "1000kB",
+                  "maximumError": "2MB"
                 },
                 {
                   "type": "anyComponentStyle",

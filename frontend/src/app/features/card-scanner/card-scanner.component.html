@@ -1,18 +1,57 @@
 <mat-dialog-content class="mat-dialog-content">
-  <video
-    class="mat-dialog-content-video"
-    #video>
-  </video>
+  @if (selectedDevice$ | async; as device) {
+    @switch (selectedScanner.code) {
+      @case (EScanner.ZXING) {
+        @defer {
+          <app-card-scanner-zxing
+            #scanner
+            [deviceId]="device.deviceId"
+            (OnSuccess)="onResult($event)">
+          </app-card-scanner-zxing>
+        } @placeholder {
+          <ng-container [ngTemplateOutlet]="loadingTemplate"></ng-container>
+        }
+      }
+      @case (EScanner.QUAGGA2) {
+        @defer {
+          <app-card-scanner-quagga2
+            #scanner
+            [deviceId]="device.deviceId"
+            (OnSuccess)="onResult($event)">
+          </app-card-scanner-quagga2>
+        } @placeholder {
+          <ng-container [ngTemplateOutlet]="loadingTemplate"></ng-container>
+        }
+      }
+    }
+  } @else {
+    <ng-container [ngTemplateOutlet]="loadingTemplate"></ng-container>
+  }
 </mat-dialog-content>
 <mat-dialog-actions class="mat-dialog-actions">
+  <section class="mat-dialog-actions-scanner">
+    <span>{{'CARDS.CARD.SCAN.SCANNER' | translate}}</span>
+    <button
+      mat-icon-button
+      (click)="openScannersHelp()">
+      <mat-icon>help</mat-icon>
+    </button>
+    <mat-button-toggle-group
+      [value]="selectedScanner"
+      (valueChange)="selectedScanner = $event">
+      @for (s of scanners; track s) {
+        <mat-button-toggle [value]="s">{{s.name}}</mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+  </section>
   <button
     mat-button
     (click)="onClickSelectDevice()">
     <mat-icon>videocam_outlined</mat-icon>
     @if (selectedDevice$ | async; as device) {
-    {{ device.label ?? device.deviceId }}
+      {{ device.label ?? device.deviceId }}
     } @else {
-    {{ 'CARDS.CARD.SCAN.SELECT_SOURCE' | translate }}
+      {{ 'CARDS.CARD.SCAN.SELECT_SOURCE' | translate }}
     }
   </button>
   <button
@@ -36,3 +75,9 @@
     {{ 'GENERAL.CLOSE' | translate }}
   </button>
 </mat-dialog-actions>
+
+<ng-template #loadingTemplate>
+  <mat-icon style="width: 50px; height: 50px;">
+    <mat-spinner [diameter]="50"></mat-spinner>
+  </mat-icon>
+</ng-template>

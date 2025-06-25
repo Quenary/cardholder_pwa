@@ -66,7 +66,27 @@
             "SCAN": {
                 "PERMISSION_ERROR": "Access to video device is denied or feature is not supported.",
                 "SELECT_SOURCE": "Select source",
-                "FROM_FILE": "Add from file"
+                "FROM_FILE": "Add from file",
+                "SCANNER": "Scanner",
+                "SCANNERS": {
+                    "GENERAL": {
+                        "TITLE": "General",
+                        "0": "A 2D code is, for example, a QR or DataMatrix",
+                        "1": "A 1D code is, for example, a regular barcode",
+                        "2": "File scanning also uses the active scanner"
+                    },
+                    "ZXING": {
+                        "TITLE": "Zxing",
+                        "0": "Supports scanning 2D codes",
+                        "1": "Worse at scanning 1D codes"
+                    },
+                    "QUAGGA2": {
+                        "TITLE": "Quagga2",
+                        "0": "Does not support scanning 2D codes",
+                        "1": "Better at scanning 1D codes",
+                        "2": "Supports more 1D formats"
+                    }
+                }
             },
             "SUCCESS": {
                 "SAVE": "Card saved",

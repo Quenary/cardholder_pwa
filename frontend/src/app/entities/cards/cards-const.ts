@@ -1,75 +1,6 @@
 import type { BarcodeFormat } from '@zxing/browser';
 import type bwip from '@bwip-js/browser';
-/**
- * Key-key mapping for zxing codes.
- * Use as main enum of codes of application.
- */
-export const EBarcodeFormat: { [K in keyof typeof BarcodeFormat & string]: K } =
-  {
-    /** Aztec 2D barcode format. */
-    AZTEC: 'AZTEC',
-    /** CODABAR 1D format. */
-    CODABAR: 'CODABAR',
-    /** Code 39 1D format. */
-    CODE_39: 'CODE_39',
-    /** Code 93 1D format. */
-    CODE_93: 'CODE_93',
-    /** Code 128 1D format. */
-    CODE_128: 'CODE_128',
-    /** Data Matrix 2D barcode format. */
-    DATA_MATRIX: 'DATA_MATRIX',
-    /** EAN-8 1D format. */
-    EAN_8: 'EAN_8',
-    /** EAN-13 1D format. */
-    EAN_13: 'EAN_13',
-    /** ITF (Interleaved Two of Five) 1D format. */
-    ITF: 'ITF',
-    /** MaxiCode 2D barcode format. */
-    MAXICODE: 'MAXICODE',
-    /** PDF417 format. */
-    PDF_417: 'PDF_417',
-    /** QR Code 2D barcode format. */
-    QR_CODE: 'QR_CODE',
-    /** RSS 14 */
-    RSS_14: 'RSS_14',
-    /** RSS EXPANDED */
-    RSS_EXPANDED: 'RSS_EXPANDED',
-    /** UPC-A 1D format. */
-    UPC_A: 'UPC_A',
-    /** UPC-E 1D format. */
-    UPC_E: 'UPC_E',
-    /** UPC/EAN extension format. Not a stand-alone format. */
-    UPC_EAN_EXTENSION: 'UPC_EAN_EXTENSION',
-  };
-/**
- * Zxing to bwip codes map.
- * Null values is not supported in bwip.
- */
-export const ZxingToBwipMap: Record<
-  keyof typeof BarcodeFormat,
-  (keyof typeof EBwipBcid & keyof typeof bwip) | null
-> = {
-  // 2D barcodes
-  AZTEC: 'azteccode',
-  DATA_MATRIX: 'datamatrix',
-  MAXICODE: 'maxicode',
-  PDF_417: 'pdf417',
-  QR_CODE: 'qrcode',
-  // 1D barcodes
-  CODABAR: 'rationalizedCodabar',
-  CODE_39: 'code39',
-  CODE_93: 'code93',
-  CODE_128: 'code128',
-  EAN_8: 'ean8',
-  EAN_13: 'ean13',
-  ITF: 'interleaved2of5',
-  UPC_A: 'upca',
-  UPC_E: 'upce',
-  UPC_EAN_EXTENSION: null,
-  // RSS formats
-  RSS_14: null,
-  RSS_EXPANDED: null,
-};
+import { QuaggaJSCodeReader } from '@ericblade/quagga2';
 
 /**
  * Check if code type is supported
@@ -77,7 +8,12 @@ export const ZxingToBwipMap: Record<
  * @returns
  */
 export const isValidCodeType = (code_type: string): boolean => {
-  return !!code_type && (code_type in EBwipBcid || code_type in ZxingToBwipMap);
+  return (
+    !!code_type &&
+    (code_type in EBwipBcid ||
+      code_type in ZxingToBwipMap ||
+      code_type in Quagga2ToBwipMap)
+  );
 };
 
 /**
@@ -196,3 +132,132 @@ export enum EBwipBcid {
   upce = 'upce',
   upcecomposite = 'upcecomposite',
 }
+
+//#region Zxing
+/**
+ * Key-key mapping for zxing codes.
+ */
+export const EBarcodeFormat: { [K in keyof typeof BarcodeFormat & string]: K } =
+  {
+    /** Aztec 2D barcode format. */
+    AZTEC: 'AZTEC',
+    /** CODABAR 1D format. */
+    CODABAR: 'CODABAR',
+    /** Code 39 1D format. */
+    CODE_39: 'CODE_39',
+    /** Code 93 1D format. */
+    CODE_93: 'CODE_93',
+    /** Code 128 1D format. */
+    CODE_128: 'CODE_128',
+    /** Data Matrix 2D barcode format. */
+    DATA_MATRIX: 'DATA_MATRIX',
+    /** EAN-8 1D format. */
+    EAN_8: 'EAN_8',
+    /** EAN-13 1D format. */
+    EAN_13: 'EAN_13',
+    /** ITF (Interleaved Two of Five) 1D format. */
+    ITF: 'ITF',
+    /** MaxiCode 2D barcode format. */
+    MAXICODE: 'MAXICODE',
+    /** PDF417 format. */
+    PDF_417: 'PDF_417',
+    /** QR Code 2D barcode format. */
+    QR_CODE: 'QR_CODE',
+    /** RSS 14 */
+    RSS_14: 'RSS_14',
+    /** RSS EXPANDED */
+    RSS_EXPANDED: 'RSS_EXPANDED',
+    /** UPC-A 1D format. */
+    UPC_A: 'UPC_A',
+    /** UPC-E 1D format. */
+    UPC_E: 'UPC_E',
+    /** UPC/EAN extension format. Not a stand-alone format. */
+    UPC_EAN_EXTENSION: 'UPC_EAN_EXTENSION',
+  };
+/**
+ * Zxing to bwip codes map.
+ * Null values is not supported in bwip.
+ */
+export const ZxingToBwipMap: Record<
+  keyof typeof BarcodeFormat,
+  (keyof typeof EBwipBcid & keyof typeof bwip) | null
+> = {
+  // 2D barcodes
+  AZTEC: 'azteccode',
+  DATA_MATRIX: 'datamatrix',
+  MAXICODE: 'maxicode',
+  PDF_417: 'pdf417',
+  QR_CODE: 'qrcode',
+  // 1D barcodes
+  CODABAR: 'rationalizedCodabar',
+  CODE_39: 'code39',
+  CODE_93: 'code93',
+  CODE_128: 'code128',
+  EAN_8: 'ean8',
+  EAN_13: 'ean13',
+  ITF: 'interleaved2of5',
+  UPC_A: 'upca',
+  UPC_E: 'upce',
+  UPC_EAN_EXTENSION: null,
+  // RSS formats
+  RSS_14: null,
+  RSS_EXPANDED: null,
+};
+//#endregion
+
+//#region Quagga2
+export type QuaggaJSCodeFormat =
+  | '2of5'
+  | 'codabar'
+  | 'code_128'
+  | 'code_32_reader'
+  | 'code_39'
+  | 'code_39_vin'
+  | 'code_93'
+  | 'ean_2'
+  | 'ean_5'
+  | 'ean_8'
+  | 'ean_13'
+  | 'i2of5'
+  | 'upc_e'
+  | 'upc_a';
+
+export const Quagga2ReaderToFormat: Record<
+  QuaggaJSCodeReader,
+  QuaggaJSCodeFormat
+> = {
+  '2of5_reader': '2of5',
+  'codabar_reader': 'codabar',
+  'code_128_reader': 'code_128',
+  'code_32_reader': 'code_32_reader',
+  'code_39_reader': 'code_39',
+  'code_39_vin_reader': 'code_39_vin',
+  'code_93_reader': 'code_93',
+  'ean_2_reader': 'ean_2',
+  'ean_5_reader': 'ean_5',
+  'ean_8_reader': 'ean_8',
+  'ean_reader': 'ean_13',
+  'i2of5_reader': 'i2of5',
+  'upc_e_reader': 'upc_e',
+  'upc_reader': 'upc_a',
+};
+export const Quagga2ToBwipMap: Record<
+  QuaggaJSCodeFormat,
+  (keyof typeof EBwipBcid & keyof typeof bwip) | null
+> = {
+  '2of5': 'code2of5',
+  'codabar': 'rationalizedCodabar',
+  'code_128': 'code128',
+  'code_32_reader': 'code32',
+  'code_39': 'code39',
+  'code_39_vin': 'code39ext',
+  'code_93': 'code93',
+  'ean_2': 'ean2',
+  'ean_5': 'ean5',
+  'ean_8': 'ean8',
+  'ean_13': 'ean13',
+  'i2of5': 'iata2of5',
+  'upc_e': 'upce',
+  'upc_a': 'upca',
+};
+//#endregion

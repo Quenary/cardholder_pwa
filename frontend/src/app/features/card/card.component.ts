@@ -108,7 +108,7 @@ export class CardComponent implements OnInit, OnDestroy {
         }
         value = value.toLowerCase();
         return this.codeTypeAutocompleteList.filter((c) => c.includes(value));
-      })
+      }),
     );
 
   ngOnInit(): void {

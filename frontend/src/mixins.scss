@@ -92,3 +92,15 @@
   justify-content: flex-end;
   flex-wrap: wrap;
 }
+// Mixin for scanner components
+@mixin scanner-host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  video {
+    width: 100%;
+    height: 100%;
+  }
+}
