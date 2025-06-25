@@ -1,30 +1,24 @@
 import {
   Component,
-  ElementRef,
   inject,
   NgZone,
   OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { MatButton } from '@angular/material/button';
-import { BrowserMultiFormatReader, BarcodeFormat } from '@zxing/browser';
-import type { Result } from '@zxing/library';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import {
   BehaviorSubject,
-  catchError,
   first,
   from,
   map,
   Observable,
-  retry,
   shareReplay,
-  Subscription,
   switchMap,
-  throwError,
 } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
+  MatDialog,
   MatDialogActions,
   MatDialogContent,
   MatDialogRef,
@@ -41,8 +35,17 @@ import {
   MatBottomSheetRef,
 } from '@angular/material/bottom-sheet';
 import { SnackService } from 'src/app/core/services/snack.service';
-import { AsyncPipe } from '@angular/common';
-import { ZxingToBwipMap } from 'src/app/entities/cards/cards-const';
+import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { CardScannerZxingComponent } from './card-scanner-zxing/card-scanner-zxing.component';
+import { CardScannerQuagga2Component } from './card-scanner-quagga2/card-scanner-quagga2.component';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { CardScannerBaseComponent } from './card-scanner-base/card-scanner-base.component';
+import {
+  EScanner,
+  IScannerResult,
+} from './card-scanner-base/scanner-interface';
+import { CardScannerHelpDialogComponent } from './card-scanner-help-dialog/card-scanner-help-dialog.component';
 
 export interface ICardScannerResult {
   text: string;
@@ -79,55 +82,89 @@ export class CardScannerDeviceSheetComponent {
   selector: 'app-card-scanner',
   imports: [
     MatButton,
+    MatIconButton,
     TranslateModule,
     MatIcon,
     MatDialogActions,
     MatDialogContent,
     AsyncPipe,
+    MatButtonToggleModule,
+    MatProgressSpinner,
+    CardScannerZxingComponent,
+    CardScannerQuagga2Component,
+    NgTemplateOutlet,
   ],
   templateUrl: './card-scanner.component.html',
   styleUrl: './card-scanner.component.scss',
 })
 export class CardScannerComponent implements OnInit, OnDestroy {
   private readonly matDialogRef = inject(MatDialogRef);
-  private readonly reader = new BrowserMultiFormatReader();
   private readonly ngZone = inject(NgZone);
   private readonly matBottomSheet = inject(MatBottomSheet);
   private readonly snackService = inject(SnackService);
   private readonly translateService = inject(TranslateService);
+  private readonly matDialog = inject(MatDialog);
 
+  public readonly EScanner = EScanner;
+  @ViewChild('scanner', {
+    static: false,
+  })
+  private scannerComponent: CardScannerBaseComponent;
+
+  /**
+   * List of scanners
+   */
+  public readonly scanners = [
+    {
+      name: 'Zxing',
+      code: EScanner.ZXING,
+    },
+    {
+      name: 'Quagga2',
+      code: EScanner.QUAGGA2,
+    },
+  ];
+  /**
+   * Selected scanner
+   */
+  public selectedScanner = this.scanners[0];
+  /**
+   * Media device list.
+   * That is also initiates permission dialog.
+   */
   private readonly devices$: Observable<MediaDeviceInfo[]> = from(
-    navigator?.mediaDevices?.getUserMedia({ video: true }) ?? Promise.reject()
+    navigator?.mediaDevices?.getUserMedia({ video: true }) ?? Promise.reject(),
   ).pipe(
-    switchMap(() => from(BrowserMultiFormatReader.listVideoInputDevices())),
-    shareReplay(1)
+    switchMap(() => from(navigator.mediaDevices.enumerateDevices())),
+    map((res) =>
+      (res || []).filter((d) => !d.kind || d.kind.includes('video')),
+    ),
+    shareReplay(1),
   );
+  /**
+   * Selected media device
+   */
   public readonly selectedDevice$ = new BehaviorSubject<MediaDeviceInfo>(null);
-  @ViewChild('video', { static: true, read: ElementRef<HTMLVideoElement> })
-  private readonly videoElementRef: ElementRef<HTMLVideoElement>;
-
-  private scanSubscription: Subscription;
 
   ngOnInit() {
     this.devices$
       .pipe(
         first(),
-        map((list) => this.getDefaultDeviceByLabel(list))
+        map((list) => this.getDefaultDeviceByLabel(list)),
       )
       .subscribe({
         next: (device) => {
-          this.onSelectSource(device);
+          this.selectedDevice$.next(device);
         },
         error: () => {
           this.snackService.error(
-            this.translateService.instant('CARDS.CARD.SCAN.PERMISSION_ERROR')
+            this.translateService.instant('CARDS.CARD.SCAN.PERMISSION_ERROR'),
           );
         },
       });
   }
 
   ngOnDestroy(): void {
-    this.scanSubscription?.unsubscribe();
     this.matBottomSheet.dismiss();
   }
 
@@ -141,78 +178,17 @@ export class CardScannerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Wrap scan to observable and start it
-   * @param deviceId
-   * @returns
-   */
-  private startScanning(deviceId: string): Observable<Result> {
-    return this.ngZone.runOutsideAngular(
-      () =>
-        new Observable((observer) => {
-          this.reader
-            .decodeFromVideoDevice(
-              deviceId,
-              this.videoElementRef.nativeElement,
-              (result, error, controls) => {
-                if (!!result) {
-                  observer.next(result);
-                }
-              }
-            )
-            .then((controls) => {
-              observer.add(() => {
-                controls.stop();
-              });
-            })
-            .catch((e) => {
-              observer.error(e);
-            });
-        })
-    );
-  }
-
-  /**
-   * Start scan on video source selection
-   * @param device
-   */
-  private onSelectSource(device: MediaDeviceInfo) {
-    this.scanSubscription?.unsubscribe();
-    this.selectedDevice$.next(device);
-    if (!!device) {
-      this.scanSubscription = this.startScanning(device.deviceId)
-        .pipe(
-          catchError((error) => {
-            this.snackService.error(error);
-            return throwError(() => error);
-          }),
-          retry({ count: 1, delay: 1000 })
-        )
-        .subscribe({
-          next: (res) => {
-            this.onResult(res);
-          },
-        });
-    }
-  }
-
-  /**
    * Callback to scanner result
    * @param res
    * @returns
    */
-  private onResult(res: Result): void {
+  public onResult(res: IScannerResult): void {
     if (!res) {
       return;
     }
-    const text = res.getText();
-    const intFormat = res.getBarcodeFormat();
-    const zFormat = Object.entries(BarcodeFormat).find(
-      ([key, value]) => value === intFormat
-    )[0];
-    const format = ZxingToBwipMap[zFormat]
     this.close({
-      text,
-      format,
+      text: res.code,
+      format: res.type,
     });
   }
 
@@ -221,25 +197,23 @@ export class CardScannerComponent implements OnInit, OnDestroy {
    * @param $event
    * @returns
    */
-  public decodeFromFile($event: Event & { target: HTMLInputElement }) {
+  public async decodeFromFile($event: Event & { target: HTMLInputElement }) {
     const file = $event.target.files[0];
     if (!file) {
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const image = new Image();
-      image.src = e.target.result as string;
-      this.reader
-        .decodeFromImageElement(image)
-        .then((res) => {
-          this.onResult(res);
-        })
-        .catch((error) => {
+    if (this.scannerComponent) {
+      this.scannerComponent.scanFile(file).subscribe({
+        next: (res) => {
+          if (res) {
+            this.onResult(res);
+          }
+        },
+        error: (error) => {
           this.snackService.error(error);
-        });
-    };
-    reader.readAsDataURL(file);
+        },
+      });
+    }
   }
 
   public close($event?: ICardScannerResult) {
@@ -257,9 +231,13 @@ export class CardScannerComponent implements OnInit, OnDestroy {
         .afterDismissed()
         .subscribe((data?: { device: MediaDeviceInfo }) => {
           if (data?.device) {
-            this.onSelectSource(data.device);
+            this.selectedDevice$.next(data.device);
           }
         });
     });
+  }
+
+  openScannersHelp() {
+    this.matDialog.open(CardScannerHelpDialogComponent);
   }
 }

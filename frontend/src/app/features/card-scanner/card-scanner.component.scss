@@ -4,14 +4,39 @@
   .mat-dialog-content {
     overflow: hidden;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-    &-video {
+    &-scanner {
+      display: block;
       width: 100%;
       height: 100%;
+    }
+    &-spinner {
+      width: auto;
+      height: auto;
     }
   }
 
   .mat-dialog-actions {
     @include mx.mat-dialog-actions;
+
+    &-scanner {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-end;
+      width: 100%;
+      gap: 16px;
+
+      & > span {
+        color: var(--mat-sys-on-surface);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
   }
 }
