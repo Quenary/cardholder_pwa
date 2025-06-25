@@ -152,8 +152,6 @@
     "ABOUT": {
         "HOMEPAGE": "Home page",
         "IMAGE_VERSION": "Docker image version",
-        "BACKEND_VERSION": "API version",
-        "FRONTEND_VERSION": "Web App version",
         "EXAMPLES": "Supported codes examples"
     }
 }
