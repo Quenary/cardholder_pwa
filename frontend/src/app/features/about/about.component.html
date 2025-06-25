@@ -16,18 +16,7 @@
         {{ 'ABOUT.IMAGE_VERSION' | translate }} {{ version.image_version }}
       </span>
     </mat-list-item>
-    <mat-list-item>
-      <span matListItemTitle>
-        {{ 'ABOUT.BACKEND_VERSION' | translate }} {{ version.app_version }}
-      </span>
-    </mat-list-item>
     }
-    <mat-list-item>
-      <span matListItemTitle>
-        {{ 'ABOUT.FRONTEND_VERSION' | translate }}
-        {{ frontendVersion$ | async }}
-      </span>
-    </mat-list-item>
   </mat-list>
   <mat-expansion-panel>
     <mat-expansion-panel-header>

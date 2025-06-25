@@ -9,7 +9,7 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { SystemApiService } from 'src/app/entities/system/system-api.service';
 import { MatIcon } from '@angular/material/icon';
-import { catchError, from, of, retry } from 'rxjs';
+import { catchError, of, retry } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { CodeExamplesComponent } from '../code-examples/code-examples.component';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -40,9 +40,6 @@ export class AboutComponent {
     catchError((error) => {
       this.snackService.error(error);
       return of(null);
-    })
-  );
-  public readonly frontendVersion$ = from(
-    import('../../../../package.json').then((p) => p.version)
+    }),
   );
 }
