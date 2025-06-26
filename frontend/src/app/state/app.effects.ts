@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AppActions } from './app.actions';
-import { catchError, delay, map, of, retry, switchMap, tap } from 'rxjs';
+import { catchError, first, map, of, skip, switchMap, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import {
@@ -16,6 +16,7 @@ import {
 } from '../shared/components/changelog/changelog.component';
 import { Store } from '@ngrx/store';
 import { SnackService } from '../core/services/snack.service';
+import { selectAppVersion } from './app.selectors';
 
 @Injectable()
 export class AppEffects {
@@ -31,20 +32,17 @@ export class AppEffects {
       this.actions$.pipe(
         ofType(AppActions.init),
         tap(() => {
-          this.store.dispatch(AppActions.getPublicSettings());
-
           const afterUpdate = localStorage.getItemJson(
             ELocalStorageKey.AFTER_UPDATE,
           );
           localStorage.removeItem(ELocalStorageKey.AFTER_UPDATE);
 
-          this.publicApiService
-            .version()
+          this.store
+            .select(selectAppVersion)
             .pipe(
-              delay(500),
+              skip(1),
+              first(),
               map((res) => res?.image_version ?? null),
-              retry({ count: 1, delay: 1000 }),
-              catchError(() => of(null)),
             )
             .subscribe((version) => {
               if (!version) {
@@ -69,6 +67,9 @@ export class AppEffects {
                 });
               }
             });
+
+          this.store.dispatch(AppActions.getPublicSettings());
+          this.store.dispatch(AppActions.getVersion());
         }),
       ),
     { dispatch: false },
@@ -125,10 +126,22 @@ export class AppEffects {
     ),
   );
 
+  getVersion$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AppActions.getVersion),
+      switchMap(() =>
+        this.publicApiService.version().pipe(
+          map((version) => AppActions.getVersionSuccess({ version })),
+          catchError((error) => of(AppActions.getVersionError({ error }))),
+        ),
+      ),
+    ),
+  );
+
   showErrors$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AppActions.getPublicSettingsError),
+        ofType(AppActions.getPublicSettingsError, AppActions.getVersionError),
         tap((action) => {
           this.snackService.error(action.error);
         }),

@@ -10,7 +10,7 @@
       </span>
       <mat-icon matListItemIcon>open_in_new</mat-icon>
     </a>
-    @if (version$ | async; as version) {
+    @if (version(); as version) {
     <mat-list-item role="">
       <span matListItemTitle>
         {{ 'ABOUT.IMAGE_VERSION' | translate }} {{ version.image_version }}

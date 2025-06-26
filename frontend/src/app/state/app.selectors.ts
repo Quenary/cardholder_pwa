@@ -39,3 +39,7 @@ export const selectAppSmtpDisabled = createSelector(_selectApp, (state) =>
     false,
   ),
 );
+export const selectAppVersion = createSelector(
+  _selectApp,
+  (state) => state.version,
+);
