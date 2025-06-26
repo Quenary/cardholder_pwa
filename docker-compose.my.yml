@@ -40,7 +40,7 @@ services:
     networks:
       - cardholder_pwa
     healthcheck:
-      test: ["CMD-SHELL", "python -c 'import urllib.request; exit(0) if urllib.request.urlopen(\"http://localhost:8000/api/system/health\").getcode() == 200 else exit(1)'"]
+      test: ["CMD-SHELL", "python -c 'import urllib.request; exit(0) if urllib.request.urlopen(\"http://localhost:8000/api/public/health\").getcode() == 200 else exit(1)'"]
       interval: 10s
       timeout: 5s
       retries: 5

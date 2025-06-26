@@ -9,7 +9,7 @@ import {
   IConfirmDialogData,
 } from '../shared/components/confirm-dialog/confirm-dialog.component';
 import { ELocalStorageKey } from '../app.consts';
-import { SystemApiService } from '../entities/system/system-api.service';
+import { PublicApiService } from '../entities/public/public-api.service';
 import {
   ChangelogDialogComponent,
   IChangelogComponentData,
@@ -20,7 +20,7 @@ export class AppEffects {
   private readonly actions$ = inject(Actions);
   private readonly matDialog = inject(MatDialog);
   private readonly translateService = inject(TranslateService);
-  private readonly systemApiService = inject(SystemApiService);
+  private readonly publicApiService = inject(PublicApiService);
 
   init$ = createEffect(
     () =>
@@ -32,7 +32,7 @@ export class AppEffects {
           );
           localStorage.removeItem(ELocalStorageKey.AFTER_UPDATE);
 
-          this.systemApiService
+          this.publicApiService
             .version()
             .pipe(
               delay(500),

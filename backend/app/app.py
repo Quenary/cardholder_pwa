@@ -5,7 +5,7 @@ from app.api import (
     user_router,
     card_router,
     password_recovery_router,
-    system_router,
+    public_router,
     admin_router,
 )
 import asyncio
@@ -31,5 +31,5 @@ app.include_router(auth_router)
 app.include_router(user_router)
 app.include_router(card_router)
 app.include_router(password_recovery_router)
-app.include_router(system_router)
+app.include_router(public_router)
 app.include_router(admin_router)

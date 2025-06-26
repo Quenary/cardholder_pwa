@@ -7,7 +7,7 @@ import {
   MatListItemTitle,
 } from '@angular/material/list';
 import { TranslateModule } from '@ngx-translate/core';
-import { SystemApiService } from 'src/app/entities/system/system-api.service';
+import { PublicApiService } from 'src/app/entities/public/public-api.service';
 import { MatIcon } from '@angular/material/icon';
 import { catchError, of, retry } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
@@ -34,10 +34,10 @@ import { ChangelogComponent } from 'src/app/shared/components/changelog/changelo
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutComponent {
-  private readonly systemApiService = inject(SystemApiService);
+  private readonly publicApiService = inject(PublicApiService);
   private readonly snackService = inject(SnackService);
 
-  public readonly version$ = this.systemApiService.version().pipe(
+  public readonly version$ = this.publicApiService.version().pipe(
     retry({ count: 1, delay: 1000 }),
     catchError((error) => {
       this.snackService.error(error);
