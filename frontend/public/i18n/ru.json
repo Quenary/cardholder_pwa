@@ -35,7 +35,8 @@
         "PASSWORD": "Пароль",
         "SIGNIN": "Войти",
         "SIGNUP": "Еще нет аккаунта?",
-        "PASSWORD_RECOVERY": "Восстановить пароль"
+        "PASSWORD_RECOVERY": "Восстановить пароль",
+        "REGISTRATION_DISABLED": "Регистрация отключена в настройках приложения"
     },
     "REGISTER": {
         "NEW_ACCOUNT": "Новый пользователь",
