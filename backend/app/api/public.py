@@ -5,7 +5,7 @@ from app.db import get_async_session
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter(tags=["system"], prefix="/system")
+router = APIRouter(tags=["public"], prefix="/public")
 
 
 @router.get("/version", response_model=Version)
