@@ -4,6 +4,12 @@
 export enum ELocalStorageKey {
   TOKEN_RESPONSE = 'cardholder-token-response',
   USER = 'cardholder-user',
+  /**
+   * This is key of app version string.
+   * Used to display changelog dialog on startup/reload,
+   * if version changed.
+   */
+  VERSION = 'cardholder-version',
 }
 /**
  * Enum of useful regexp

@@ -10,6 +10,7 @@ import { createActionGroup, emptyProps, props } from '@ngrx/store';
 export const AppActions = createActionGroup({
   source: 'APP',
   events: {
+    init: emptyProps(),
     networkOnline: emptyProps(),
     networkOffline: emptyProps(),
     versionDetected: props<{ event: VersionDetectedEvent }>(),
