@@ -36,7 +36,8 @@
         "SIGNIN": "Войти",
         "SIGNUP": "Еще нет аккаунта?",
         "PASSWORD_RECOVERY": "Восстановить пароль",
-        "REGISTRATION_DISABLED": "Регистрация отключена в настройках приложения"
+        "REGISTRATION_DISABLED": "Регистрация отключена в настройках приложения",
+        "SMTP_DISABLED": "SMTP отключен в переменных окружения"
     },
     "REGISTER": {
         "NEW_ACCOUNT": "Новый пользователь",

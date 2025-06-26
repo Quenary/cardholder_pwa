@@ -36,7 +36,8 @@
         "SIGNIN": "Sign in",
         "SIGNUP": "Don't have an account?",
         "PASSWORD_RECOVERY": "Password recovery",
-        "REGISTRATION_DISABLED": "Registration is disabled in the application settings"
+        "REGISTRATION_DISABLED": "Registration is disabled in the application settings",
+        "SMTP_DISABLED": "SMTP is disabled in the environment variables"
     },
     "REGISTER": {
         "NEW_ACCOUNT": "New account",

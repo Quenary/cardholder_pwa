@@ -3,10 +3,12 @@ export interface IVersion {
 }
 
 export enum EPublicSettingKey {
-  ALLOW_REGISTRATION = 'ALLOW_REGISTRATION'
+  ALLOW_REGISTRATION = 'ALLOW_REGISTRATION',
+  SMTP_DISABLED = 'SMTP_DISABLED',
 }
 export type TPublicSettingValueType = {
   [EPublicSettingKey.ALLOW_REGISTRATION]: boolean;
+  [EPublicSettingKey.SMTP_DISABLED]: boolean;
   [K: string]: unknown;
 };
 export interface IPublicSettingsItem<
