@@ -49,6 +49,6 @@ async def settings(session: AsyncSession = Depends(get_async_session)):
 
     public_keys = ["SMTP_DISABLED"]
     for pk in public_keys:
-        result_list.append({"key": pk, "value": getattr(Config, pk) or None})
-
+        value = getattr(Config, pk) if hasattr(Config, pk) else None
+        result_list.append({"key": pk, "value": value})
     return result_list
