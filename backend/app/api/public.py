@@ -9,6 +9,7 @@ from app.db import models
 import app.schemas as schemas
 from app.enums import ESettingKey
 from app.helpers import get_setting_typed_value
+from app.config import Config
 
 
 router = APIRouter(tags=["public"], prefix="/public")
@@ -45,4 +46,9 @@ async def settings(session: AsyncSession = Depends(get_async_session)):
         result_list.append(
             {"key": s.key, "value": get_setting_typed_value(s.value, s.value_type)}
         )
+
+    public_keys = ["SMTP_DISABLED"]
+    for pk in public_keys:
+        result_list.append({"key": pk, "value": getattr(Config, pk) or None})
+
     return result_list

@@ -16,6 +16,7 @@ class Config:
     PASSWORD_RECOVERY_CODE_LIFETIME_MIN: ClassVar[float]
     DB_URL: ClassVar[str]
     DB_CLEANUP_INTERVAL_MIN: ClassVar[float]
+    SMTP_DISABLED: ClassVar[bool]
     SMTP_USE_TLS: ClassVar[bool]
     SMTP_SERVER: ClassVar[str]
     SMTP_PORT: ClassVar[int]
@@ -49,6 +50,7 @@ class Config:
             cls.DB_CLEANUP_INTERVAL_MIN = float(
                 os.getenv("DB_CLEANUP_INTERVAL_MIN") or 360
             )
+            cls.SMTP_DISABLED = os.getenv("SMTP_DISABLED", "false").lower() == "true"
             cls.SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "false").lower() == "true"
             defaultPort: int = 587 if cls.SMTP_USE_TLS else 25
             cls.SMTP_SERVER = os.getenv("SMTP_SERVER", "")
