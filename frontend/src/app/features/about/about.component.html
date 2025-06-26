@@ -18,12 +18,24 @@
     </mat-list-item>
     }
   </mat-list>
+
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       {{ 'ABOUT.EXAMPLES' | translate }}
     </mat-expansion-panel-header>
     <ng-template matExpansionPanelContent>
       <app-code-examples></app-code-examples>
+    </ng-template>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      {{ 'ABOUT.CHANGELOG' | translate }}
+    </mat-expansion-panel-header>
+    <ng-template matExpansionPanelContent>
+      @defer {
+        <app-changelog></app-changelog>
+      }
     </ng-template>
   </mat-expansion-panel>
 </div>
