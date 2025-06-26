@@ -13,6 +13,7 @@ import { catchError, of, retry } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { CodeExamplesComponent } from '../code-examples/code-examples.component';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { ChangelogComponent } from 'src/app/shared/components/changelog/changelog.component';
 
 @Component({
   selector: 'app-about',
@@ -26,6 +27,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
     MatListItemIcon,
     CodeExamplesComponent,
     MatExpansionModule,
+    ChangelogComponent,
   ],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss',

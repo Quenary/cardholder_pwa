@@ -152,6 +152,7 @@
     "ABOUT": {
         "HOMEPAGE": "Home page",
         "IMAGE_VERSION": "Docker image version",
-        "EXAMPLES": "Supported codes examples"
+        "EXAMPLES": "Supported codes examples",
+        "CHANGELOG": "Changelog"
     }
 }

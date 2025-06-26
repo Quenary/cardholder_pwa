@@ -152,6 +152,7 @@
     "ABOUT": {
         "HOMEPAGE": "Page d'accueil",
         "IMAGE_VERSION": "Version de l'image Docker",
-        "EXAMPLES": "Exemples de codes pris en charge"
+        "EXAMPLES": "Exemples de codes pris en charge",
+        "CHANGELOG": "journal des modifications"
     }
 }
