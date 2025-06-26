@@ -1,4 +1,3 @@
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   MatList,
@@ -7,20 +6,19 @@ import {
   MatListItemTitle,
 } from '@angular/material/list';
 import { TranslateModule } from '@ngx-translate/core';
-import { PublicApiService } from 'src/app/entities/public/public-api.service';
 import { MatIcon } from '@angular/material/icon';
-import { catchError, of, retry } from 'rxjs';
-import { SnackService } from 'src/app/core/services/snack.service';
 import { CodeExamplesComponent } from '../code-examples/code-examples.component';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { ChangelogComponent } from 'src/app/shared/components/changelog/changelog.component';
+import { Store } from '@ngrx/store';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { selectAppVersion } from 'src/app/state/app.selectors';
 
 @Component({
   selector: 'app-about',
   imports: [
     MatList,
     MatListItem,
-    AsyncPipe,
     TranslateModule,
     MatIcon,
     MatListItemTitle,
@@ -34,14 +32,7 @@ import { ChangelogComponent } from 'src/app/shared/components/changelog/changelo
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutComponent {
-  private readonly publicApiService = inject(PublicApiService);
-  private readonly snackService = inject(SnackService);
+  private readonly store = inject(Store);
 
-  public readonly version$ = this.publicApiService.version().pipe(
-    retry({ count: 1, delay: 1000 }),
-    catchError((error) => {
-      this.snackService.error(error);
-      return of(null);
-    }),
-  );
+  public readonly version = toSignal(this.store.select(selectAppVersion));
 }

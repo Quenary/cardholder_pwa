@@ -4,6 +4,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { marked } from 'marked';
 import {
   catchError,
+  first,
   from,
   map,
   Observable,
@@ -11,8 +12,12 @@ import {
   retry,
   shareReplay,
   switchMap,
+  timeout,
 } from 'rxjs';
 import { SnackService } from './snack.service';
+import { Store } from '@ngrx/store';
+import { selectAppVersion } from 'src/app/state/app.selectors';
+import { IVersion } from 'src/app/entities/public/public-interface';
 
 @Injectable({
   providedIn: 'root',
@@ -21,19 +26,26 @@ export class ChangelogService {
   private readonly httpClient = inject(HttpClient);
   private readonly domSanitizer = inject(DomSanitizer);
   private readonly snackService = inject(SnackService);
+  private readonly store = inject(Store);
 
-  private readonly changelogHtml$ = this.httpClient
-    .get('/CHANGELOG.md', { responseType: 'text' })
-    .pipe(
-      switchMap((changelog) => from(marked(changelog, { async: true }))),
-      map((res) => this.domSanitizer.bypassSecurityTrustHtml(res)),
-      retry({ count: 1, delay: 1000 }),
-      catchError((error) => {
-        this.snackService.error(error);
-        return of(null);
+  private readonly changelogHtml$ = this.store.select(selectAppVersion).pipe(
+    first((version) => !!version),
+    timeout({ first: 1000, with: () => of(<IVersion>{}) }),
+    switchMap((version) =>
+      // query parameter is a hack for bypass cache and get new file
+      this.httpClient.get(`/CHANGELOG.md?v=${version.image_version}`, {
+        responseType: 'text',
       }),
-      shareReplay(1),
-    );
+    ),
+    switchMap((changelog) => from(marked(changelog, { async: true }))),
+    map((res) => this.domSanitizer.bypassSecurityTrustHtml(res)),
+    retry({ count: 1, delay: 1000 }),
+    catchError((error) => {
+      this.snackService.error(error);
+      return of(null);
+    }),
+    shareReplay(1),
+  );
 
   getChangelogHtml(): Observable<SafeHtml> {
     return this.changelogHtml$;
