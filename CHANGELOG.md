@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/Quenary/cardholder_pwa/compare/v1.4.0...v1.4.1) (2025-06-26)
+
+
+### Bug Fixes
+
+* copy CHANGELOG.md to frontend ([43b6d46](https://github.com/Quenary/cardholder_pwa/commit/43b6d466a8c1bd398d79f027a7804deda272f2ff)), closes [#11](https://github.com/Quenary/cardholder_pwa/issues/11)
+
 # [1.4.0](https://github.com/Quenary/cardholder_pwa/compare/v1.3.0...v1.4.0) (2025-06-26)
 
 
