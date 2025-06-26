@@ -18,6 +18,8 @@ import {
 } from 'src/app/entities/admin/admin-interface';
 import { NaiveDatePipe } from 'src/app/shared/pipes/naive-date.pipe';
 import { MatTooltip } from '@angular/material/tooltip';
+import { Store } from '@ngrx/store';
+import { AppActions } from 'src/app/state/app.actions';
 
 @Component({
   selector: 'app-admin-settings',
@@ -39,9 +41,10 @@ export class AdminSettingsComponent implements OnInit {
   private readonly adminApiService = inject(AdminApiService);
   private readonly snackService = inject(SnackService);
   private readonly translateService = inject(TranslateService);
+  private readonly store = inject(Store);
 
   public readonly keysTranslates = this.translateService.instant(
-    'ADMIN.SETTINGS.KEYS'
+    'ADMIN.SETTINGS.KEYS',
   );
   public readonly ESettingValueType = ESettingValueType;
   public readonly displayedColumns: (keyof ISetting)[] = [
@@ -63,7 +66,7 @@ export class AdminSettingsComponent implements OnInit {
       .pipe(
         finalize(() => {
           this.isLoading$.next(false);
-        })
+        }),
       )
       .subscribe({
         next: (list) => {
@@ -101,7 +104,8 @@ export class AdminSettingsComponent implements OnInit {
       .pipe(
         finalize(() => {
           this.isLoading$.next(false);
-        })
+          this.store.dispatch(AppActions.getPublicSettings());
+        }),
       )
       .subscribe({
         next: () => {
