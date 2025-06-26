@@ -1,3 +1,19 @@
+# [1.5.0](https://github.com/Quenary/cardholder_pwa/compare/v1.4.2...v1.5.0) (2025-06-26)
+
+
+### Bug Fixes
+
+* **backend:** null env var in public settings ([895c82d](https://github.com/Quenary/cardholder_pwa/commit/895c82d8cd10649dbdcbdd29d0dd01bf2570f73a)), closes [#12](https://github.com/Quenary/cardholder_pwa/issues/12)
+* **frontend:** disable sign-up button if registration disabled ([99e7321](https://github.com/Quenary/cardholder_pwa/commit/99e732165d5a31569d1c2746a109bbb73d38925b)), closes [#28](https://github.com/Quenary/cardholder_pwa/issues/28)
+
+
+### Features
+
+* **backend:** added public settings endpoint ([110c8e1](https://github.com/Quenary/cardholder_pwa/commit/110c8e145ca05a96a06fb9d8b943a37dbea975ec)), closes [#28](https://github.com/Quenary/cardholder_pwa/issues/28)
+* **backend:** env var to disable smtp ([078ce3c](https://github.com/Quenary/cardholder_pwa/commit/078ce3c79565768a5067d39fbce22027ea329dd7)), closes [#12](https://github.com/Quenary/cardholder_pwa/issues/12)
+* **frontend:** add app public settings ([18b14aa](https://github.com/Quenary/cardholder_pwa/commit/18b14aa10e634360af2dc96bc1f71c3e22e0d47b)), closes [#28](https://github.com/Quenary/cardholder_pwa/issues/28) [#12](https://github.com/Quenary/cardholder_pwa/issues/12)
+* **frontend:** disable password recovery button by env var ([6bc8201](https://github.com/Quenary/cardholder_pwa/commit/6bc8201ece691bf1a3dde25abcbc2b5c62c80dff)), closes [#12](https://github.com/Quenary/cardholder_pwa/issues/12)
+
 ## [1.4.2](https://github.com/Quenary/cardholder_pwa/compare/v1.4.1...v1.4.2) (2025-06-26)
 
 
