@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/Quenary/cardholder_pwa/compare/v1.5.0...v1.5.1) (2025-06-26)
+
+
+### Bug Fixes
+
+* after update changelog may have been loaded from cache ([ae71d18](https://github.com/Quenary/cardholder_pwa/commit/ae71d1848bf01b398541a9e410923c40868e2db6)), closes [#31](https://github.com/Quenary/cardholder_pwa/issues/31)
+
 # [1.5.0](https://github.com/Quenary/cardholder_pwa/compare/v1.4.2...v1.5.0) (2025-06-26)
 
 
