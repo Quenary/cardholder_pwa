@@ -1,3 +1,17 @@
+# [1.4.0](https://github.com/Quenary/cardholder_pwa/compare/v1.3.0...v1.4.0) (2025-06-26)
+
+
+### Bug Fixes
+
+* **frontend:** safer json from storage ([3a5f1b2](https://github.com/Quenary/cardholder_pwa/commit/3a5f1b218b2fefb5319514b72f60762de4fceb12))
+* remove backend/frontend versions ([59d05f4](https://github.com/Quenary/cardholder_pwa/commit/59d05f48e849872dd2833580953e318f1c736859)), closes [#11](https://github.com/Quenary/cardholder_pwa/issues/11)
+
+
+### Features
+
+* add changelog on frontend ([79b97b3](https://github.com/Quenary/cardholder_pwa/commit/79b97b353a4c2684fb518fb7ad375f789e9fba57)), closes [#11](https://github.com/Quenary/cardholder_pwa/issues/11)
+* **frontend:** add changelog dialog after update ([09940fe](https://github.com/Quenary/cardholder_pwa/commit/09940fe0ff7359c6b09e99c58cb885fe8e882e2c)), closes [#11](https://github.com/Quenary/cardholder_pwa/issues/11)
+
 # [1.3.0](https://github.com/Quenary/cardholder_pwa/compare/v1.2.0...v1.3.0) (2025-06-25)
 
 
