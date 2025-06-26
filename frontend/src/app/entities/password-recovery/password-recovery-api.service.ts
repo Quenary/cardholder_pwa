@@ -1,23 +1,22 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
   IPasswordRecoveryCode,
   IPasswordRecoverySubmit,
 } from './password-recovery-interface';
 import { Observable } from 'rxjs';
-import { environment } from '@env/environment';
+import { BaseApiService } from '../base/base-api.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class PasswordRecoveryApiService {
-  private readonly httpClient = inject(HttpClient);
+export class PasswordRecoveryApiService extends BaseApiService<'recovery'> {
+  protected override readonly prefix = 'recovery';
 
   code(body: IPasswordRecoveryCode): Observable<any> {
-    return this.httpClient.post(`${environment.api}/recovery/code`, body);
+    return this.httpClient.post(`${this.basePath}/code`, body);
   }
 
   submit(body: IPasswordRecoverySubmit): Observable<any> {
-    return this.httpClient.put(`${environment.api}/recovery/submit`, body);
+    return this.httpClient.put(`${this.basePath}/submit`, body);
   }
 }

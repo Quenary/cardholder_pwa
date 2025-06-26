@@ -1,14 +1,13 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { IOAuth2PasswordRequestForm, ITokenResponse } from './auth-interface';
 import { Observable } from 'rxjs';
-import { environment } from '@env/environment';
+import { BaseApiService } from '../base/base-api.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthApiService {
-  constructor(private httpClient: HttpClient) {}
+export class AuthApiService extends BaseApiService<''> {
+  protected override readonly prefix = '';
 
   token(body: IOAuth2PasswordRequestForm): Observable<ITokenResponse> {
     const formData = new FormData();
@@ -16,26 +15,26 @@ export class AuthApiService {
     formData.append('username', body.username);
     formData.append('password', body.password);
     return this.httpClient.post<ITokenResponse>(
-      `${environment.api}/token`,
-      formData
+      `${this.basePath}/token`,
+      formData,
     );
   }
 
   tokenRefresh(refresh_token: string): Observable<ITokenResponse> {
     return this.httpClient.post<ITokenResponse>(
-      `${environment.api}/token/refresh`,
-      { refresh_token }
+      `${this.basePath}/token/refresh`,
+      { refresh_token },
     );
   }
 
   logout(refresh_token: string): Observable<string> {
     return this.httpClient.post(
-      `${environment.api}/logout`,
+      `${this.basePath}/logout`,
       { refresh_token },
       {
         observe: 'body',
         responseType: 'text',
-      }
+      },
     );
   }
 }
