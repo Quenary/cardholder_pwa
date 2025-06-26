@@ -3,6 +3,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Optional
 from app.config import Config
+import logging
 
 
 class EmailSender:
@@ -14,7 +15,14 @@ class EmailSender:
     @classmethod
     def send_email(cls, to_email: str, subject: str, body: str) -> bool:
         if not cls.status():
-            raise ValueError("SMTP configuration is incomplete")
+            msg = "SMTP configuration is incomplete. You need to set at least 'SMTP_SERVER', 'SMTP_PORT', 'SMTP_FROM_EMAIL' environment variables."
+            logging.error(msg)
+            return False
+
+        if Config.SMTP_DISABLED:
+            msg = "SMTP is disabled in environment variables, but the application tried to send email."
+            logging.error(msg)
+            return False
 
         msg = MIMEMultipart()
         msg["From"] = Config.SMTP_FROM_EMAIL
@@ -23,13 +31,17 @@ class EmailSender:
         msg.attach(MIMEText(body, "plain"))
 
         with smtplib.SMTP(Config.SMTP_SERVER, Config.SMTP_PORT) as server:
-            if Config.SMTP_USE_TLS:
-                server.starttls()
+            try:
+                if Config.SMTP_USE_TLS:
+                    server.starttls()
 
-            if Config.SMTP_USERNAME and Config.SMTP_PASSWORD:
-                server.login(Config.SMTP_USERNAME, Config.SMTP_PASSWORD)
+                if Config.SMTP_USERNAME and Config.SMTP_PASSWORD:
+                    server.login(Config.SMTP_USERNAME, Config.SMTP_PASSWORD)
 
-            server.send_message(msg)
+                server.send_message(msg)
+            except smtplib.SMTPResponseException as e:
+                logging.error(e.strerror)
+                return False
         return True
 
     @classmethod
