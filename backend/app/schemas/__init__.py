@@ -8,4 +8,5 @@ from .settings import (
     GetSettingsRequestItem,
     GetSettingsRequest,
 )
+from .public_settings import PublicSettingsItem
 from .validators import password_validator
