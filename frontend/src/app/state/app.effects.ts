@@ -59,9 +59,11 @@ export class AppEffects {
 
               if (version !== lastVersion && afterUpdate) {
                 localStorage.setItem(ELocalStorageKey.VERSION, version);
+                // Versions in changelog saved without previx
+                const compareTo = lastVersion.replace('v', '');
                 this.matDialog.open(ChangelogDialogComponent, {
                   data: <IChangelogComponentData>{
-                    versionPredicate: (v) => v > lastVersion,
+                    versionPredicate: (v) => v > compareTo,
                   },
                   autoFocus: false,
                 });

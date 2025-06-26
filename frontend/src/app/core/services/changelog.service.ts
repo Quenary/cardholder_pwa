@@ -87,7 +87,7 @@ export class ChangelogService {
     const versionHeaderRegex = /^(\d+\.\d+\.\d+)/;
 
     for (const el of children) {
-      if (el.tagName === 'H1') {
+      if (['H1', 'H2'].includes(el.tagName)) {
         const versionMatch = el.textContent?.match(versionHeaderRegex);
         if (versionMatch) {
           // Save block on new block, if predicate is true
