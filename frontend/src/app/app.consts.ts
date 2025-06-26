@@ -10,6 +10,10 @@ export enum ELocalStorageKey {
    * if version changed.
    */
   VERSION = 'cardholder-version',
+  /**
+   * Flag indicationg that app loaded after an update.
+   */
+  AFTER_UPDATE = 'cardholder-after-update',
 }
 /**
  * Enum of useful regexp
