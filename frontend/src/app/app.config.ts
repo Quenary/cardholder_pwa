@@ -34,6 +34,7 @@ import { userReducer } from './entities/user/state/user.reducers';
 import { UserEffects } from './entities/user/state/user.effects';
 import { userInitializer } from './core/app-initializers/user-initializer';
 import { localeInitializer } from './core/app-initializers/locale-initializer';
+import { appInitializer } from './core/app-initializers/app-initializer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -54,7 +55,7 @@ export const appConfig: ApplicationConfig = {
             new TranslateHttpLoader(httpClient, '/i18n/', '.json'),
           deps: [HttpClient],
         },
-      })
+      }),
     ),
     {
       provide: LOCALE_ID,
@@ -63,6 +64,7 @@ export const appConfig: ApplicationConfig = {
         return locale;
       },
     },
+    provideAppInitializer(() => appInitializer()),
     provideAppInitializer(() => translateInitializer()),
     provideAppInitializer(() => localeInitializer()),
     provideAppInitializer(() => authInitializer()),
