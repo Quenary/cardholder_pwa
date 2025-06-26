@@ -17,7 +17,10 @@ import { IOAuth2PasswordRequestForm } from 'src/app/entities/auth/auth-interface
 import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
 import { selectAuthIsLoading } from 'src/app/entities/auth/state/auth.selectors';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { selectAppAllowRegistration } from 'src/app/state/app.selectors';
+import {
+  selectAppAllowRegistration,
+  selectAppSmtpDisabled,
+} from 'src/app/state/app.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatTooltip } from '@angular/material/tooltip';
 
@@ -45,6 +48,9 @@ export class AuthComponent {
   public readonly isLoading = toSignal(this.store.select(selectAuthIsLoading));
   public readonly allowRegistration = toSignal(
     this.store.select(selectAppAllowRegistration),
+  );
+  public readonly smtpDisabled = toSignal(
+    this.store.select(selectAppSmtpDisabled),
   );
   public readonly form = new FormGroup<
     TInterfaceToForm<Omit<IOAuth2PasswordRequestForm, 'grant_type'>>

@@ -36,7 +36,8 @@
         "SIGNIN": "Se connecter",
         "SIGNUP": "Vous n'avez pas de compte ?",
         "PASSWORD_RECOVERY": "Récuperation de mot de passe",
-        "REGISTRATION_DISABLED": "L'inscription est désactivée dans les paramètres de l'application"
+        "REGISTRATION_DISABLED": "L'inscription est désactivée dans les paramètres de l'application",
+        "SMTP_DISABLED": "Le SMTP est désactivé dans les variables d'environnement"
     },
     "REGISTER": {
         "NEW_ACCOUNT": "Nouveau compte",

@@ -55,13 +55,17 @@
       </button>
     </div>
 
-    <button
-      mat-button
-      routerLink="/password-recovery/request"
-      [disabled]="isLoading()"
-      type="button">
-      <mat-icon>error</mat-icon>
-      {{ 'AUTH.PASSWORD_RECOVERY' | translate }}
-    </button>
+    <div
+      [matTooltip]="'AUTH.SMTP_DISABLED' | translate"
+      [matTooltipDisabled]="!smtpDisabled()">
+      <button
+        mat-button
+        routerLink="/password-recovery/request"
+        [disabled]="isLoading() || smtpDisabled()"
+        type="button">
+        <mat-icon>error</mat-icon>
+        {{ 'AUTH.PASSWORD_RECOVERY' | translate }}
+      </button>
+    </div>
   </section>
 </form>
