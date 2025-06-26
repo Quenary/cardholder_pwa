@@ -12,7 +12,14 @@ declare module 'localStorage' {
 Storage.prototype.getItemJson = function (key) {
   const value = localStorage.getItem(key);
   if (value) {
-    return JSON.parse(value);
+    try {
+      return JSON.parse(value);
+    } catch (e) {
+      console.error(e);
+      console.warn(`Invalid key '${key}' removed from storage`);
+      localStorage.removeItem(key);
+      return null;
+    }
   }
   return null;
 };
