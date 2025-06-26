@@ -1,12 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+
 import app.schemas as schemas, app.enums as enums
 from app.db import models
 from app.core import auth
 from app.db import get_async_session
 from app.core.user import delete_user
 from app.core.smtp import EmailSender
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from app.helpers import get_setting_typed_value
+
 
 router = APIRouter(tags=["admin"], prefix="/admin")
 
@@ -88,17 +91,7 @@ async def get_system_settings(
     settings = result.scalars()
     res = []
     for s in settings:
-        val = s.value
-        try:
-            if s.value_type == enums.ESettingType.BOOL:
-                val = val.lower() == "true"
-            elif s.value_type == enums.ESettingType.FLOAT:
-                val = float(val)
-            elif s.value_type == enums.ESettingType.INT:
-                val = int(val)
-        except Exception:
-            pass
-
+        val = get_setting_typed_value(s.value, s.value_type)
         res.append(
             {
                 "key": s.key,

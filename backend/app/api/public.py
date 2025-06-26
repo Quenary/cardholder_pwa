@@ -1,14 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException
-from app.schemas import Version
 import os
-from app.db import get_async_session
-from sqlalchemy import text
+from sqlalchemy import text, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Any
+
+from app.db import get_async_session
+from app.db import models
+import app.schemas as schemas
+from app.enums import ESettingKey
+from app.helpers import get_setting_typed_value
+
 
 router = APIRouter(tags=["public"], prefix="/public")
 
 
-@router.get("/version", response_model=Version)
+@router.get("/version", response_model=schemas.Version)
 def get_version():
     image_version = os.getenv("VERSION") or None
     return {"image_version": image_version}
@@ -21,3 +27,22 @@ async def health(session: AsyncSession = Depends(get_async_session)):
         return "OK"
     except Exception:
         raise HTTPException(503, "db_error")
+
+
+@router.get(
+    "/settings",
+    response_model=list[schemas.PublicSettingsItem],
+    description="Returns list of several app settings and environment variables. Key ",
+)
+async def settings(session: AsyncSession = Depends(get_async_session)):
+    result_list: list[dict[str, Any]] = []
+
+    public_keys = [ESettingKey.ALLOW_REGISTRATION]
+    stmt = select(models.Setting).where(models.Setting.key.in_(public_keys))
+    result = await session.execute(stmt)
+    settings = result.scalars()
+    for s in settings:
+        result_list.append(
+            {"key": s.key, "value": get_setting_typed_value(s.value, s.value_type)}
+        )
+    return result_list
