@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/Quenary/cardholder_pwa/compare/v1.4.1...v1.4.2) (2025-06-26)
+
+
+### Bug Fixes
+
+* **frontend:** changelog dialog may appear before update dialog ([1d9d43b](https://github.com/Quenary/cardholder_pwa/commit/1d9d43bf678be6f7eb71b6ae8b01ec7d4d5e3008)), closes [#11](https://github.com/Quenary/cardholder_pwa/issues/11)
+
 ## [1.4.1](https://github.com/Quenary/cardholder_pwa/compare/v1.4.0...v1.4.1) (2025-06-26)
 
 
