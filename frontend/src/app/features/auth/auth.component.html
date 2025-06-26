@@ -32,28 +32,33 @@
   <section class="auth-form-buttons">
     <button
       mat-flat-button
-      [disabled]="isLoading$ | async"
+      [disabled]="isLoading()"
       type="submit">
       <mat-icon>login</mat-icon>
       {{ 'AUTH.SIGNIN' | translate }}
-      @if (isLoading$ | async) {
-      <mat-icon iconPositionEnd
-        ><mat-spinner [diameter]="15"></mat-spinner
-      ></mat-icon>
+      @if (isLoading()) {
+        <mat-icon iconPositionEnd
+          ><mat-spinner [diameter]="15"></mat-spinner
+        ></mat-icon>
       }
     </button>
-    <button
-      mat-button
-      routerLink="/register"
-      [disabled]="isLoading$ | async"
-      type="button">
-      <mat-icon>person_add</mat-icon>
-      {{ 'AUTH.SIGNUP' | translate }}
-    </button>
+    <div
+      [matTooltip]="'AUTH.REGISTRATION_DISABLED' | translate"
+      [matTooltipDisabled]="allowRegistration()">
+      <button
+        mat-button
+        routerLink="/register"
+        [disabled]="isLoading() || !allowRegistration()"
+        type="button">
+        <mat-icon>person_add</mat-icon>
+        {{ 'AUTH.SIGNUP' | translate }}
+      </button>
+    </div>
+
     <button
       mat-button
       routerLink="/password-recovery/request"
-      [disabled]="isLoading$ | async"
+      [disabled]="isLoading()"
       type="button">
       <mat-icon>error</mat-icon>
       {{ 'AUTH.PASSWORD_RECOVERY' | translate }}

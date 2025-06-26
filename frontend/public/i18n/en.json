@@ -35,7 +35,8 @@
         "PASSWORD": "Password",
         "SIGNIN": "Sign in",
         "SIGNUP": "Don't have an account?",
-        "PASSWORD_RECOVERY": "Password recovery"
+        "PASSWORD_RECOVERY": "Password recovery",
+        "REGISTRATION_DISABLED": "Registration is disabled in the application settings"
     },
     "REGISTER": {
         "NEW_ACCOUNT": "New account",

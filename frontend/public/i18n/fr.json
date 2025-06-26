@@ -35,7 +35,8 @@
         "PASSWORD": "Mot de passe",
         "SIGNIN": "Se connecter",
         "SIGNUP": "Vous n'avez pas de compte ?",
-        "PASSWORD_RECOVERY": "Récuperation de mot de passe"
+        "PASSWORD_RECOVERY": "Récuperation de mot de passe",
+        "REGISTRATION_DISABLED": "L'inscription est désactivée dans les paramètres de l'application"
     },
     "REGISTER": {
         "NEW_ACCOUNT": "Nouveau compte",
