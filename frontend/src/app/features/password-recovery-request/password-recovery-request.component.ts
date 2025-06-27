@@ -1,5 +1,9 @@
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -12,7 +16,7 @@ import { MatInput, MatFormField, MatLabel } from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, finalize } from 'rxjs';
+import { finalize } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { PasswordRecoveryApiService } from 'src/app/entities/password-recovery/password-recovery-api.service';
 import { IPasswordRecoveryCode } from 'src/app/entities/password-recovery/password-recovery-interface';
@@ -30,7 +34,6 @@ import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
     ReactiveFormsModule,
     TranslateModule,
     MatProgressSpinner,
-    AsyncPipe,
   ],
   templateUrl: './password-recovery-request.component.html',
   styleUrl: './password-recovery-request.component.scss',
@@ -38,20 +41,20 @@ import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
 })
 export class PasswordRecoveryRequestComponent {
   private readonly passwordRecoveryApiService = inject(
-    PasswordRecoveryApiService
+    PasswordRecoveryApiService,
   );
   private readonly translateService = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly snackService = inject(SnackService);
 
-  public readonly isLoading$ = new BehaviorSubject<boolean>(false);
+  public readonly isLoading = signal(false);
   public readonly form = new FormGroup<TInterfaceToForm<IPasswordRecoveryCode>>(
     {
       email: new FormControl<string>(null, [
         Validators.required,
         Validators.email,
       ]),
-    }
+    },
   );
 
   onSubmit(): void {
@@ -59,18 +62,18 @@ export class PasswordRecoveryRequestComponent {
       return;
     }
     const body = this.form.getRawValue();
-    this.isLoading$.next(true);
+    this.isLoading.set(true);
     this.passwordRecoveryApiService
       .code(body)
       .pipe(
         finalize(() => {
-          this.isLoading$.next(false);
-        })
+          this.isLoading.set(false);
+        }),
       )
       .subscribe({
         next: () => {
           this.snackService.success(
-            this.translateService.instant('PASSWORD_RECOVERY.SENT')
+            this.translateService.instant('PASSWORD_RECOVERY.SENT'),
           );
           this.router.navigate(['/auth']);
         },

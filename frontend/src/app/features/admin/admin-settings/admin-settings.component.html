@@ -1,7 +1,7 @@
 <h3>{{ 'ADMIN.SETTINGS.TITLE' | translate }}</h3>
 <table
   mat-table
-  [dataSource]="settings$ | async">
+  [dataSource]="settings()">
   <ng-container matColumnDef="key">
     <th
       mat-header-cell
@@ -26,36 +26,41 @@
     <td
       mat-cell
       *matCellDef="let entry">
-      @switch (entry.value_type) { @case (ESettingValueType.FLOAT) {
-      <input
-        #floatInput
-        type="number"
-        matInput
-        [value]="entry.value"
-        (blur)="onChange(floatInput.value, entry)" />
-      } @case (ESettingValueType.INT) {
-      <input
-        #intInput
-        type="number"
-        inputmode="numeric"
-        step="1"
-        matInput
-        [value]="entry.value"
-        (blur)="onChange(intInput.value, entry)" />
-      } @case (ESettingValueType.BOOL) {
-      <mat-checkbox
-        #checkboxInput
-        [checked]="entry.value"
-        (change)="onChange(checkboxInput.checked, entry)">
-      </mat-checkbox>
-      } @default {
-      <input
-        #textInput
-        type="text"
-        matInput
-        [value]="entry.value"
-        (blur)="onChange(textInput.value, entry)" />
-      } }
+      @switch (entry.value_type) {
+        @case (ESettingValueType.FLOAT) {
+          <input
+            #floatInput
+            type="number"
+            matInput
+            [value]="entry.value"
+            (blur)="onChange(floatInput.value, entry)" />
+        }
+        @case (ESettingValueType.INT) {
+          <input
+            #intInput
+            type="number"
+            inputmode="numeric"
+            step="1"
+            matInput
+            [value]="entry.value"
+            (blur)="onChange(intInput.value, entry)" />
+        }
+        @case (ESettingValueType.BOOL) {
+          <mat-checkbox
+            #checkboxInput
+            [checked]="entry.value"
+            (change)="onChange(checkboxInput.checked, entry)">
+          </mat-checkbox>
+        }
+        @default {
+          <input
+            #textInput
+            type="text"
+            matInput
+            [value]="entry.value"
+            (blur)="onChange(textInput.value, entry)" />
+        }
+      }
     </td>
   </ng-container>
 

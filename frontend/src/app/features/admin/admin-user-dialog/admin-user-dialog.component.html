@@ -35,13 +35,13 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="mat-dialog-actions">
-  @if (isOwner$ | async) {
+  @if (isOwner()) {
     @switch (user.role_code) {
       @case (EUserRole.ADMIN) {
         <button
           class="accent-color"
           mat-button
-          [disabled]="isLoading$ | async"
+          [disabled]="isLoading()"
           (click)="changeUserRole(EUserRole.MEMBER)">
           <mat-icon>remove_moderator</mat-icon>
           {{ 'ADMIN.USERS.CHANGE_ROLE.TO_MEMBER' | translate }}
@@ -51,7 +51,7 @@
         <button
           class="accent-color"
           mat-button
-          [disabled]="isLoading$ | async"
+          [disabled]="isLoading()"
           (click)="changeUserRole(EUserRole.ADMIN)">
           <mat-icon>add_moderator</mat-icon>
           {{ 'ADMIN.USERS.CHANGE_ROLE.TO_ADMIN' | translate }}
@@ -60,19 +60,19 @@
     }
   }
   @if (
-    user.role_code == EUserRole.MEMBER || (user.role_code == EUserRole.ADMIN && (isOwner$ | async))
+    user.role_code == EUserRole.MEMBER || (user.role_code == EUserRole.ADMIN && isOwner())
   ) {
     <button
       class="warn-color"
       mat-button
-      [disabled]="isLoading$ | async"
+      [disabled]="isLoading()"
       (click)="deleteUser()">
       {{ 'GENERAL.DELETE' | translate }}
     </button>
   }
   <button
     mat-flat-button
-    [disabled]="isLoading$ | async"
+    [disabled]="isLoading()"
     (click)="close()">
     {{ 'GENERAL.CLOSE' | translate }}
   </button>

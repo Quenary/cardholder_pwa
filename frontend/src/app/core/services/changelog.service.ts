@@ -70,7 +70,7 @@ export class ChangelogService {
    * @param versionPredicate
    * @returns
    */
-  private filterChangelogHtml(
+  public filterChangelogHtml(
     html: SafeHtml,
     versionPredicate: (v: string) => boolean,
   ): string {

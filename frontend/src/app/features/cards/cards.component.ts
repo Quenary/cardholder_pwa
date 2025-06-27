@@ -1,22 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
+  computed,
+  effect,
   inject,
-  OnInit,
 } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
-import { AsyncPipe } from '@angular/common';
-import {
-  combineLatest,
-  distinctUntilChanged,
-  filter,
-  map,
-  shareReplay,
-  startWith,
-} from 'rxjs';
+import { map } from 'rxjs';
 import {
   MatAutocomplete,
   MatOption,
@@ -37,7 +29,7 @@ import {
   selectCardsIsLoading,
   selectCardsList,
 } from 'src/app/entities/cards/state/cards.selectors';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatFabButton } from '@angular/material/button';
 import { CardCodeViewerComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
 import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
@@ -48,7 +40,6 @@ import { IsOldCodeType } from 'src/app/shared/pipes/is-old-code-type.pipe';
   selector: 'app-cards',
   imports: [
     RouterOutlet,
-    AsyncPipe,
     MatAutocomplete,
     MatOption,
     MatAutocompleteTrigger,
@@ -71,61 +62,56 @@ import { IsOldCodeType } from 'src/app/shared/pipes/is-old-code-type.pipe';
   styleUrl: './cards.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CardsComponent implements OnInit {
+export class CardsComponent {
   private readonly store = inject(Store);
   private readonly router = inject(Router);
-  private readonly destroyRef = inject(DestroyRef);
 
-  public readonly showParent$ = this.router.events.pipe(
-    startWith(null),
-    map(() => this.router.url === '/cards'),
-    distinctUntilChanged(),
-    shareReplay(1)
+  public readonly showParent = toSignal(
+    this.router.events.pipe(map(() => this.router.url === '/cards')),
+    { initialValue: this.router.url === '/cards' },
   );
   public readonly cardsPlaceholder = Array(6).fill(null);
-  public readonly isLoading$ = this.store
-    .select(selectCardsIsLoading)
-    .pipe(shareReplay(1));
-  /**
-   * All cards
-   */
-  private readonly _cards$ = this.store.select(selectCardsList);
+  public readonly isLoading = toSignal(this.store.select(selectCardsIsLoading));
   /**
    * Form control for search field
    */
   public readonly searchControl = new FormControl<string>(null);
+
+  /**
+   * All cards
+   */
+  private readonly _cards = toSignal(this.store.select(selectCardsList));
+  /**
+   * Search signal
+   */
+  private readonly _search = toSignal(this.searchControl.valueChanges, {
+    initialValue: null,
+  });
   /**
    * Filtered cards
    */
-  public readonly cards$ = combineLatest([
-    this._cards$,
-    this.searchControl.valueChanges.pipe(startWith(null)),
-  ]).pipe(
-    map(([list, search]) => {
-      if (!search) {
-        return list;
-      }
-      const searchLC = search.toLowerCase();
-      return list.filter((item) => item.name.toLowerCase().includes(searchLC));
-    })
-  );
+  public readonly cards = computed(() => {
+    const cards = this._cards();
+    const search = this._search();
+    if (!search) {
+      return cards;
+    }
+    const searchLC = search.toLowerCase();
+    return cards.filter((item) => item.name.toLowerCase().includes(searchLC));
+  });
   /**
-   * Filtered search options
+   * Filtered autocomplete list
    */
-  public readonly autocompleteOptions$ = this.cards$.pipe(
-    map((list) => list.map((item) => item.name))
+  public readonly autocompleteOptions = computed(() =>
+    this.cards().map((item) => item.name),
   );
 
-  ngOnInit(): void {
-    this.showParent$
-      .pipe(
-        filter((res) => res),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: () => {
-          this.store.dispatch(CardsActions.list());
-        },
-      });
+  constructor() {
+    effect(() => {
+      const showParent = this.showParent();
+      if (showParent) {
+        this.store.dispatch(CardsActions.list());
+      }
+    });
   }
 }

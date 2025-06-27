@@ -1,68 +1,74 @@
 <router-outlet></router-outlet>
 
-@if (showParent$ | async) {
-<section class="cards-header">
-  <mat-autocomplete #matAutocompleteRef="matAutocomplete">
-    @for (option of autocompleteOptions$ | async; track option) {
-    <mat-option [value]="option">{{ option }}</mat-option>
-    }
-  </mat-autocomplete>
-  <mat-form-field class="cards-header-search">
-    <mat-label>{{ 'CARDS.SEARCH' | translate }}</mat-label>
-    <input
-      #searchInput
-      type="text"
-      [placeholder]="'CARDS.SEARCH_PLACEHOLDER' | translate"
-      aria-label="Search by name"
-      matInput
-      [formControl]="searchControl"
-      [matAutocomplete]="matAutocompleteRef" />
-    @if (searchControl.value) {
-    <mat-icon
-      matSuffix
-      (click)="searchControl.reset()"
-      >cancel
-    </mat-icon>
-    }
-  </mat-form-field>
+@if (showParent()) {
+  <section class="cards-header">
+    <mat-autocomplete #matAutocompleteRef="matAutocomplete">
+      @for (option of autocompleteOptions(); track option) {
+        <mat-option [value]="option">{{ option }}</mat-option>
+      }
+    </mat-autocomplete>
+    <mat-form-field class="cards-header-search">
+      <mat-label>{{ 'CARDS.SEARCH' | translate }}</mat-label>
+      <input
+        #searchInput
+        type="text"
+        [placeholder]="'CARDS.SEARCH_PLACEHOLDER' | translate"
+        aria-label="Search by name"
+        matInput
+        [formControl]="searchControl"
+        [matAutocomplete]="matAutocompleteRef" />
+      @if (searchControl.value) {
+        <mat-icon
+          matSuffix
+          (click)="searchControl.reset()"
+          >cancel
+        </mat-icon>
+      }
+    </mat-form-field>
 
-  <button
-    class="accent-color"
-    mat-fab
-    routerLink="/cards/new">
-    <mat-icon>add</mat-icon>
-  </button>
-</section>
+    <button
+      class="accent-color"
+      mat-fab
+      routerLink="/cards/new">
+      <mat-icon>add</mat-icon>
+    </button>
+  </section>
 
-<section class="cards-list">
-  @if (isLoading$ | async) { @for (pc of cardsPlaceholder; track pc) {
-  <div class="cards-list-item animated-placeholder"> </div>
-  } } @else { @for (card of cards$ | async; track card) {
-  <div
-    class="cards-list-item"
-    matRipple
-    [routerLink]="['/cards', card.id]">
-    <section class="cards-list-item-header">
-      <span class="cards-list-item-header-text">
-        {{ card.name }}
-      </span>
-      <section class="cards-list-item-header-icons">
-        <mat-icon class="accent-color"> edit_note </mat-icon>
-        @if (card | isOldCodeType) {
-        <mat-icon class="warn-color"> warning </mat-icon>
-        }
-      </section>
-    </section>
-    @if (card | isValidCard) { @defer {
-    <app-card-code-viewer
-      class="cards-list-item-preview"
-      [style.background]="card.color"
-      [color]="card.color | getOnColor"
-      [card]="card"
-      (click)="$event.stopPropagation()">
-    </app-card-code-viewer>
-    } }
-  </div>
-  } }
-</section>
+  <section class="cards-list">
+    @if (isLoading()) {
+      @for (pc of cardsPlaceholder; track pc) {
+        <div class="cards-list-item animated-placeholder"> </div>
+      }
+    } @else {
+      @for (card of cards(); track card) {
+        <div
+          class="cards-list-item"
+          matRipple
+          [routerLink]="['/cards', card.id]">
+          <section class="cards-list-item-header">
+            <span class="cards-list-item-header-text">
+              {{ card.name }}
+            </span>
+            <section class="cards-list-item-header-icons">
+              <mat-icon class="accent-color"> edit_note </mat-icon>
+              @if (card | isOldCodeType) {
+                <mat-icon class="warn-color"> warning </mat-icon>
+              }
+            </section>
+          </section>
+          @if (card | isValidCard) {
+            @defer {
+              <app-card-code-viewer
+                class="cards-list-item-preview"
+                [style.background]="card.color"
+                [color]="card.color | getOnColor"
+                [card]="card"
+                (click)="$event.stopPropagation()">
+              </app-card-code-viewer>
+            }
+          }
+        </div>
+      }
+    }
+  </section>
 }

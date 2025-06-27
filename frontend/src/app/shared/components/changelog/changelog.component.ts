@@ -1,27 +1,18 @@
-import { AsyncPipe } from '@angular/common';
-import {
-  Component,
-  inject,
-  Input,
-  OnChanges,
-  OnInit,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, computed, inject, Input, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
-import { SafeHtml } from '@angular/platform-browser';
 import { TranslateModule } from '@ngx-translate/core';
-import { Observable, of } from 'rxjs';
 import { ChangelogService } from 'src/app/core/services/changelog.service';
 
 /**
- * Options for {@link ChangelogComponent} and {@link ChangelogDialogComponent}
+ * Options for {@link ChangelogDialogComponent}
  */
-export interface IChangelogComponentData {
+export interface IChangelogDialogComponentData {
   /**
    * Version predicate for filtering
    * @param version version string
@@ -33,43 +24,41 @@ export interface IChangelogComponentData {
 
 @Component({
   selector: 'app-changelog',
-  imports: [AsyncPipe],
+  imports: [],
   templateUrl: './changelog.component.html',
   styleUrl: './changelog.component.scss',
 })
-export class ChangelogComponent
-  implements OnInit, OnChanges, IChangelogComponentData
-{
+export class ChangelogComponent {
   protected readonly changelogService = inject(ChangelogService);
 
-  @Input() versionPredicate: (version: string) => boolean;
-
-  public changelog$: Observable<SafeHtml> = of(null);
-
-  ngOnInit(): void {
-    this.changelog$ = this.getChangelog();
+  @Input() set versionPredicate(value: (version: string) => boolean) {
+    this._versionPredicate.set(value);
   }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.versionPredicate && !changes.versionPredicate.firstChange) {
-      this.changelog$ = this.getChangelog();
+  protected readonly _versionPredicate =
+    signal<(version: string) => boolean>(null);
+  protected readonly _changelog = toSignal(
+    this.changelogService.getChangelogHtml(),
+  );
+  public readonly changelog = computed(() => {
+    const _versionPredicate = this._versionPredicate();
+    const _changelog = this._changelog();
+    if (_versionPredicate) {
+      return this.changelogService.filterChangelogHtml(
+        _changelog,
+        _versionPredicate,
+      );
     }
-  }
-
-  protected getChangelog(): Observable<SafeHtml> {
-    return this.versionPredicate
-      ? this.changelogService.getChangelogHtmlByVersion(this.versionPredicate)
-      : this.changelogService.getChangelogHtml();
-  }
+    return _changelog;
+  });
 }
 
 @Component({
   selector: 'app-changelog-dialog',
-  imports: [MatDialogModule, TranslateModule, AsyncPipe, MatButton],
+  imports: [MatDialogModule, TranslateModule, MatButton],
   template: `
   <h1 mat-dialog-title>{{'ABOUT.CHANGELOG' | translate}}</h1>
   <mat-dialog-content>
-    <div [innerHTML]="changelog$ | async"></div>
+    <div [innerHTML]="changelog()"></div>
   </mat-dialog-content>
   <mat-dialog-actions>
     <button
@@ -82,12 +71,15 @@ export class ChangelogComponent
 })
 export class ChangelogDialogComponent
   extends ChangelogComponent
-  implements IChangelogComponentData
+  implements IChangelogDialogComponentData
 {
   private readonly matDialogRef = inject(MatDialogRef);
-  private readonly data: IChangelogComponentData = inject(MAT_DIALOG_DATA);
-  public override versionPredicate: (version: string) => boolean =
-    this.data.versionPredicate;
+  private readonly data: IChangelogDialogComponentData = inject(MAT_DIALOG_DATA);
+
+  constructor() {
+    super();
+    this._versionPredicate.set(this.data.versionPredicate);
+  }
 
   public close(): void {
     this.matDialogRef.close();

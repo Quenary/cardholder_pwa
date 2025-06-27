@@ -1,7 +1,7 @@
 <h3>{{ 'ADMIN.USERS.TITLE' | translate }}</h3>
 <table
   mat-table
-  [dataSource]="users$ | async">
+  [dataSource]="users()">
   <ng-container matColumnDef="username">
     <th
       mat-header-cell

@@ -1,3 +1,3 @@
-@if (changelog$ | async; as changelog) {
-  <div [innerHTML]="changelog"></div>
+@if (changelog()) {
+  <div [innerHTML]="changelog()"></div>
 }

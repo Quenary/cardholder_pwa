@@ -2,13 +2,13 @@
   <mat-sidenav
     class="sidenav"
     mode="push"
-    [opened]="sidenavOpened"
-    (openedChange)="sidenavOpened = $event">
+    [opened]="sidenavOpened()"
+    (openedChange)="sidenavOpened.set($event)">
     <mat-nav-list
       class="sidenav-list"
       aria-label="Main navigation"
-      (click)="sidenavOpened = false">
-      @for (item of links$ | async; track item) {
+      (click)="sidenavOpened.set(false)">
+      @for (item of links(); track item) {
       <a
         mat-list-item
         [routerLink]="item.link"
@@ -23,17 +23,17 @@
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content class="sidenav-container-content">
-    @if (isAuthorized$ | async) { @defer {
+    @if (isAuthorized()) { @defer {
     <mat-toolbar class="mat-toolbar sidenav-container-content-toolbar">
       <button
         mat-icon-button
-        (click)="sidenavOpened = !sidenavOpened">
+        (click)="sidenavOpened.set(!sidenavOpened())">
         <mat-icon>menu</mat-icon>
       </button>
       <span class="sidenav-container-content-toolbar-title">
         {{ 'GENERAL.TITLE' | translate }}
       </span>
-      @if (isOffline$ | async) {
+      @if (isOffline()) {
       <section class="sidenav-container-content-toolbar-connection">
         {{ 'GENERAL.CONNECTION' | translate }}
         <mat-icon iconPositionEnd

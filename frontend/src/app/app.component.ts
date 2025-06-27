@@ -1,13 +1,18 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import {
   MatSidenavContainer,
   MatSidenav,
   MatSidenavContent,
 } from '@angular/material/sidenav';
-import { combineLatest, map, Observable } from 'rxjs';
+import { map } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { AsyncPipe } from '@angular/common';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatToolbar } from '@angular/material/toolbar';
@@ -22,6 +27,7 @@ import { AuthActions } from './entities/auth/state/auth.actions';
 import { selectAppIsOffline } from './state/app.selectors';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { selectUserIsAdmin } from './entities/user/state/user.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 interface INavItem {
   name: string;
@@ -45,7 +51,6 @@ interface INavItem {
     MatNavList,
     MatListItemIcon,
     RouterLinkActive,
-    AsyncPipe,
     MatIconButton,
     MatProgressSpinner,
   ],
@@ -56,56 +61,56 @@ interface INavItem {
 export class AppComponent {
   private readonly store = inject(Store);
   private readonly translateService = inject(TranslateService);
-  public readonly isOffline$ = this.store.select(selectAppIsOffline);
-  /**
-   * Items for side nav panel
-   */
-  public readonly links$: Observable<INavItem[]> = combineLatest([
-    this.translateService.get('NAV'),
-    this.store.select(selectUserIsAdmin),
-  ]).pipe(
-    map(([translates, isAdmin]) => [
+
+  public readonly isOffline = toSignal(this.store.select(selectAppIsOffline));
+
+  private readonly isAdmin = toSignal(this.store.select(selectUserIsAdmin));
+  private readonly navTranslates = toSignal(this.translateService.get('NAV'));
+  public readonly links = computed<INavItem[]>(() => {
+    const isAdmin = this.isAdmin();
+    const navTranslates = this.navTranslates();
+    return [
       {
-        name: translates.CARD,
+        name: navTranslates.CARD,
         icon: 'credit_card_outlined',
         link: '/cards',
       },
       {
-        name: translates.USER,
+        name: navTranslates.USER,
         icon: 'person_outlined',
         link: '/user',
       },
       ...(isAdmin
         ? [
             {
-              name: translates.ADMIN,
+              name: navTranslates.ADMIN,
               icon: 'admin_panel_settings',
               link: '/admin',
             },
           ]
         : []),
       {
-        name: translates.ABOUT,
+        name: navTranslates.ABOUT,
         icon: 'info_outlined',
         link: '/about',
       },
       {
-        name: translates.EXIT,
+        name: navTranslates.EXIT,
         icon: 'logout',
         onClick: () => {
           this.store.dispatch(AuthActions.logout());
         },
       },
-    ])
-  );
+    ];
+  });
   /**
    * Whether to show authorized content (navigation, header, e.g.)
    */
-  public readonly isAuthorized$ = this.store
-    .select(selectAuthTokenResponse)
-    .pipe(map((res) => !!res));
+  public readonly isAuthorized = toSignal(
+    this.store.select(selectAuthTokenResponse).pipe(map((res) => !!res)),
+  );
   /**
    * Side nav opened flag
    */
-  public sidenavOpened: boolean = false;
+  public readonly sidenavOpened = signal(false);
 }
