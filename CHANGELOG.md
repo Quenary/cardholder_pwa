@@ -1,3 +1,5 @@
+## [1.5.3](https://github.com/Quenary/cardholder_pwa/compare/v1.5.2...v1.5.3) (2025-06-27)
+
 ## [1.5.2](https://github.com/Quenary/cardholder_pwa/compare/v1.5.1...v1.5.2) (2025-06-26)
 
 
