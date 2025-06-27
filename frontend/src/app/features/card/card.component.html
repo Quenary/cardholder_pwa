@@ -9,19 +9,21 @@
       (click)="scanCode()">
       <mat-icon>qr_code_scanner</mat-icon>
     </button>
-    @if (form.value | isValidCard) { @defer {
-    <app-card-code-viewer
-      class="card-form-scan-viewer"
-      [card]="$any(form.value)"
-      (OnNewType)="form.controls.code_type.setValue($event)">
-    </app-card-code-viewer>
-    } }
+    @if (form.value | isValidCard) {
+      @defer {
+        <app-card-code-viewer
+          class="card-form-scan-viewer"
+          [card]="$any(form.value)"
+          (OnNewType)="form.controls.code_type.setValue($event)">
+        </app-card-code-viewer>
+      }
+    }
   </section>
 
-  @if (card$ | async | isOldCodeType) {
-  <span [style.color]="'var(--mat-sys-error)'">
-    {{ 'CARDS.CARD.CODE_FORMAT_WARN' | translate }}
-  </span>
+  @if (card() | isOldCodeType) {
+    <span [style.color]="'var(--mat-sys-error)'">
+      {{ 'CARDS.CARD.CODE_FORMAT_WARN' | translate }}
+    </span>
   }
 
   <section class="card-form-codes">
@@ -41,8 +43,8 @@
         {{ 'CARDS.CARD.CODE_TYPE' | translate }}
       </mat-label>
       <mat-autocomplete #codeTypeAutocomplete="matAutocomplete">
-        @for (codeType of codeTypeAutocompleteList$ | async; track codeType) {
-        <mat-option [value]="codeType">{{ codeType }}</mat-option>
+        @for (codeType of codeTypeAutocompleteList(); track codeType) {
+          <mat-option [value]="codeType">{{ codeType }}</mat-option>
         }
       </mat-autocomplete>
       <input
@@ -82,45 +84,45 @@
       id="card-color"
       formControlName="color" />
     @if (form.controls.color.value) {
-    <button
-      mat-icon-button
-      matSuffix
-      (click)="form.controls.color.setValue(null)">
-      <mat-icon>clear </mat-icon>
-    </button>
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="form.controls.color.setValue(null)">
+        <mat-icon>clear </mat-icon>
+      </button>
     }
   </mat-form-field>
 
   <section class="card-form-buttons">
-    @if (canDelete$ | async) {
-    <button
-      class="warn-color"
-      mat-button
-      type="button"
-      [disabled]="isLoading$ | async"
-      (click)="onDelete()">
-      <mat-icon>delete</mat-icon>
-      {{ 'GENERAL.DELETE' | translate }}
-    </button>
+    @if (canDelete()) {
+      <button
+        class="warn-color"
+        mat-button
+        type="button"
+        [disabled]="isLoading()"
+        (click)="onDelete()">
+        <mat-icon>delete</mat-icon>
+        {{ 'GENERAL.DELETE' | translate }}
+      </button>
     }
     <button
       mat-button
       routerLink="/cards"
       type="button"
-      [disabled]="isLoading$ | async">
+      [disabled]="isLoading()">
       <mat-icon>close</mat-icon>
       {{ 'GENERAL.CLOSE' | translate }}
     </button>
     <button
       mat-flat-button
       type="submit"
-      [disabled]="(isLoading$ | async) || !(hasChanges$ | async)">
+      [disabled]="isLoading() || !hasChanges()">
       {{ 'GENERAL.SAVE' | translate }}
       <mat-icon>save</mat-icon>
-      @if (isLoading$ | async) {
-      <mat-icon iconPositionEnd
-        ><mat-spinner [diameter]="15"></mat-spinner
-      ></mat-icon>
+      @if (isLoading()) {
+        <mat-icon iconPositionEnd
+          ><mat-spinner [diameter]="15"></mat-spinner
+        ></mat-icon>
       }
     </button>
   </section>

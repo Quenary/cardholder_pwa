@@ -1,21 +1,16 @@
 import {
+  ChangeDetectionStrategy,
   Component,
+  effect,
   inject,
   NgZone,
   OnDestroy,
   OnInit,
+  signal,
   ViewChild,
 } from '@angular/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import {
-  BehaviorSubject,
-  first,
-  from,
-  map,
-  Observable,
-  shareReplay,
-  switchMap,
-} from 'rxjs';
+import { catchError, from, map, of, switchMap } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   MatDialog,
@@ -35,7 +30,7 @@ import {
   MatBottomSheetRef,
 } from '@angular/material/bottom-sheet';
 import { SnackService } from 'src/app/core/services/snack.service';
-import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { CardScannerZxingComponent } from './card-scanner-zxing/card-scanner-zxing.component';
 import { CardScannerQuagga2Component } from './card-scanner-quagga2/card-scanner-quagga2.component';
@@ -43,9 +38,11 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { CardScannerBaseComponent } from './card-scanner-base/card-scanner-base.component';
 import {
   EScanner,
+  IScanner,
   IScannerResult,
 } from './card-scanner-base/scanner-interface';
 import { CardScannerHelpDialogComponent } from './card-scanner-help-dialog/card-scanner-help-dialog.component';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 export interface ICardScannerResult {
   text: string;
@@ -87,7 +84,6 @@ export class CardScannerDeviceSheetComponent {
     MatIcon,
     MatDialogActions,
     MatDialogContent,
-    AsyncPipe,
     MatButtonToggleModule,
     MatProgressSpinner,
     CardScannerZxingComponent,
@@ -96,8 +92,9 @@ export class CardScannerDeviceSheetComponent {
   ],
   templateUrl: './card-scanner.component.html',
   styleUrl: './card-scanner.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CardScannerComponent implements OnInit, OnDestroy {
+export class CardScannerComponent implements OnDestroy {
   private readonly matDialogRef = inject(MatDialogRef);
   private readonly ngZone = inject(NgZone);
   private readonly matBottomSheet = inject(MatBottomSheet);
@@ -114,7 +111,7 @@ export class CardScannerComponent implements OnInit, OnDestroy {
   /**
    * List of scanners
    */
-  public readonly scanners = [
+  public readonly scanners: IScanner[] = [
     {
       name: 'Zxing',
       code: EScanner.ZXING,
@@ -127,41 +124,43 @@ export class CardScannerComponent implements OnInit, OnDestroy {
   /**
    * Selected scanner
    */
-  public selectedScanner = this.scanners[0];
+  public readonly selectedScanner = signal<IScanner>(this.scanners[0]);
   /**
    * Media device list.
    * That is also initiates permission dialog.
    */
-  private readonly devices$: Observable<MediaDeviceInfo[]> = from(
-    navigator?.mediaDevices?.getUserMedia({ video: true }) ?? Promise.reject(),
-  ).pipe(
-    switchMap(() => from(navigator.mediaDevices.enumerateDevices())),
-    map((res) =>
-      (res || []).filter((d) => !d.kind || d.kind.includes('video')),
+  private readonly devices = toSignal(
+    from(
+      navigator?.mediaDevices?.getUserMedia({ video: true }) ??
+        Promise.reject(),
+    ).pipe(
+      switchMap(() => from(navigator.mediaDevices.enumerateDevices())),
+      map((res) =>
+        (res || []).filter((d) => !d.kind || d.kind.includes('video')),
+      ),
+      catchError(() => {
+        this.snackService.error(
+          this.translateService.instant('CARDS.CARD.SCAN.PERMISSION_ERROR'),
+        );
+        return of([]);
+      }),
     ),
-    shareReplay(1),
+    { initialValue: [] },
   );
   /**
    * Selected media device
    */
-  public readonly selectedDevice$ = new BehaviorSubject<MediaDeviceInfo>(null);
+  public readonly selectedDevice = signal<MediaDeviceInfo>(null);
 
-  ngOnInit() {
-    this.devices$
-      .pipe(
-        first(),
-        map((list) => this.getDefaultDeviceByLabel(list)),
-      )
-      .subscribe({
-        next: (device) => {
-          this.selectedDevice$.next(device);
-        },
-        error: () => {
-          this.snackService.error(
-            this.translateService.instant('CARDS.CARD.SCAN.PERMISSION_ERROR'),
-          );
-        },
-      });
+  constructor() {
+    effect(() => {
+      const devices = this.devices();
+      const device = this.selectedDevice();
+      if (devices.length && !device) {
+        const device = this.getDefaultDeviceByLabel(devices);
+        this.selectedDevice.set(device);
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -221,20 +220,19 @@ export class CardScannerComponent implements OnInit, OnDestroy {
   }
 
   public onClickSelectDevice(): void {
-    this.devices$.pipe(first()).subscribe((devices) => {
-      this.matBottomSheet
-        .open(CardScannerDeviceSheetComponent, {
-          data: {
-            devices,
-          },
-        })
-        .afterDismissed()
-        .subscribe((data?: { device: MediaDeviceInfo }) => {
-          if (data?.device) {
-            this.selectedDevice$.next(data.device);
-          }
-        });
-    });
+    const devices = this.devices();
+    this.matBottomSheet
+      .open(CardScannerDeviceSheetComponent, {
+        data: {
+          devices,
+        },
+      })
+      .afterDismissed()
+      .subscribe((data?: { device: MediaDeviceInfo }) => {
+        if (data?.device) {
+          this.selectedDevice.set(data.device);
+        }
+      });
   }
 
   openScannersHelp() {

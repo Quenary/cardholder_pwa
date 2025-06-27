@@ -1,5 +1,10 @@
-import { AsyncPipe } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -17,7 +22,7 @@ import {
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, finalize, first } from 'rxjs';
+import { finalize, first } from 'rxjs';
 import { ERegexp } from 'src/app/app.consts';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { PasswordRecoveryApiService } from 'src/app/entities/password-recovery/password-recovery-api.service';
@@ -38,23 +43,24 @@ import { passwordMatchValidator } from 'src/app/shared/validators/passwords-matc
     TranslateModule,
     MatProgressSpinner,
     MatSuffix,
-    AsyncPipe,
   ],
   templateUrl: './password-recovery-submit.component.html',
   styleUrl: './password-recovery-submit.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PasswordRecoverySubmitComponent implements OnInit {
   private readonly passwordRecoveryApiService = inject(
-    PasswordRecoveryApiService
+    PasswordRecoveryApiService,
   );
   private readonly translateService = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly snackService = inject(SnackService);
 
-  public readonly isLoading$ = new BehaviorSubject<boolean>(false);
-  public hidePassword: boolean = true;
-  public hideConfirmPassword: boolean = true;
+  public readonly isLoading = signal(false);
+  public readonly hidePassword = signal(true);
+  public readonly hideConfirmPassword = signal(true);
+
   public readonly form = new FormGroup<
     TInterfaceToForm<IPasswordRecoverySubmit>
   >(
@@ -69,7 +75,7 @@ export class PasswordRecoverySubmitComponent implements OnInit {
         Validators.pattern(ERegexp.password),
       ]),
     },
-    [passwordMatchValidator()]
+    [passwordMatchValidator()],
   );
 
   ngOnInit(): void {
@@ -87,18 +93,18 @@ export class PasswordRecoverySubmitComponent implements OnInit {
       return;
     }
 
-    this.isLoading$.next(true);
+    this.isLoading.set(true);
     this.passwordRecoveryApiService
       .submit(this.form.getRawValue())
       .pipe(
         finalize(() => {
-          this.isLoading$.next(false);
-        })
+          this.isLoading.set(false);
+        }),
       )
       .subscribe({
         next: () => {
           this.snackService.success(
-            this.translateService.instant('PASSWORD_RECOVERY.SUCCESS')
+            this.translateService.instant('PASSWORD_RECOVERY.SUCCESS'),
           );
           this.router.navigate(['/auth']);
         },

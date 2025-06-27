@@ -1,5 +1,11 @@
-import { AsyncPipe, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import {
@@ -14,14 +20,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import {
-  switchMap,
-  finalize,
-  EMPTY,
-  BehaviorSubject,
-  tap,
-  Observable,
-} from 'rxjs';
+import { switchMap, finalize, EMPTY, tap } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { AdminApiService } from 'src/app/entities/admin/admin-api.service';
 import { selectUserIsOwner } from 'src/app/entities/user/state/user.selectors';
@@ -45,7 +44,6 @@ export interface IAdminUserDialogData {
     MatDialogTitle,
     TranslateModule,
     FormsModule,
-    AsyncPipe,
     MatListModule,
     DatePipe,
     MatIcon,
@@ -64,13 +62,13 @@ export class AdminUserDialogComponent {
   private readonly translateService = inject(TranslateService);
   private readonly store = inject(Store);
 
-  public readonly isOwner$: Observable<boolean> =
-    this.store.select(selectUserIsOwner);
+  public readonly isOwner = toSignal(this.store.select(selectUserIsOwner));
+  public readonly isLoading = signal(false);
+
   public readonly EUserRole = EUserRole;
   public readonly rolesTranslates =
     this.translateService.instant('ADMIN.USERS.ROLES');
   public user = this.data.user;
-  public readonly isLoading$ = new BehaviorSubject<boolean>(false);
 
   public deleteUser(): void {
     this.matDialog
@@ -86,18 +84,18 @@ export class AdminUserDialogComponent {
       .pipe(
         switchMap((res) => {
           if (res) {
-            this.isLoading$.next(true);
+            this.isLoading.set(true);
             return this.adminApiService.deleteUser(this.user.id).pipe(
               tap(() => {
                 this.close();
               }),
               finalize(() => {
-                this.isLoading$.next(false);
-              })
+                this.isLoading.set(false);
+              }),
             );
           }
           return EMPTY;
-        })
+        }),
       )
       .subscribe({
         error: (error) => {
@@ -110,7 +108,7 @@ export class AdminUserDialogComponent {
     const title = 'ADMIN.USERS.CHANGE_ROLE.CONFIRM';
     const subtitle = this.translateService.instant(
       'ADMIN.USERS.CHANGE_ROLE.CONFIRM_SUBTITLE',
-      { role: this.rolesTranslates[role] }
+      { role: this.rolesTranslates[role] },
     );
     this.matDialog
       .open(ConfirmDialogComponent, {
@@ -125,7 +123,7 @@ export class AdminUserDialogComponent {
       .pipe(
         switchMap((res) => {
           if (res) {
-            this.isLoading$.next(true);
+            this.isLoading.set(true);
             return this.adminApiService
               .changeUserRole(this.data.user.id, role)
               .pipe(
@@ -133,12 +131,12 @@ export class AdminUserDialogComponent {
                   this.close();
                 }),
                 finalize(() => {
-                  this.isLoading$.next(false);
-                })
+                  this.isLoading.set(false);
+                }),
               );
           }
           return EMPTY;
-        })
+        }),
       )
       .subscribe({
         error: (error) => {

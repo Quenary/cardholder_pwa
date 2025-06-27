@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
@@ -6,7 +11,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { UserApiService } from 'src/app/entities/user/user-api.service';
 import { IUserCreate, IUserUpdate } from 'src/app/entities/user/user-interface';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { BehaviorSubject, finalize } from 'rxjs';
+import { finalize } from 'rxjs';
 import {
   FormGroup,
   FormControl,
@@ -22,7 +27,6 @@ import {
   MatLabel,
   MatSuffix,
 } from '@angular/material/input';
-import { AsyncPipe } from '@angular/common';
 import { SnackService } from 'src/app/core/services/snack.service';
 
 @Component({
@@ -40,7 +44,6 @@ import { SnackService } from 'src/app/core/services/snack.service';
     ReactiveFormsModule,
     TranslateModule,
     MatSuffix,
-    AsyncPipe,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
@@ -52,9 +55,10 @@ export class RegisterComponent {
   private readonly translateService = inject(TranslateService);
   private readonly snackService = inject(SnackService);
 
-  public readonly isLoading$ = new BehaviorSubject<boolean>(false);
-  public hidePassword: boolean = true;
-  public hideConfirmPassword: boolean = true;
+  public readonly isLoading = signal(false);
+  public readonly hidePassword = signal(true);
+  public readonly hideConfirmPassword = signal(true);
+
   public readonly form = new FormGroup<
     TInterfaceToForm<IUserCreate & IUserUpdate>
   >(
@@ -76,7 +80,7 @@ export class RegisterComponent {
         Validators.email,
       ]),
     },
-    [passwordMatchValidator()]
+    [passwordMatchValidator()],
   );
 
   onSubmit(): void {
@@ -84,18 +88,18 @@ export class RegisterComponent {
       return;
     }
 
-    this.isLoading$.next(true);
+    this.isLoading.set(true);
     this.userApiService
       .create(this.form.getRawValue())
       .pipe(
         finalize(() => {
-          this.isLoading$.next(false);
-        })
+          this.isLoading.set(false);
+        }),
       )
       .subscribe({
         next: () => {
           this.snackService.success(
-            this.translateService.instant('REGISTER.SUCCESS')
+            this.translateService.instant('REGISTER.SUCCESS'),
           );
           this.router.navigate(['/auth']);
         },

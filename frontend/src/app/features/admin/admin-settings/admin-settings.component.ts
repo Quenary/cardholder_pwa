@@ -1,15 +1,16 @@
-import { AsyncPipe, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   inject,
   OnInit,
+  signal,
 } from '@angular/core';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatInput } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, finalize } from 'rxjs';
+import { finalize } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { AdminApiService } from 'src/app/entities/admin/admin-api.service';
 import {
@@ -27,7 +28,6 @@ import { AppActions } from 'src/app/state/app.actions';
     MatCheckbox,
     MatInput,
     MatTableModule,
-    AsyncPipe,
     TranslateModule,
     DatePipe,
     NaiveDatePipe,
@@ -52,30 +52,21 @@ export class AdminSettingsComponent implements OnInit {
     'updated_at',
     'value',
   ];
-  public readonly isLoading$ = new BehaviorSubject<boolean>(false);
-  public readonly settings$ = new BehaviorSubject<ISetting[]>([]);
+  public readonly settings = signal<ISetting[]>([]);
 
   ngOnInit(): void {
     this.getSettings();
   }
 
   private getSettings(): void {
-    this.isLoading$.next(true);
-    this.adminApiService
-      .getSettings()
-      .pipe(
-        finalize(() => {
-          this.isLoading$.next(false);
-        }),
-      )
-      .subscribe({
-        next: (list) => {
-          this.settings$.next(list);
-        },
-        error: (error) => {
-          this.snackService.error(error);
-        },
-      });
+    this.adminApiService.getSettings().subscribe({
+      next: (list) => {
+        this.settings.set(list);
+      },
+      error: (error) => {
+        this.snackService.error(error);
+      },
+    });
   }
 
   public onChange(value: number | boolean | string, setting: ISetting): void {
@@ -93,7 +84,6 @@ export class AdminSettingsComponent implements OnInit {
         value = value;
     }
 
-    this.isLoading$.next(true);
     this.adminApiService
       .setSettings([
         {
@@ -103,7 +93,6 @@ export class AdminSettingsComponent implements OnInit {
       ])
       .pipe(
         finalize(() => {
-          this.isLoading$.next(false);
           this.store.dispatch(AppActions.getPublicSettings());
         }),
       )

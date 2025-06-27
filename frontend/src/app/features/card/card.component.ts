@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   inject,
   OnDestroy,
@@ -31,14 +32,13 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ICardBase } from 'src/app/entities/cards/cards-interface';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
 import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   selectCardsActiveCanDelete,
   selectCardsActiveHasChanges,
   selectCardsActiveInfo,
   selectCardsIsLoading,
 } from 'src/app/entities/cards/state/cards.selectors';
-import { AsyncPipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import type { ICardScannerResult } from '../card-scanner/card-scanner.component';
 import { CardCodeViewerComponent } from '../../shared/components/card-code-viewer/card-code-viewer.component';
@@ -48,7 +48,6 @@ import {
   MatAutocompleteTrigger,
   MatOption,
 } from '@angular/material/autocomplete';
-import { map, Observable, startWith } from 'rxjs';
 import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
 import { ERegexp } from 'src/app/app.consts';
 import { IsOldCodeType } from 'src/app/shared/pipes/is-old-code-type.pipe';
@@ -66,7 +65,6 @@ import { IsOldCodeType } from 'src/app/shared/pipes/is-old-code-type.pipe';
     TranslateModule,
     MatProgressSpinner,
     RouterLink,
-    AsyncPipe,
     MatFabButton,
     CardCodeViewerComponent,
     MatAutocomplete,
@@ -86,10 +84,15 @@ export class CardComponent implements OnInit, OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
   private readonly matDialog = inject(MatDialog);
 
-  public readonly card$ = this.store.select(selectCardsActiveInfo);
-  public readonly isLoading$ = this.store.select(selectCardsIsLoading);
-  public readonly canDelete$ = this.store.select(selectCardsActiveCanDelete);
-  public readonly hasChanges$ = this.store.select(selectCardsActiveHasChanges);
+  public readonly card = toSignal(this.store.select(selectCardsActiveInfo));
+  public readonly isLoading = toSignal(this.store.select(selectCardsIsLoading));
+  public readonly canDelete = toSignal(
+    this.store.select(selectCardsActiveCanDelete),
+  );
+  public readonly hasChanges = toSignal(
+    this.store.select(selectCardsActiveHasChanges),
+  );
+
   public readonly form = new FormGroup<TInterfaceToForm<ICardBase>>({
     code: new FormControl<string>(null, [Validators.required]),
     code_type: new FormControl<string>(null, [Validators.required]),
@@ -97,19 +100,21 @@ export class CardComponent implements OnInit, OnDestroy {
     description: new FormControl<string>(null),
     color: new FormControl<string>(null, [Validators.pattern(ERegexp.color)]),
   });
-  private readonly codeTypeAutocompleteList: string[] =
+
+  private readonly _codeTypeAutocompleteList: string[] =
     Object.values(EBwipBcid);
-  public readonly codeTypeAutocompleteList$: Observable<string[]> =
-    this.form.controls.code_type.valueChanges.pipe(
-      startWith(null),
-      map((value) => {
-        if (!value) {
-          return this.codeTypeAutocompleteList;
-        }
-        value = value.toLowerCase();
-        return this.codeTypeAutocompleteList.filter((c) => c.includes(value));
-      }),
-    );
+  private readonly codeType = toSignal(
+    this.form.controls.code_type.valueChanges,
+    { initialValue: null },
+  );
+  public readonly codeTypeAutocompleteList = computed(() => {
+    let codeType = this.codeType();
+    if (!codeType) {
+      return this._codeTypeAutocompleteList;
+    }
+    codeType = codeType.toLowerCase();
+    return this._codeTypeAutocompleteList.filter((c) => c.includes(codeType));
+  });
 
   ngOnInit(): void {
     this.activatedRoute.params

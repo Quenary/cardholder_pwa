@@ -36,15 +36,15 @@
       }}</mat-label>
       <input
         matInput
-        [type]="hidePassword ? 'password' : 'text'"
+        [type]="hidePassword() ? 'password' : 'text'"
         id="password"
         name="password"
         autocomplete="new-password"
         formControlName="password" />
       <mat-icon
         matSuffix
-        (click)="hidePassword = !hidePassword"
-        >{{ hidePassword ? 'visibility_off' : 'visibility' }}
+        (click)="hidePassword.set(!hidePassword())"
+        >{{ hidePassword() ? 'visibility_off' : 'visibility' }}
       </mat-icon>
     </mat-form-field>
     <mat-form-field class="register-component-form-field">
@@ -53,40 +53,40 @@
       }}</mat-label>
       <input
         matInput
-        [type]="hideConfirmPassword ? 'password' : 'text'"
+        [type]="hideConfirmPassword() ? 'password' : 'text'"
         id="confirm-password"
         name="confirm-password"
         autocomplete="new-password"
         formControlName="confirm_password" />
       <mat-icon
         matSuffix
-        (click)="hideConfirmPassword = !hideConfirmPassword">
-        {{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}
+        (click)="hideConfirmPassword.set(!hideConfirmPassword())">
+        {{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}
       </mat-icon>
     </mat-form-field>
     <ul class="register-component-form-password-hints">
       @for (item of 'USER.PASSWORD_HINTS' | translate; track item) {
-      <li>{{ item }}</li>
+        <li>{{ item }}</li>
       }
     </ul>
     <section class="register-component-form-buttons">
       <button
         mat-flat-button
         type="submit"
-        [disabled]="isLoading$ | async">
+        [disabled]="isLoading()">
         {{ 'REGISTER.SIGNUP' | translate }}
         <mat-icon>person_add</mat-icon>
-        @if (isLoading$ | async) {
-        <mat-icon iconPositionEnd
-          ><mat-spinner [diameter]="15"></mat-spinner
-        ></mat-icon>
+        @if (isLoading()) {
+          <mat-icon iconPositionEnd
+            ><mat-spinner [diameter]="15"></mat-spinner
+          ></mat-icon>
         }
       </button>
       <button
         mat-button
         routerLink="/auth"
         type="button"
-        [disabled]="isLoading$ | async">
+        [disabled]="isLoading()">
         <mat-icon>login</mat-icon>
         {{ 'REGISTER.SIGNIN' | translate }}
       </button>

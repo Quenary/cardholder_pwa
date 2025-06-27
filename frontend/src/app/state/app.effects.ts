@@ -12,7 +12,7 @@ import { ELocalStorageKey } from '../app.consts';
 import { PublicApiService } from '../entities/public/public-api.service';
 import {
   ChangelogDialogComponent,
-  IChangelogComponentData,
+  IChangelogDialogComponentData,
 } from '../shared/components/changelog/changelog.component';
 import { Store } from '@ngrx/store';
 import { SnackService } from '../core/services/snack.service';
@@ -62,7 +62,7 @@ export class AppEffects {
                 // Versions in changelog saved without previx
                 const compareTo = lastVersion.replace('v', '');
                 this.matDialog.open(ChangelogDialogComponent, {
-                  data: <IChangelogComponentData>{
+                  data: <IChangelogDialogComponentData>{
                     versionPredicate: (v) => v > compareTo,
                   },
                   autoFocus: false,

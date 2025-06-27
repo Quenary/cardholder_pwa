@@ -1,6 +1,6 @@
 <mat-dialog-content class="mat-dialog-content">
-  @if (selectedDevice$ | async; as device) {
-    @switch (selectedScanner.code) {
+  @if (selectedDevice(); as device) {
+    @switch (selectedScanner().code) {
       @case (EScanner.ZXING) {
         @defer {
           <app-card-scanner-zxing
@@ -37,8 +37,8 @@
       <mat-icon>help</mat-icon>
     </button>
     <mat-button-toggle-group
-      [value]="selectedScanner"
-      (valueChange)="selectedScanner = $event">
+      [value]="selectedScanner()"
+      (valueChange)="selectedScanner.set($event)">
       @for (s of scanners; track s) {
         <mat-button-toggle [value]="s">{{s.name}}</mat-button-toggle>
       }
@@ -48,7 +48,7 @@
     mat-button
     (click)="onClickSelectDevice()">
     <mat-icon>videocam_outlined</mat-icon>
-    @if (selectedDevice$ | async; as device) {
+    @if (selectedDevice(); as device) {
       {{ device.label ?? device.deviceId }}
     } @else {
       {{ 'CARDS.CARD.SCAN.SELECT_SOURCE' | translate }}

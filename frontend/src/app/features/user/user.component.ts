@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -12,8 +12,7 @@ import {
   selectUserIsOwner,
 } from 'src/app/entities/user/state/user.selectors';
 import { UserActions } from 'src/app/entities/user/state/user.actions';
-import { AsyncPipe } from '@angular/common';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   ReactiveFormsModule,
   FormGroup,
@@ -38,7 +37,6 @@ import { MatCheckbox, MatCheckboxChange } from '@angular/material/checkbox';
     MatButton,
     TranslateModule,
     MatProgressSpinner,
-    AsyncPipe,
     MatInput,
     MatIcon,
     MatFormField,
@@ -59,11 +57,14 @@ export class UserComponent implements OnInit {
     return this.form.value as IUserUpdate;
   }
 
-  public readonly isOwner$ = this.store.select(selectUserIsOwner);
-  public readonly isLoading$ = this.store.select(selectUserIsLoading);
-  public readonly hasChanges$ = this.store.select(selectUserHasChanges);
-  public hidePassword: boolean = true;
-  public hideConfirmPassword: boolean = true;
+  public readonly isOwner = toSignal(this.store.select(selectUserIsOwner));
+  public readonly isLoading = toSignal(this.store.select(selectUserIsLoading));
+  public readonly hasChanges = toSignal(
+    this.store.select(selectUserHasChanges),
+  );
+  public readonly hidePassword = signal(true);
+  public readonly hideConfirmPassword = signal(true);
+
   public readonly form = new FormGroup<
     TInterfaceToForm<IUserCreate & IUserUpdate>
   >(
