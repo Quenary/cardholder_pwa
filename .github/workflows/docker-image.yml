@@ -1,18 +1,18 @@
 name: Build and Push Docker Image on Version Tag
 
 on:
-  push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+  # push:
+  #   tags:
+  #     - 'v[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
     inputs:
       version:
-        description: 'Tag version to build (e.g. v1.2.3)'
-        required: false
-  workflow_run:
-    workflows: ["Semantic Release"]
-    types:
-      - completed
+        description: "Tag version to build (e.g. v1.2.3), this will be the docker-image tag"
+        required: true
+  # workflow_run:
+  #   workflows: ["Semantic Release"]
+  #   types:
+  #     - completed
 
 jobs:
   check-tag:
@@ -24,42 +24,36 @@ jobs:
       IMAGE_NAME: quenary/cardholder_pwa
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Determine version
-      id: version
-      run: |
-        if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
+      - name: Determine version
+        id: version
+        run: |
           VERSION="${{ github.event.inputs.version }}"
-        elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
-          VERSION="${GITHUB_REF##*/}"
-        else
-          VERSION=$(git tag --sort=-creatordate | grep '^v[0-9]' | head -n 1)
-        fi
 
-        if [ -z "$VERSION" ]; then
-          echo "❌ ERROR: No version tag found. Aborting."
-          exit 1
-        fi
+          if [ -z "$VERSION" ]; then
+            echo "❌ ERROR: No version tag found. Aborting."
+            exit 1
+          fi
 
-        echo "✅ Using VERSION=$VERSION"
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "✅ Using VERSION=$VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-    - name: Check if Docker tag already exists
-      id: check_tag
-      run: |
-        STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-          https://hub.docker.com/v2/repositories/${{ env.IMAGE_NAME }}/tags/${{ steps.version.outputs.version }}/)
-        echo "Status: $STATUS"
-        if [ "$STATUS" = "200" ]; then
-          echo "exists=true" >> $GITHUB_OUTPUT
-        else
-          echo "exists=false" >> $GITHUB_OUTPUT
-        fi
+      - name: Check if Docker tag already exists
+        id: check_tag
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            https://hub.docker.com/v2/repositories/${{ env.IMAGE_NAME }}/tags/${{ steps.version.outputs.version }}/)
+          echo "Status: $STATUS"
+          if [ "$STATUS" = "200" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
 
   build:
     needs: check-tag
@@ -70,21 +64,21 @@ jobs:
       VERSION: ${{ needs.check-tag.outputs.version }}
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Log in to Docker Hub
-      run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    - name: Build and tag Docker image
-      run: |
-        docker build \
-          --build-arg VERSION=${{ env.VERSION }} \
-          -t $IMAGE_NAME:${{ env.VERSION }} \
-          -t $IMAGE_NAME:latest .
+      - name: Build and tag Docker image
+        run: |
+          docker build \
+            --build-arg VERSION=${{ env.VERSION }} \
+            -t $IMAGE_NAME:${{ env.VERSION }} \
+            -t $IMAGE_NAME:latest .
 
-    - name: Push Docker image (${{ env.VERSION }})
-      run: docker push $IMAGE_NAME:${{ env.VERSION }}
+      - name: Push Docker image (${{ env.VERSION }})
+        run: docker push $IMAGE_NAME:${{ env.VERSION }}
 
-    - name: Push Docker image (latest)
-      run: docker push $IMAGE_NAME:latest
+      - name: Push Docker image (latest)
+        run: docker push $IMAGE_NAME:latest
