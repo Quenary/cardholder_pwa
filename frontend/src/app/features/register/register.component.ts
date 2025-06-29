@@ -42,7 +42,6 @@ import { SnackService } from 'src/app/core/services/snack.service';
     MatFormField,
     MatLabel,
     ReactiveFormsModule,
-    TranslateModule,
     MatSuffix,
   ],
   templateUrl: './register.component.html',
