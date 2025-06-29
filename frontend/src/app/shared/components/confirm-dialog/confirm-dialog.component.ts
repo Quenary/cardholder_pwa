@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -18,7 +23,7 @@ export interface IConfirmDialogData {
   /**
    * Additional checkbox to activate the confirmation button
    */
-  addCheckbox: boolean;
+  addCheckbox?: boolean;
   title?: string;
   subtitle?: string;
   cancelText?: string;
@@ -53,7 +58,7 @@ export class ConfirmDialogComponent {
   public readonly subtitle = this.data?.subtitle ?? null;
   public readonly cancelText = this.data?.cancelText ?? 'GENERAL.CANCEL';
   public readonly confirmText = this.data?.confirmText ?? 'GENERAL.CONFIRM';
-  public confirmCheckboxValue: boolean = false;
+  public readonly confirmCheckbox = signal(false);
   public cancel(): void {
     this.dialogRef.close(false);
   }
