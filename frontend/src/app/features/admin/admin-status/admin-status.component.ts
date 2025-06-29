@@ -1,11 +1,11 @@
-import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { map, retry, catchError, of, share } from 'rxjs';
+import { map, retry, catchError, of } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { AdminApiService } from 'src/app/entities/admin/admin-api.service';
 import { PublicApiService } from 'src/app/entities/public/public-api.service';
@@ -16,7 +16,6 @@ import { PublicApiService } from 'src/app/entities/public/public-api.service';
     MatListModule,
     MatButton,
     MatIcon,
-    AsyncPipe,
     TranslateModule,
     NgTemplateOutlet,
   ],

@@ -11,7 +11,6 @@ import {
   MatSidenav,
   MatSidenavContent,
 } from '@angular/material/sidenav';
-import { map } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -22,7 +21,7 @@ import {
   MatListItemIcon,
 } from '@angular/material/list';
 import { Store } from '@ngrx/store';
-import { selectAuthTokenResponse } from './entities/auth/state/auth.selectors';
+import { selectAuthIsAuthorized } from './entities/auth/state/auth.selectors';
 import { AuthActions } from './entities/auth/state/auth.actions';
 import { selectAppIsOffline } from './state/app.selectors';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -62,9 +61,9 @@ export class AppComponent {
   private readonly store = inject(Store);
   private readonly translateService = inject(TranslateService);
 
-  public readonly isOffline = toSignal(this.store.select(selectAppIsOffline));
+  public readonly isOffline = this.store.selectSignal(selectAppIsOffline);
 
-  private readonly isAdmin = toSignal(this.store.select(selectUserIsAdmin));
+  private readonly isAdmin = this.store.selectSignal(selectUserIsAdmin);
   private readonly navTranslates = toSignal(this.translateService.get('NAV'));
   public readonly links = computed<INavItem[]>(() => {
     const isAdmin = this.isAdmin();
@@ -106,8 +105,8 @@ export class AppComponent {
   /**
    * Whether to show authorized content (navigation, header, e.g.)
    */
-  public readonly isAuthorized = toSignal(
-    this.store.select(selectAuthTokenResponse).pipe(map((res) => !!res)),
+  public readonly isAuthorized = this.store.selectSignal(
+    selectAuthIsAuthorized,
   );
   /**
    * Side nav opened flag

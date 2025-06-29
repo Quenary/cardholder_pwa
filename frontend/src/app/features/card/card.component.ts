@@ -84,13 +84,13 @@ export class CardComponent implements OnInit, OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
   private readonly matDialog = inject(MatDialog);
 
-  public readonly card = toSignal(this.store.select(selectCardsActiveInfo));
-  public readonly isLoading = toSignal(this.store.select(selectCardsIsLoading));
-  public readonly canDelete = toSignal(
-    this.store.select(selectCardsActiveCanDelete),
+  public readonly card = this.store.selectSignal(selectCardsActiveInfo);
+  public readonly isLoading = this.store.selectSignal(selectCardsIsLoading);
+  public readonly canDelete = this.store.selectSignal(
+    selectCardsActiveCanDelete,
   );
-  public readonly hasChanges = toSignal(
-    this.store.select(selectCardsActiveHasChanges),
+  public readonly hasChanges = this.store.selectSignal(
+    selectCardsActiveHasChanges,
   );
 
   public readonly form = new FormGroup<TInterfaceToForm<ICardBase>>({

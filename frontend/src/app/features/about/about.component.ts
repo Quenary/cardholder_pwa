@@ -11,7 +11,6 @@ import { CodeExamplesComponent } from '../code-examples/code-examples.component'
 import { MatExpansionModule } from '@angular/material/expansion';
 import { ChangelogComponent } from 'src/app/shared/components/changelog/changelog.component';
 import { Store } from '@ngrx/store';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { selectAppVersion } from 'src/app/state/app.selectors';
 
 @Component({
@@ -34,5 +33,5 @@ import { selectAppVersion } from 'src/app/state/app.selectors';
 export class AboutComponent {
   private readonly store = inject(Store);
 
-  public readonly version = toSignal(this.store.select(selectAppVersion));
+  public readonly version = this.store.selectSignal(selectAppVersion);
 }

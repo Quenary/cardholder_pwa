@@ -21,7 +21,6 @@ import {
   selectAppAllowRegistration,
   selectAppSmtpDisabled,
 } from 'src/app/state/app.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
@@ -45,13 +44,11 @@ import { MatTooltip } from '@angular/material/tooltip';
 export class AuthComponent {
   private readonly store = inject(Store);
 
-  public readonly isLoading = toSignal(this.store.select(selectAuthIsLoading));
-  public readonly allowRegistration = toSignal(
-    this.store.select(selectAppAllowRegistration),
+  public readonly isLoading = this.store.selectSignal(selectAuthIsLoading);
+  public readonly allowRegistration = this.store.selectSignal(
+    selectAppAllowRegistration,
   );
-  public readonly smtpDisabled = toSignal(
-    this.store.select(selectAppSmtpDisabled),
-  );
+  public readonly smtpDisabled = this.store.selectSignal(selectAppSmtpDisabled);
   public readonly form = new FormGroup<
     TInterfaceToForm<Omit<IOAuth2PasswordRequestForm, 'grant_type'>>
   >({
