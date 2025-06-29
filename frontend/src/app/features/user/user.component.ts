@@ -12,7 +12,7 @@ import {
   selectUserIsOwner,
 } from 'src/app/entities/user/state/user.selectors';
 import { UserActions } from 'src/app/entities/user/state/user.actions';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ReactiveFormsModule,
   FormGroup,
@@ -57,11 +57,9 @@ export class UserComponent implements OnInit {
     return this.form.value as IUserUpdate;
   }
 
-  public readonly isOwner = toSignal(this.store.select(selectUserIsOwner));
-  public readonly isLoading = toSignal(this.store.select(selectUserIsLoading));
-  public readonly hasChanges = toSignal(
-    this.store.select(selectUserHasChanges),
-  );
+  public readonly isOwner = this.store.selectSignal(selectUserIsOwner);
+  public readonly isLoading = this.store.selectSignal(selectUserIsLoading);
+  public readonly hasChanges = this.store.selectSignal(selectUserHasChanges);
   public readonly hidePassword = signal(true);
   public readonly hideConfirmPassword = signal(true);
 

@@ -71,7 +71,7 @@ export class CardsComponent {
     { initialValue: this.router.url === '/cards' },
   );
   public readonly cardsPlaceholder = Array(6).fill(null);
-  public readonly isLoading = toSignal(this.store.select(selectCardsIsLoading));
+  public readonly isLoading = this.store.selectSignal(selectCardsIsLoading);
   /**
    * Form control for search field
    */
@@ -80,7 +80,7 @@ export class CardsComponent {
   /**
    * All cards
    */
-  private readonly _cards = toSignal(this.store.select(selectCardsList));
+  private readonly _cards = this.store.selectSignal(selectCardsList);
   /**
    * Search signal
    */

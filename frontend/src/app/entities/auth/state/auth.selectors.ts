@@ -5,9 +5,13 @@ const _selectAuth = createFeatureSelector<IAuthState>('auth');
 export const selectAuth = createSelector(_selectAuth, (state) => state);
 export const selectAuthIsLoading = createSelector(
   _selectAuth,
-  (state) => state.isLoading
+  (state) => state.isLoading,
 );
 export const selectAuthTokenResponse = createSelector(
   _selectAuth,
-  (state) => state.tokenResponse
+  (state) => state.tokenResponse,
+);
+export const selectAuthIsAuthorized = createSelector(
+  _selectAuth,
+  (state) => !!state.tokenResponse,
 );

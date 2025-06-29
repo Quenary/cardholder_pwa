@@ -5,7 +5,6 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import {
@@ -62,7 +61,7 @@ export class AdminUserDialogComponent {
   private readonly translateService = inject(TranslateService);
   private readonly store = inject(Store);
 
-  public readonly isOwner = toSignal(this.store.select(selectUserIsOwner));
+  public readonly isOwner = this.store.selectSignal(selectUserIsOwner);
   public readonly isLoading = signal(false);
 
   public readonly EUserRole = EUserRole;
