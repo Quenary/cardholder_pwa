@@ -8,7 +8,8 @@
     "start:nohmr": "ng serve --port=4207 --open --no-hmr",
     "build": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadles"
   },
   "private": true,
   "dependencies": {
