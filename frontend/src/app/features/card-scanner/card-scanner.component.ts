@@ -3,9 +3,7 @@ import {
   Component,
   effect,
   inject,
-  NgZone,
   OnDestroy,
-  OnInit,
   signal,
   ViewChild,
 } from '@angular/core';
@@ -43,6 +41,7 @@ import {
 } from './card-scanner-base/scanner-interface';
 import { CardScannerHelpDialogComponent } from './card-scanner-help-dialog/card-scanner-help-dialog.component';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MediaDevicesService } from 'src/app/core/services/media-devices.service';
 
 export interface ICardScannerResult {
   text: string;
@@ -96,11 +95,11 @@ export class CardScannerDeviceSheetComponent {
 })
 export class CardScannerComponent implements OnDestroy {
   private readonly matDialogRef = inject(MatDialogRef);
-  private readonly ngZone = inject(NgZone);
   private readonly matBottomSheet = inject(MatBottomSheet);
   private readonly snackService = inject(SnackService);
   private readonly translateService = inject(TranslateService);
   private readonly matDialog = inject(MatDialog);
+  private readonly mediaDevicesService = inject(MediaDevicesService);
 
   public readonly EScanner = EScanner;
   @ViewChild('scanner', {
@@ -130,11 +129,8 @@ export class CardScannerComponent implements OnDestroy {
    * That is also initiates permission dialog.
    */
   private readonly devices = toSignal(
-    from(
-      navigator?.mediaDevices?.getUserMedia({ video: true }) ??
-        Promise.reject(),
-    ).pipe(
-      switchMap(() => from(navigator.mediaDevices.enumerateDevices())),
+    from(this.mediaDevicesService.getUserMedia({ video: true })).pipe(
+      switchMap(() => from(this.mediaDevicesService.enumerateDevices())),
       map((res) =>
         (res || []).filter((d) => !d.kind || d.kind.includes('video')),
       ),
