@@ -1,3 +1,10 @@
+## [1.5.7](https://github.com/Quenary/cardholder_pwa/compare/v1.5.6...v1.5.7) (2025-06-30)
+
+
+### Bug Fixes
+
+* **frontend:** sw caching and updating ([47a937f](https://github.com/Quenary/cardholder_pwa/commit/47a937fd15540e1a0f1ded154f9fa548fa6df67b))
+
 ## [1.5.6](https://github.com/Quenary/cardholder_pwa/compare/v1.5.5...v1.5.6) (2025-06-30)
 
 
