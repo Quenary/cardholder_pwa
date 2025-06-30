@@ -15,4 +15,4 @@ def run_migrations():
 if __name__ == "__main__":
     run_migrations()
     log_level = os.getenv("LOG_LEVEL") or "warning"
-    uvicorn.run("app.app:app", host="localhost", port=8000, log_level=log_level)
+    uvicorn.run("app.app:app", host="0.0.0.0", port=8000, log_level=log_level)
