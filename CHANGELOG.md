@@ -1,3 +1,10 @@
+## [1.5.6](https://github.com/Quenary/cardholder_pwa/compare/v1.5.5...v1.5.6) (2025-06-30)
+
+
+### Bug Fixes
+
+* **backend:** unicorn listen on 0.0.0.0 ([a796a34](https://github.com/Quenary/cardholder_pwa/commit/a796a341d8c05a71f28a481d96c04e1572bea744)), closes [#36](https://github.com/Quenary/cardholder_pwa/issues/36)
+
 ## [1.5.5](https://github.com/Quenary/cardholder_pwa/compare/v1.5.4...v1.5.5) (2025-06-30)
 
 
