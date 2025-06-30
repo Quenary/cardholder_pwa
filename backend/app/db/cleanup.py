@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import delete
 from .models import RefreshToken, PasswordRecoveryCode
 from .session import _async_session_maker
+import logging
 from app.config import Config
 from app.helpers import now
 
@@ -14,7 +15,7 @@ async def cleanup():
     """
     while True:
         async with _async_session_maker() as session:
-            print('CLEANUP')
+            logging.info('Cardholder-pwa cleanup db')
             await _cleanup(session)
         await asyncio.sleep(Config.DB_CLEANUP_INTERVAL_MIN * 60)
 

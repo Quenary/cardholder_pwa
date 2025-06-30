@@ -34,7 +34,7 @@ async def get_card(
     return card
 
 
-@router.post("/cards", response_model=schemas.Card)
+@router.post("/cards", response_model=schemas.Card, status_code=201)
 async def create_card(
     card: schemas.CardCreate,
     session: AsyncSession = Depends(db.get_async_session),

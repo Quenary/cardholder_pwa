@@ -8,7 +8,7 @@ from app.helpers import delay_to_minimum
 router = APIRouter(tags=["user"])
 
 
-@router.post("/user", response_model=schemas.User)
+@router.post("/user", response_model=schemas.User, status_code=201)
 @delay_to_minimum(1)
 async def create_user(
     user: schemas.UserCreate,
@@ -17,7 +17,7 @@ async def create_user(
 ):
     creds_taken = await auth.is_creds_taken(session, user.username, user.email, None)
     if creds_taken:
-        raise HTTPException(400, "Username or email is already registered")
+        raise HTTPException(400, "Username or email is already taken")
 
     stmt = select(models.User).limit(1)
     result = await session.execute(stmt)
