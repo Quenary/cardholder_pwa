@@ -1,7 +1,16 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AppActions } from './app.actions';
-import { catchError, first, map, of, skip, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  first,
+  from,
+  map,
+  of,
+  switchMap,
+  tap,
+  timeout,
+} from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import {
@@ -37,18 +46,18 @@ export class AppEffects {
           );
           localStorage.removeItem(ELocalStorageKey.AFTER_UPDATE);
 
-          this.store
-            .select(selectAppVersion)
+          from(navigator?.serviceWorker?.ready ?? Promise.resolve())
             .pipe(
-              skip(1),
-              first(),
-              map((res) => res?.image_version ?? null),
+              timeout({ first: 5000, with: () => of(null) }),
+              switchMap(() => this.store.select(selectAppVersion)),
+              first((v) => !!v),
+              map((v) => v.image_version),
+              timeout({ first: 5000, with: () => of(null) }),
             )
             .subscribe((version) => {
               if (!version) {
                 return;
               }
-
               const lastVersion = localStorage.getItem(
                 ELocalStorageKey.VERSION,
               );
@@ -59,7 +68,7 @@ export class AppEffects {
 
               if (version !== lastVersion && afterUpdate) {
                 localStorage.setItem(ELocalStorageKey.VERSION, version);
-                // Versions in changelog saved without previx
+                // Versions in changelog saved without prefix
                 const compareTo = lastVersion.replace('v', '');
                 this.matDialog.open(ChangelogDialogComponent, {
                   data: <IChangelogDialogComponentData>{

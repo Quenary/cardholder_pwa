@@ -1,7 +1,19 @@
 import { ApplicationRef, inject, Injectable } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { Store } from '@ngrx/store';
-import { concat, first, interval, Subject, takeUntil } from 'rxjs';
+import {
+  asyncScheduler,
+  concat,
+  filter,
+  first,
+  fromEvent,
+  interval,
+  map,
+  merge,
+  Subject,
+  takeUntil,
+  throttleTime,
+} from 'rxjs';
 import { AppActions } from 'src/app/state/app.actions';
 
 /**
@@ -29,7 +41,7 @@ export class UpdateService {
           }
           case 'VERSION_INSTALLATION_FAILED': {
             this.store.dispatch(
-              AppActions.versionInstallationFailed({ event })
+              AppActions.versionInstallationFailed({ event }),
             );
             break;
           }
@@ -45,10 +57,18 @@ export class UpdateService {
       });
 
     const appIsStable$ = this.applicationRef.isStable.pipe(
-      first((isStable) => isStable === true)
+      first((isStable) => isStable === true),
     );
     const checkInterval$ = interval(6 * 60 * 60 * 1000);
-    concat(appIsStable$, checkInterval$)
+    const checkOnTabActive$ = fromEvent(document, 'visibilitychange').pipe(
+      map(() => document.visibilityState == 'visible'),
+      filter((res) => !!res),
+      throttleTime(5 * 60 * 1000, asyncScheduler, {
+        leading: true,
+        trailing: false,
+      }),
+    );
+    concat(appIsStable$, merge(checkInterval$, checkOnTabActive$))
       .pipe(takeUntil(this.init$))
       .subscribe(async () => {
         try {
@@ -57,7 +77,7 @@ export class UpdateService {
           console.log(
             updateFound
               ? 'A new version is available.'
-              : 'Already on the latest version.'
+              : 'Already on the latest version.',
           );
         } catch (err) {
           console.error('Failed to check for updates:', err);
