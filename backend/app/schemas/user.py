@@ -1,5 +1,5 @@
 from typing import Optional, Self
-from pydantic import BaseModel, EmailStr, field_validator, model_validator
+from pydantic import BaseModel, EmailStr, field_validator, model_validator, ConfigDict
 from .validators import password_validator
 from app.enums import EUserRole
 from datetime import datetime
@@ -55,5 +55,4 @@ class User(BaseModel):
     updated_at: datetime
     role_code: EUserRole
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
