@@ -1,3 +1,10 @@
+## [1.5.5](https://github.com/Quenary/cardholder_pwa/compare/v1.5.4...v1.5.5) (2025-06-30)
+
+
+### Bug Fixes
+
+* **backend:** suitable create status codes (201) ([05bf03d](https://github.com/Quenary/cardholder_pwa/commit/05bf03d1e144193f1738e78a59dd0b0af89d3270))
+
 ## [1.5.4](https://github.com/Quenary/cardholder_pwa/compare/v1.5.3...v1.5.4) (2025-06-29)
 
 
