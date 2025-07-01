@@ -103,12 +103,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch latest refs explicitly
-        run: |
-          git fetch origin main
-          git fetch --tags
-          git reset --hard origin/main
-
       - name: Determine version
         id: version
         run: |
@@ -153,6 +147,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Fetch latest refs explicitly
+        run: |
+          git fetch origin main
+          git fetch --tags
+          git reset --hard origin/main
 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
