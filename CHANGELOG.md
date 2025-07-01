@@ -1,3 +1,10 @@
+## [1.5.9](https://github.com/Quenary/cardholder_pwa/compare/v1.5.8...v1.5.9) (2025-07-01)
+
+
+### Bug Fixes
+
+* **ci:** add fetch and reset of main after semantic-release to get latest commit with CHANGELOG.md ([fdb03f2](https://github.com/Quenary/cardholder_pwa/commit/fdb03f24070f86b179ef160d5165f82955be0ae7))
+
 ## [1.5.8](https://github.com/Quenary/cardholder_pwa/compare/v1.5.7...v1.5.8) (2025-07-01)
 
 
