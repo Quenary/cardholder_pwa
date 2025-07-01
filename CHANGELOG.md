@@ -1,3 +1,10 @@
+## [1.5.8](https://github.com/Quenary/cardholder_pwa/compare/v1.5.7...v1.5.8) (2025-07-01)
+
+
+### Bug Fixes
+
+* older CHANGELOG.md in image because of fetch-depth in build job ([236469b](https://github.com/Quenary/cardholder_pwa/commit/236469b05603b72cef39198c97946b22b26bc2ad))
+
 ## [1.5.7](https://github.com/Quenary/cardholder_pwa/compare/v1.5.6...v1.5.7) (2025-06-30)
 
 
