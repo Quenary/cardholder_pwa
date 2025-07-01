@@ -103,6 +103,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Fetch latest refs explicitly
+        run: |
+          git fetch origin main
+          git fetch --tags
+          git reset --hard origin/main
+
       - name: Determine version
         id: version
         run: |
