@@ -1,3 +1,10 @@
+## [1.5.10](https://github.com/Quenary/cardholder_pwa/compare/v1.5.9...v1.5.10) (2025-07-01)
+
+
+### Bug Fixes
+
+* **ci:** move fetch and reset of main to build job to get latest commit with CHANGELOG.md ([4c630a0](https://github.com/Quenary/cardholder_pwa/commit/4c630a0b85cdb595312d97f3714b5bcaeb0cf24a))
+
 ## [1.5.9](https://github.com/Quenary/cardholder_pwa/compare/v1.5.8...v1.5.9) (2025-07-01)
 
 
