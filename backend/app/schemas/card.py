@@ -10,7 +10,7 @@ class CardBase(BaseModel):
     name: str
     description: Optional[str] = None
     color: Optional[str] = None
-    isFavorite: Optional[bool] = None
+    is_favorite: Optional[bool] = None
 
     @field_validator("color")
     @classmethod
@@ -36,7 +36,7 @@ class CardPatch(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     color: Optional[str] = None
-    isFavorite: Optional[bool] = None
+    is_favorite: Optional[bool] = None
     used_at: Optional[datetime] = None
 
     @field_validator("used_at")

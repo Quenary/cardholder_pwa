@@ -20,7 +20,7 @@ class Card(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[Optional[Text]] = mapped_column(Text, nullable=True)
     color: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    isFavorite: Mapped[bool] = mapped_column(
+    is_favorite: Mapped[bool] = mapped_column(
         Boolean, server_default=text("FALSE"), default=False, nullable=False
     )
     used_at: Mapped[bool] = mapped_column(DateTime, nullable=True)

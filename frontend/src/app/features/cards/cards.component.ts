@@ -100,7 +100,7 @@ export class CardsComponent {
       search = search.toLowerCase();
       cards = cards.filter((item) => item.name.toLowerCase().includes(search));
     }
-    return cards.sort((a, b) => +b.isFavorite - +a.isFavorite);
+    return cards.sort((a, b) => +b.is_favorite - +a.is_favorite);
   });
   /**
    * Filtered autocomplete list
@@ -119,12 +119,12 @@ export class CardsComponent {
   }
 
   public toggleFavorite(card: ICard): void {
-    const isFavorite = !card.isFavorite;
+    const is_favorite = !card.is_favorite;
     this.store.dispatch(
       CardsActions.patchListItem({
         id: card.id,
         body: {
-          isFavorite,
+          is_favorite,
         },
       }),
     );

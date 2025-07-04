@@ -4,7 +4,7 @@ export interface ICardBase {
   name: string;
   description: string;
   color: string;
-  isFavorite?: boolean;
+  is_favorite?: boolean;
   used_at?: string;
 }
 export interface ICard extends ICardBase {
