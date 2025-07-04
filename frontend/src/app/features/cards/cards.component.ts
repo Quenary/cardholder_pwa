@@ -30,11 +30,12 @@ import {
   selectCardsList,
 } from 'src/app/entities/cards/state/cards.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { MatFabButton } from '@angular/material/button';
+import { MatFabButton, MatIconButton } from '@angular/material/button';
 import { CardCodeViewerComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
 import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
 import { GetOnColorPipe } from 'src/app/shared/pipes/get-on-color.pipe';
 import { IsOldCodeType } from 'src/app/shared/pipes/is-old-code-type.pipe';
+import { ICard } from 'src/app/entities/cards/cards-interface';
 
 @Component({
   selector: 'app-cards',
@@ -57,6 +58,7 @@ import { IsOldCodeType } from 'src/app/shared/pipes/is-old-code-type.pipe';
     RouterLink,
     GetOnColorPipe,
     IsOldCodeType,
+    MatIconButton,
   ],
   templateUrl: './cards.component.html',
   styleUrl: './cards.component.scss',
@@ -91,13 +93,14 @@ export class CardsComponent {
    * Filtered cards
    */
   public readonly cards = computed(() => {
-    const cards = this._cards();
-    const search = this._search();
-    if (!search) {
-      return cards;
+    let cards = this._cards();
+    let search = this._search();
+    cards = [...cards];
+    if (search) {
+      search = search.toLowerCase();
+      cards = cards.filter((item) => item.name.toLowerCase().includes(search));
     }
-    const searchLC = search.toLowerCase();
-    return cards.filter((item) => item.name.toLowerCase().includes(searchLC));
+    return cards.sort((a, b) => +b.isFavorite - +a.isFavorite);
   });
   /**
    * Filtered autocomplete list
@@ -113,5 +116,17 @@ export class CardsComponent {
         this.store.dispatch(CardsActions.list());
       }
     });
+  }
+
+  public toggleFavorite(card: ICard): void {
+    const isFavorite = !card.isFavorite;
+    this.store.dispatch(
+      CardsActions.patchListItem({
+        id: card.id,
+        body: {
+          isFavorite,
+        },
+      }),
+    );
   }
 }

@@ -4,7 +4,11 @@ export interface ICardBase {
   name: string;
   description: string;
   color: string;
+  isFavorite?: boolean;
+  used_at?: string;
 }
 export interface ICard extends ICardBase {
   id: number;
+  created_at: string;
+  updated_at: string;
 }

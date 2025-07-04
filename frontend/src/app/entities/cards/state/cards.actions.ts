@@ -28,5 +28,8 @@ export const CardsActions = createActionGroup({
     'set form': props<{ form: ICardBase }>(),
     'save card': emptyProps(),
     'exit card': emptyProps(),
+    patchListItem: props<{ id: number; body: Partial<ICardBase> }>(),
+    patchListItemSuccess: props<{ card: ICard }>(),
+    patchListItemError: props<{ error: HttpErrorResponse }>(),
   },
 });
