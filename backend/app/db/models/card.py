@@ -1,6 +1,6 @@
 from app.helpers import now
 from .base import Base
-from sqlalchemy import Integer, String, Text, DateTime, ForeignKey, text
+from sqlalchemy import Integer, String, Text, DateTime, ForeignKey, text, Boolean
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from sqlalchemy.sql import func
 from datetime import datetime
@@ -20,6 +20,10 @@ class Card(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[Optional[Text]] = mapped_column(Text, nullable=True)
     color: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    isFavorite: Mapped[bool] = mapped_column(
+        Boolean, server_default=text("FALSE"), default=False, nullable=False
+    )
+    used_at: Mapped[bool] = mapped_column(DateTime, nullable=True)
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=False
     )
