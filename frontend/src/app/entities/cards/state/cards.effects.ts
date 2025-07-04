@@ -38,10 +38,10 @@ export class CardsEffects {
       switchMap((action) =>
         this.cardsApiService.list().pipe(
           map((list) => CardsActions.listSuccess({ list })),
-          catchError((error) => of(CardsActions.listError({ error })))
-        )
-      )
-    )
+          catchError((error) => of(CardsActions.listError({ error }))),
+        ),
+      ),
+    ),
   );
 
   read$ = createEffect(() =>
@@ -50,10 +50,10 @@ export class CardsEffects {
       switchMap((action) =>
         this.cardsApiService.read(action.id).pipe(
           map((info) => CardsActions.readSuccess({ info })),
-          catchError((error) => of(CardsActions.readError({ error })))
-        )
-      )
-    )
+          catchError((error) => of(CardsActions.readError({ error }))),
+        ),
+      ),
+    ),
   );
 
   saveCard$ = createEffect(() =>
@@ -64,10 +64,10 @@ export class CardsEffects {
         of(
           !!active.info
             ? CardsActions.update({ id: active.info.id, body: active.form })
-            : CardsActions.create({ body: active.form })
-        )
-      )
-    )
+            : CardsActions.create({ body: active.form }),
+        ),
+      ),
+    ),
   );
 
   create$ = createEffect(() =>
@@ -76,10 +76,10 @@ export class CardsEffects {
       switchMap((action) =>
         this.cardsApiService.create(action.body).pipe(
           map((info) => CardsActions.createSuccess({ info })),
-          catchError((error) => of(CardsActions.createError({ error })))
-        )
-      )
-    )
+          catchError((error) => of(CardsActions.createError({ error }))),
+        ),
+      ),
+    ),
   );
 
   createSuccess$ = createEffect(
@@ -90,9 +90,9 @@ export class CardsEffects {
           this.router.navigate([`/cards/${action.info.id}`], {
             replaceUrl: true,
           });
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   update$ = createEffect(() =>
@@ -101,10 +101,10 @@ export class CardsEffects {
       switchMap((action) =>
         this.cardsApiService.update(action.id, action.body).pipe(
           map((info) => CardsActions.updateSuccess({ info })),
-          catchError((error) => of(CardsActions.updateError({ error })))
-        )
-      )
-    )
+          catchError((error) => of(CardsActions.updateError({ error }))),
+        ),
+      ),
+    ),
   );
 
   showSaveSnack$ = createEffect(
@@ -113,11 +113,11 @@ export class CardsEffects {
         ofType(CardsActions.createSuccess, CardsActions.updateSuccess),
         tap(() => {
           this.snackService.success(
-            this.translateService.instant('CARDS.CARD.SUCCESS.SAVE')
+            this.translateService.instant('CARDS.CARD.SUCCESS.SAVE'),
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   deleteAttempt$ = createEffect(() =>
@@ -132,11 +132,11 @@ export class CardsEffects {
           .afterClosed()
           .pipe(
             switchMap((res) =>
-              res ? of(CardsActions.delete({ id: info.id })) : EMPTY
-            )
-          )
-      )
-    )
+              res ? of(CardsActions.delete({ id: info.id })) : EMPTY,
+            ),
+          ),
+      ),
+    ),
   );
 
   delete$ = createEffect(() =>
@@ -145,10 +145,10 @@ export class CardsEffects {
       switchMap((action) =>
         this.cardsApiService.delete(action.id).pipe(
           map(() => CardsActions.deleteSuccess()),
-          catchError((error) => of(CardsActions.deleteError({ error })))
-        )
-      )
-    )
+          catchError((error) => of(CardsActions.deleteError({ error }))),
+        ),
+      ),
+    ),
   );
 
   deleteSuccess$ = createEffect(
@@ -157,12 +157,24 @@ export class CardsEffects {
         ofType(CardsActions.deleteSuccess),
         tap((action) => {
           this.snackService.success(
-            this.translateService.instant('CARDS.CARD.SUCCESS.DELETE')
+            this.translateService.instant('CARDS.CARD.SUCCESS.DELETE'),
           );
           this.router.navigate(['/cards'], { replaceUrl: true });
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
+  );
+
+  patchListItem$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CardsActions.patchListItem),
+      switchMap((action) =>
+        this.cardsApiService.patch(action.id, action.body).pipe(
+          map((card) => CardsActions.patchListItemSuccess({ card })),
+          catchError((error) => of(CardsActions.patchListItemError({ error }))),
+        ),
+      ),
+    ),
   );
 
   showErrors$ = createEffect(
@@ -173,12 +185,13 @@ export class CardsEffects {
           CardsActions.createError,
           CardsActions.readError,
           CardsActions.updateError,
-          CardsActions.deleteError
+          CardsActions.deleteError,
+          CardsActions.patchListItemError,
         ),
         tap((action) => {
           this.snackService.error(action.error);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 }

@@ -27,7 +27,7 @@ export const cardsReducer = createReducer(
     (state, payload) => ({
       ...state,
       isLoading: true,
-    })
+    }),
   ),
   on(CardsActions.listSuccess, (state, payload) => ({
     ...state,
@@ -46,7 +46,7 @@ export const cardsReducer = createReducer(
         hasChanges: false,
       },
       isLoading: false,
-    })
+    }),
   ),
   on(CardsActions.deleteSuccess, (state, payload) => ({
     ...state,
@@ -62,7 +62,7 @@ export const cardsReducer = createReducer(
       color: null,
     };
     const hasChanges = Object.entries(payload.form).some(
-      ([k, v]) => v != info[k as keyof ICardBase]
+      ([k, v]) => v != info[k as keyof ICardBase],
     );
     return {
       ...state,
@@ -86,6 +86,18 @@ export const cardsReducer = createReducer(
     (state, payload) => ({
       ...state,
       isLoading: false,
-    })
-  )
+    }),
+  ),
+  on(CardsActions.patchListItemSuccess, (state, payload) => {
+    const list = [...state.list];
+    const index = list.findIndex((i) => i.id == payload.card.id);
+    list[index] = {
+      ...list[index],
+      ...payload.card,
+    };
+    return {
+      ...state,
+      list,
+    };
+  }),
 );

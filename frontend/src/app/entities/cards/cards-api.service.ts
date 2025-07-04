@@ -31,4 +31,8 @@ export class CardApiService extends BaseApiService<'cards'> {
   list(): Observable<ICard[]> {
     return this.httpClient.get<ICard[]>(`${this.basePath}`);
   }
+
+  patch(id: number, body: Partial<ICardBase>): Observable<ICard> {
+    return this.httpClient.patch<ICard>(`${this.basePath}/${id}`, body);
+  }
 }
