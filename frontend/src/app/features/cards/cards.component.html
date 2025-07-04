@@ -53,7 +53,7 @@
               <button
                 mat-icon-button
                 (click)="$event.stopPropagation(); toggleFavorite(card);">
-                @if (card.isFavorite) {
+                @if (card.is_favorite) {
                   <mat-icon class="warn-color">favorite</mat-icon>
                 } @else {
                   <mat-icon>favorite_outline</mat-icon>

@@ -24,7 +24,7 @@ def upgrade() -> None:
     with op.batch_alter_table("cards", schema=None) as batch_op:
         batch_op.add_column(
             sa.Column(
-                "isFavorite",
+                "is_favorite",
                 sa.Boolean(),
                 server_default=sa.text("(FALSE)"),
                 nullable=False,
@@ -35,5 +35,5 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     with op.batch_alter_table("cards", schema=None) as batch_op:
-        batch_op.drop_column("isFavorite")
+        batch_op.drop_column("is_favorite")
         batch_op.drop_column("used_at")
