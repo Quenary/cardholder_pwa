@@ -50,15 +50,18 @@
               {{ card.name }}
             </span>
             <section class="cards-list-item-header-icons">
-              <button
-                mat-icon-button
-                (click)="$event.stopPropagation(); toggleFavorite(card);">
-                @if (card.is_favorite) {
-                  <mat-icon class="warn-color">favorite</mat-icon>
-                } @else {
-                  <mat-icon>favorite_outline</mat-icon>
-                }
-              </button>
+              @if (card.is_favorite) {
+                <mat-icon
+                  class="warn-color"
+                  (click)="$event.stopPropagation(); toggleFavorite(card);"
+                  >favorite</mat-icon
+                >
+              } @else {
+                <mat-icon
+                  (click)="$event.stopPropagation(); toggleFavorite(card);"
+                  >favorite_outline</mat-icon
+                >
+              }
               <mat-icon class="accent-color"> edit_note </mat-icon>
               @if (card | isOldCodeType) {
                 <mat-icon class="warn-color"> warning </mat-icon>

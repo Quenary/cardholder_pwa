@@ -50,9 +50,6 @@
           display: inline-flex;
           gap: 8px;
           & > * {
-            display: contents;
-          }
-          mat-icon {
             color: var(--mat-sys-primary);
           }
         }
