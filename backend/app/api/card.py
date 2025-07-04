@@ -50,7 +50,7 @@ async def create_card(
 @router.put("/cards/{card_id}", response_model=schemas.Card)
 async def update_card(
     card_id: int,
-    updated: schemas.CardCreate,
+    updated: schemas.CardUpdate,
     session: AsyncSession = Depends(db.get_async_session),
     user: models.User = Depends(auth.is_user),
 ):
@@ -64,7 +64,7 @@ async def update_card(
 
     if not card:
         raise HTTPException(status_code=404, detail="Card not found")
-    for key, value in updated.model_dump().items():
+    for key, value in updated.model_dump(exclude_unset=True).items():
         if getattr(card, key) != value:
             setattr(card, key, value)
     await session.commit()
@@ -90,3 +90,27 @@ async def delete_card(
     await session.delete(card)
     await session.commit()
     return {"detail": "Card deleted"}
+
+
+@router.patch("/cards/{card_id}")
+async def patch_card(
+    card_id: int,
+    body: schemas.CardPatch,
+    session: AsyncSession = Depends(db.get_async_session),
+    user: models.User = Depends(auth.is_user),
+):
+    stmt = (
+        select(models.Card)
+        .where(models.Card.id == card_id, models.Card.user_id == user.id)
+        .limit(1)
+    )
+    result = await session.execute(stmt)
+    card = result.scalar_one_or_none()
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found")
+    for key, value in body.model_dump(exclude_unset=True).items():
+        if getattr(card, key) != value:
+            setattr(card, key, value)
+    await session.commit()
+    await session.refresh(card)
+    return card
