@@ -27,6 +27,14 @@
     </mat-form-field>
 
     <button
+      mat-fab
+      [matBadge]="filtersCount()"
+      [matBadgeHidden]="!filtersCount()"
+      (click)="openSortFilterDialog()">
+      <mat-icon>filter_list</mat-icon>
+    </button>
+
+    <button
       class="accent-color"
       mat-fab
       routerLink="/cards/new">
@@ -75,7 +83,7 @@
                 [style.background]="card.color"
                 [color]="card.color | getOnColor"
                 [card]="card"
-                (click)="$event.stopPropagation()">
+                (click)="$event.stopPropagation(); updateUsedDate(card);">
               </app-card-code-viewer>
             }
           }

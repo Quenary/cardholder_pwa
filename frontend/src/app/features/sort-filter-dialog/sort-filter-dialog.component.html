@@ -1,0 +1,154 @@
+<h3 matDialogTitle>
+  {{title | translate}}
+</h3>
+<mat-dialog-content class="mat-dialog-content">
+  @if (sortingOptions) {
+    <form
+      [formGroup]="sortingForm"
+      class="form"
+      name="sorting-form"
+      autocomplete="off">
+      <mat-form-field>
+        <mat-label>{{'SORT_FILTER.SORT_BY' | translate}}</mat-label>
+        <mat-select formControlName="key">
+          @for (item of sortingOptions; track item) {
+            <mat-option [value]="item.key"
+              >{{item.label | translate}}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-icon matPrefix>swap_vert</mat-icon>
+        <mat-label>{{'SORT_FILTER.SORT_DIR' | translate}}</mat-label>
+        <mat-select formControlName="direction">
+          @for (item of sortingOrders; track item) {
+            <mat-option [value]="item.value">
+              <mat-icon matPrefix>{{item.icon}}</mat-icon>
+              {{item.label | translate}}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </form>
+  }
+
+  @if (filterOptions) {
+    @for (form of filterFormArray.controls; track form) {
+      <form
+        [formGroup]="form"
+        class="form"
+        name="filter-form"
+        autocomplete="off">
+        <mat-form-field class="form-filter-by">
+          <mat-label>{{'SORT_FILTER.FILTER_BY' | translate}}</mat-label>
+          <mat-select
+            formControlName="option"
+            (selectionChange)="form.patchValue({criteria: null, value: null})">
+            @for (item of filterOptions; track item) {
+              <mat-option [value]="item">
+                {{item.label | translate}}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-icon
+            matIconSuffix
+            role="button"
+            name="filter-form-remove-button"
+            (click)="removeFilter(form)">
+            delete
+          </mat-icon>
+        </mat-form-field>
+
+        @if (form.controls.option.value) {
+          <mat-form-field>
+            <mat-label>{{'SORT_FILTER.CRITERIA' | translate}}</mat-label>
+            <mat-select
+              formControlName="criteria"
+              (selectionChange)="form.patchValue({value: null})">
+              @for (item of form.controls.option.value.criterias; track item) {
+                <mat-option [value]="item">
+                  {{criteriasNames[item]}}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+
+        @if (form.controls.criteria.value; as criteria) {
+          @if (
+            criteria !== FilterCriteria.NULL && criteria !== FilterCriteria.NOT_NULL
+          ) {
+            @switch (form.controls.option.value.type) {
+              @case ('string') {
+                <mat-form-field>
+                  <mat-label>{{'SORT_FILTER.VALUE' | translate}}</mat-label>
+                  <input
+                    matInput
+                    formControlName="value" />
+                </mat-form-field>
+              }
+              @case ('date') {
+                <mat-form-field>
+                  <mat-label>{{'SORT_FILTER.VALUE' | translate}}</mat-label>
+                  <input
+                    matInput
+                    formControlName="value"
+                    [matDatepicker]="picker" />
+                  <mat-datepicker #picker></mat-datepicker>
+                  <mat-datepicker-toggle
+                    matIconSuffix
+                    [for]="picker"></mat-datepicker-toggle>
+                </mat-form-field>
+              }
+              @case ('boolean') {
+                <mat-form-field>
+                  <mat-label>{{'SORT_FILTER.VALUE' | translate}}</mat-label>
+                  <mat-select formControlName="value">
+                    @for (item of booleanOption; track item) {
+                      <mat-option [value]="item.value">
+                        {{item.label}}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              }
+              @default {
+                <mat-form-field>
+                  <mat-label>{{'SORT_FILTER.VALUE' | translate}}</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    formControlName="value" />
+                </mat-form-field>
+              }
+            }
+          }
+        }
+      </form>
+    }
+
+    @if (filterFormArray.controls.length < maxFilters()) {
+      <button
+        mat-flat-button
+        (click)="addFilter()">
+        <mat-icon>add</mat-icon>
+        {{'SORT_FILTER.ADD_FILTER' | translate}}
+      </button>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="mat-dialog-actions">
+  <button
+    mat-button
+    (click)="cancel()">
+    {{ 'GENERAL.CANCEL' | translate }}
+  </button>
+  <button
+    mat-flat-button
+    [disabled]="sortingForm.invalid"
+    (click)="confirm()">
+    {{ 'GENERAL.CONFIRM' | translate }}
+  </button>
+</mat-dialog-actions>

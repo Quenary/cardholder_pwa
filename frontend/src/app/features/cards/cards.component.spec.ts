@@ -39,6 +39,8 @@ describe('CardsComponent', () => {
         'description': null,
         'color': '#d40c0c',
         'id': 1,
+        'updated_at': null,
+        'created_at': null,
       },
       {
         'code': '0123456789012',
@@ -47,6 +49,8 @@ describe('CardsComponent', () => {
         'description': 'test desc\nnewline',
         'color': '#057eff',
         'id': 2,
+        'updated_at': null,
+        'created_at': null,
       },
     ];
     storeMock.setState({

@@ -64,6 +64,10 @@
             "NAME": "Name",
             "DESCRIPTION": "Description",
             "COLOR": "Color",
+            "IS_FAVORITE": "Favorite",
+            "USED_AT": "Used at",
+            "CREATED_AT": "Created at",
+            "UPDATED_AT": "Updated at",
             "CODE_FORMAT_WARN": "The app now uses different names for code types. Save the card with the new code type.",
             "SCAN": {
                 "PERMISSION_ERROR": "Access to video device is denied or feature is not supported.",
@@ -156,5 +160,33 @@
         "IMAGE_VERSION": "Docker image version",
         "EXAMPLES": "Supported codes examples",
         "CHANGELOG": "Changelog"
+    },
+    "SORT_FILTER": {
+        "TITLE": "Sorting and Filtering",
+        "SORT_BY": "Sort by",
+        "SORT_DIR": "Direction",
+        "SORT_DIRS": {
+            "ASC": "Ascending",
+            "DESC": "Descending"
+        },
+        "FILTER_BY": "Filter by",
+        "CRITERIA": "Criteria",
+        "VALUE": "Value",
+        "ADD_FILTER": "Add filter",
+        "BOOL_LABEL": {
+            "TRUE": "Yes",
+            "FALSE": "No"
+        },
+        "CRITERIAS": {
+            "LIKE": "Contains",
+            "EQUALS": "Equals",
+            "NOT_EQUALS": "Not equals",
+            "NULL": "Is empty",
+            "NOT_NULL": "Is not empty",
+            "GREATER": "Greater than",
+            "LESS": "Less than",
+            "GREATER_OR_EQUALS": "Greater or equal",
+            "LESS_OR_EQUALS": "Less or equal"
+        }
     }
 }

@@ -64,6 +64,10 @@
             "NAME": "Nom",
             "DESCRIPTION": "Description",
             "COLOR": "Couleur",
+            "IS_FAVORITE": "Favori",
+            "USED_AT": "Date d'utilisation",
+            "CREATED_AT": "Date de création",
+            "UPDATED_AT": "Date de modification",
             "CODE_FORMAT_WARN": "L'application utilise désormais des noms différents pour les types de codes. Enregistrez la carte avec le nouveau type de code.",
             "SCAN": {
                 "PERMISSION_ERROR": "L'accès au périphérique vidéo est refusé ou la fonctionnalité n'est pas prise en charge.",
@@ -156,5 +160,33 @@
         "IMAGE_VERSION": "Version de l'image Docker",
         "EXAMPLES": "Exemples de codes pris en charge",
         "CHANGELOG": "journal des modifications"
+    },
+    "SORT_FILTER": {
+        "TITLE": "Tri et filtrage",
+        "SORT_BY": "Trier par",
+        "SORT_DIR": "Direction",
+        "SORT_DIRS": {
+            "ASC": "Croissant",
+            "DESC": "Décroissant"
+        },
+        "FILTER_BY": "Filtrer par",
+        "CRITERIA": "Critère",
+        "VALUE": "Valeur",
+        "ADD_FILTER": "Ajouter un filtre",
+        "BOOL_LABEL": {
+            "TRUE": "Oui",
+            "FALSE": "Non"
+        },
+        "CRITERIAS": {
+            "LIKE": "Contient",
+            "EQUALS": "Égal à",
+            "NOT_EQUALS": "Différent de",
+            "NULL": "Est vide",
+            "NOT_NULL": "N'est pas vide",
+            "GREATER": "Supérieur à",
+            "LESS": "Inférieur à",
+            "GREATER_OR_EQUALS": "Supérieur ou égal à",
+            "LESS_OR_EQUALS": "Inférieur ou égal à"
+        }
     }
 }
