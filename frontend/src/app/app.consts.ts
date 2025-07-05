@@ -14,6 +14,14 @@ export enum ELocalStorageKey {
    * Flag indicationg that app loaded after an update.
    */
   AFTER_UPDATE = 'cardholder-after-update',
+  /**
+   * Last sorting model
+   */
+  CARD_SORTING = 'cardholder-card-sorting',
+  /**
+   * Last filters model
+   */
+  CARD_FILTERS = 'cardholder-card-filters',
 }
 /**
  * Enum of useful regexp

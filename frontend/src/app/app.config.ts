@@ -35,6 +35,7 @@ import { UserEffects } from './entities/user/state/user.effects';
 import { userInitializer } from './core/app-initializers/user-initializer';
 import { localeInitializer } from './core/app-initializers/locale-initializer';
 import { appInitializer } from './core/app-initializers/app-initializer';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -47,6 +48,7 @@ export const appConfig: ApplicationConfig = {
     provideEffects([AppEffects, AuthEffects, UserEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
     provideHttpClient(withInterceptors([getTokenInterceptor])),
+    provideNativeDateAdapter(),
     importProvidersFrom(
       TranslateModule.forRoot({
         loader: {

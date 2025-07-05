@@ -1,0 +1,19 @@
+@use 'mixins' as mx;
+
+.mat-dialog-content {
+  max-height: unset;
+}
+
+.form {
+  @include mx.flex-container(2);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  margin-bottom: 20px;
+
+  &-filter-by {
+    flex-basis: 100%;
+  }
+}
+
+.mat-dialog-actions {
+  @include mx.mat-dialog-actions;
+}
