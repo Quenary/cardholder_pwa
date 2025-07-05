@@ -68,7 +68,7 @@ const dialogData: ISortFilterDialogData<ICard> = {
   },
 };
 
-fdescribe('SortFilterDialogComponent', () => {
+describe('SortFilterDialogComponent', () => {
   let component: SortFilterDialogComponent<ICard>;
   let fixture: ComponentFixture<SortFilterDialogComponent<ICard>>;
   let template: HTMLElement;
