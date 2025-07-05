@@ -23,7 +23,7 @@ class Card(Base):
     is_favorite: Mapped[bool] = mapped_column(
         Boolean, server_default=text("FALSE"), default=False, nullable=False
     )
-    used_at: Mapped[bool] = mapped_column(DateTime, nullable=True)
+    used_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=False
     )

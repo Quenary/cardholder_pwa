@@ -45,8 +45,8 @@ class CardPatch(BaseModel):
         if not v:
             return v
         if v.tzinfo:
-            return v.astimezone(timezone.utc)
-        return v.replace(tzinfo=None)
+            return v.astimezone(timezone.utc).replace(tzinfo=None)
+        return v
 
     @field_validator("color")
     @classmethod
