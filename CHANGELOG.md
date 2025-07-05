@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/Quenary/cardholder_pwa/compare/v1.6.0...v1.6.1) (2025-07-05)
+
+
+### Bug Fixes
+
+* **backend:** fix used_at date format (to naive dt) ([a5f7d35](https://github.com/Quenary/cardholder_pwa/commit/a5f7d35b1ad7a89b05779a1bc379aae11de27e61))
+
 # [1.6.0](https://github.com/Quenary/cardholder_pwa/compare/v1.5.10...v1.6.0) (2025-07-05)
 
 
