@@ -1,3 +1,17 @@
+# [1.6.0](https://github.com/Quenary/cardholder_pwa/compare/v1.5.10...v1.6.0) (2025-07-05)
+
+
+### Bug Fixes
+
+* **frontend:** card favorite button prevents click on code ([4014720](https://github.com/Quenary/cardholder_pwa/commit/40147204313d6adc52717fac6be101110e891c32))
+
+
+### Features
+
+* **backend:** added card is_favorite and used_at ([62f9094](https://github.com/Quenary/cardholder_pwa/commit/62f9094db3abdb4ffb41ea688ecf6c3388229876)), closes [#21](https://github.com/Quenary/cardholder_pwa/issues/21)
+* **frontend:** add favorite cards ([8241cb5](https://github.com/Quenary/cardholder_pwa/commit/8241cb509241d7b191711eea6fc4098cff80739d)), closes [#21](https://github.com/Quenary/cardholder_pwa/issues/21)
+* **frontend:** cards sorting and filtering ([a5e41f3](https://github.com/Quenary/cardholder_pwa/commit/a5e41f335515ab86f68b93e7441d7b6b170a5b44)), closes [#21](https://github.com/Quenary/cardholder_pwa/issues/21)
+
 ## [1.5.10](https://github.com/Quenary/cardholder_pwa/compare/v1.5.9...v1.5.10) (2025-07-01)
 
 
