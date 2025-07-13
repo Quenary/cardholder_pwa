@@ -22,6 +22,10 @@ export enum ELocalStorageKey {
    * Last filters model
    */
   CARD_FILTERS = 'cardholder-card-filters',
+  /**
+   * Wether to invert code colors by default
+   */
+  CODE_COLOR_INVERSION = 'cardholder-code-color-inversion',
 }
 /**
  * Enum of useful regexp
