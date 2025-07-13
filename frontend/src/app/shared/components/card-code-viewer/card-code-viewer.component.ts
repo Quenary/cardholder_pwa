@@ -8,6 +8,7 @@ import {
   OnChanges,
   OnInit,
   Output,
+  signal,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -23,6 +24,7 @@ import {
 import { MatIcon } from '@angular/material/icon';
 import Bwip from '@bwip-js/browser';
 import { TranslateModule } from '@ngx-translate/core';
+import { ELocalStorageKey } from 'src/app/app.consts';
 import { ZxingToBwipMap } from 'src/app/entities/cards/cards-const';
 import { ICardBase } from 'src/app/entities/cards/cards-interface';
 
@@ -148,11 +150,11 @@ export class CardCodeViewerComponent
     <h2 mat-dialog-title>{{ card.name }}</h2>
     <mat-dialog-content
       class="mat-dialog-content"
-      [class.invert]="invert">
+      [class.invert]="invert()">
       <canvas
         class="canvas"
         #canvas
-        (click)="invert = !invert">
+        (click)="toggleInvert()">
       </canvas>
       @if (card.description) {
         <pre class="desc" [innerHTML]="card.description"></pre>
@@ -161,7 +163,7 @@ export class CardCodeViewerComponent
     <mat-dialog-actions class="mat-dialog-actions">
       <button
         mat-button
-        (click)="invert = !invert">
+        (click)="toggleInvert()">
         <mat-icon>touch_app</mat-icon>
         {{ 'CARDS.VIEWER.INVERT' | translate }}
       </button>
@@ -204,14 +206,22 @@ export class CardCodeViewerDialogComponent extends CardCodeViewerComponent {
   private readonly matDialogRef = inject(MatDialogRef);
   private readonly data: ICardCodeViewerData = inject(MAT_DIALOG_DATA);
 
-  public invert: boolean = false;
+  public readonly invert = signal<boolean>(
+    localStorage.getItemJson(ELocalStorageKey.CODE_COLOR_INVERSION),
+  );
 
   constructor() {
     super();
     Object.assign(this, this.data);
   }
 
-  public close() {
+  public toggleInvert(): void {
+    const invert = !this.invert();
+    this.invert.set(invert);
+    localStorage.setItemJson(ELocalStorageKey.CODE_COLOR_INVERSION, invert);
+  }
+
+  public close(): void {
     this.matDialogRef.close();
   }
 }
