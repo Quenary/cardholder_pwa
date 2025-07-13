@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/Quenary/cardholder_pwa/compare/v1.6.1...v1.7.0) (2025-07-13)
+
+
+### Features
+
+* **frontend:** preserve code color inversion ([4081f0b](https://github.com/Quenary/cardholder_pwa/commit/4081f0bd371e4518bb2ba03e17373aec88936fd9))
+
 ## [1.6.1](https://github.com/Quenary/cardholder_pwa/compare/v1.6.0...v1.6.1) (2025-07-05)
 
 
