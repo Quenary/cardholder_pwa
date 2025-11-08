@@ -39,10 +39,5 @@ services:
       DB_URL: mysql+asyncmy://cardholder_user:cardholder_pass@db:3306/cardholder_db
     networks:
       - cardholder_pwa
-    healthcheck:
-      test: ["CMD-SHELL", "python -c 'import urllib.request; exit(0) if urllib.request.urlopen(\"http://localhost:8000/api/public/health\").getcode() == 200 else exit(1)'"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     ports:
       - "80:80"
