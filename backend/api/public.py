@@ -4,12 +4,12 @@ from sqlalchemy import text, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any
 
-from app.db import get_async_session
-from app.db import models
-import app.schemas as schemas
-from app.enums import ESettingKey
-from app.helpers import get_setting_typed_value
-from app.config import Config
+from backend.db import get_async_session
+from backend.db import models
+import backend.schemas as schemas
+from backend.enums import ESettingKey
+from backend.helpers import get_setting_typed_value
+from backend.config import Config
 
 
 router = APIRouter(tags=["public"], prefix="/public")

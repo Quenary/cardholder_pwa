@@ -4,9 +4,9 @@ from unittest.mock import AsyncMock, MagicMock
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from typing import cast, Any
-from app.api.admin import admin_delete_user
-from app.db.models import User
-from app.enums import EUserRole
+from backend.api.admin import admin_delete_user
+from backend.db.models import User
+from backend.enums import EUserRole
 
 
 @pytest.mark.asyncio

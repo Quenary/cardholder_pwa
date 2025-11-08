@@ -2,13 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-import app.schemas as schemas, app.enums as enums
-from app.db import models
-from app.core import auth
-from app.db import get_async_session
-from app.core.user import delete_user
-from app.core.smtp import EmailSender
-from app.helpers import get_setting_typed_value
+import backend.schemas as schemas, backend.enums as enums
+from backend.db import models
+from backend.core import auth
+from backend.db import get_async_session
+from backend.core.user import delete_user
+from backend.core.smtp import EmailSender
+from backend.helpers import get_setting_typed_value
 
 
 router = APIRouter(tags=["admin"], prefix="/admin")

@@ -2,12 +2,12 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from datetime import timedelta, datetime
-from app.helpers import now
+from backend.helpers import now
 import bcrypt
-import app.schemas as schemas, app.db as db, app.db.models as models, app.enums as enums
+import backend.schemas as schemas, backend.db as db, backend.db.models as models, backend.enums as enums
 from typing import cast
 import secrets
-from app.config import Config
+from backend.config import Config
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_
 

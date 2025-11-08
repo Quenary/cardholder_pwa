@@ -1,4 +1,4 @@
-from app.helpers import now
+from backend.helpers import now
 from .base import Base
 from sqlalchemy import Integer, String, Text, DateTime, ForeignKey, text, Boolean
 from sqlalchemy.orm import relationship, mapped_column, Mapped

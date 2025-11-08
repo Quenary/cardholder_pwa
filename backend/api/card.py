@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-import app.db as db, app.db.models as models, app.schemas as schemas, app.core.auth as auth
+import backend.db as db, backend.db.models as models, backend.schemas as schemas, backend.core.auth as auth
 from sqlalchemy import select
 
 router = APIRouter(tags=["card"])

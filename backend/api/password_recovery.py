@@ -1,16 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import update
-import app.db.models as models, app.db as db, app.schemas as schemas, app.core.auth as auth
+import backend.db.models as models, backend.db as db, backend.schemas as schemas, backend.core.auth as auth
 import secrets
 from datetime import timedelta
-from app.helpers import now
-from app.core.smtp import EmailSender
-from app.config import Config
+from backend.helpers import now
+from backend.core.smtp import EmailSender
+from backend.config import Config
 from sqlalchemy import select, desc
 from sqlalchemy.orm import selectinload
 import asyncio
-from app.helpers import delay_to_minimum
+from backend.helpers import delay_to_minimum
 
 router = APIRouter(tags=["password recovery"], prefix="/recovery")
 

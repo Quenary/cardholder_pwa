@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from app.config import Config
-from app.api import (
+from backend.config import Config
+from backend.api import (
     auth_router,
     user_router,
     card_router,
@@ -9,7 +9,7 @@ from app.api import (
     admin_router,
 )
 import asyncio
-from app.db import cleanup
+from backend.db import cleanup
 from contextlib import asynccontextmanager
 
 

@@ -4,8 +4,8 @@ from sqlalchemy import delete
 from .models import RefreshToken, PasswordRecoveryCode
 from .session import _async_session_maker
 import logging
-from app.config import Config
-from app.helpers import now
+from backend.config import Config
+from backend.helpers import now
 
 
 async def cleanup():
