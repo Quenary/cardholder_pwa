@@ -1,11 +1,12 @@
 import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import delete
-from .models import RefreshToken, PasswordRecoveryCode
+from .models.refresh_token_model import RefreshTokenModel
+from .models.password_recovery_code_model import PasswordRecoveryCodeModel
 from .session import _async_session_maker
 import logging
 from backend.config import Config
-from backend.helpers import now
+from backend.helpers.now import now
 
 
 async def cleanup():
@@ -24,14 +25,14 @@ async def _cleanup(session: AsyncSession):
     _now = now()
 
     await session.execute(
-        delete(RefreshToken).where(
-            (RefreshToken.expires_at < _now) | (RefreshToken.revoked == True)
+        delete(RefreshTokenModel).where(
+            (RefreshTokenModel.expires_at < _now) | (RefreshTokenModel.revoked == True)
         )
     )
     await session.execute(
-        delete(PasswordRecoveryCode).where(
-            (PasswordRecoveryCode.expires_at < _now)
-            | (PasswordRecoveryCode.revoked == True)
+        delete(PasswordRecoveryCodeModel).where(
+            (PasswordRecoveryCodeModel.expires_at < _now)
+            | (PasswordRecoveryCodeModel.revoked == True)
         )
     )
 

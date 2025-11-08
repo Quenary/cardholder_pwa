@@ -3,11 +3,14 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
-from backend.api.user import create_user, update_user
-from backend.core.auth import verify_password
-from backend.db.models import User
-from backend.schemas import UserCreate, UserUpdate
-from backend.enums import EUserRole
+from backend.api.user_api import create_user, update_user
+from backend.core.auth_core import verify_password
+from backend.db.models.user_model import UserModel
+from backend.schemas.user_schema import (
+    UserCreateSchema,
+    UserUpdateSchema,
+)
+from backend.enums.user_role_enum import EUserRole
 
 
 def _get_user_create(
@@ -17,8 +20,8 @@ def _get_user_create(
         "password": "123456qQ",
         "confirm_password": "123456qQ",
     }
-) -> UserCreate:
-    return UserCreate(**payload)
+) -> UserCreateSchema:
+    return UserCreateSchema(**payload)
 
 
 def _get_user_update(
@@ -26,8 +29,8 @@ def _get_user_update(
         "username": "user_name",
         "email": "user_email@example.com",
     }
-) -> UserUpdate:
-    return UserUpdate(**payload)
+) -> UserUpdateSchema:
+    return UserUpdateSchema(**payload)
 
 
 @pytest.mark.asyncio
@@ -41,13 +44,17 @@ async def test_user_should_create_owner():
     session_mock.add.return_value = None
 
     with patch(
-        "backend.core.auth.is_creds_taken", new_callable=AsyncMock
+        "backend.core.auth_core.is_creds_taken",
+        new_callable=AsyncMock,
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = False
 
         result = await create_user(user, session_mock, True)
         assert result.role_code == EUserRole.OWNER
-        assert session_mock.add.mock_calls[0].args[0].role_code == EUserRole.OWNER
+        assert (
+            session_mock.add.mock_calls[0].args[0].role_code
+            == EUserRole.OWNER
+        )
 
 
 @pytest.mark.asyncio
@@ -61,13 +68,17 @@ async def test_user_should_create_member():
     session_mock.add.return_value = None
 
     with patch(
-        "backend.core.auth.is_creds_taken", new_callable=AsyncMock
+        "backend.core.auth_core.is_creds_taken",
+        new_callable=AsyncMock,
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = False
 
         result = await create_user(user, session_mock, True)
         assert result.role_code != EUserRole.OWNER
-        assert session_mock.add.mock_calls[0].args[0].role_code != EUserRole.OWNER
+        assert (
+            session_mock.add.mock_calls[0].args[0].role_code
+            != EUserRole.OWNER
+        )
 
 
 @pytest.mark.asyncio
@@ -77,7 +88,8 @@ async def test_user_should_not_create_if_creds_taken():
     session_mock = AsyncMock(spec=AsyncSession)
 
     with patch(
-        "backend.core.auth.is_creds_taken", new_callable=AsyncMock
+        "backend.core.auth_core.is_creds_taken",
+        new_callable=AsyncMock,
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = True
 
@@ -85,18 +97,21 @@ async def test_user_should_not_create_if_creds_taken():
             await create_user(user, session_mock, True)
 
     assert exc_info.value.status_code == 400
-    assert exc_info.value.detail == "Username or email is already taken"
+    assert (
+        exc_info.value.detail == "Username or email is already taken"
+    )
 
 
 @pytest.mark.asyncio
 async def test_user_should_not_update_if_creds_taken():
     user = _get_user_update()
-    current_user: User = User(id=1)
+    current_user: UserModel = UserModel(id=1)
 
     session_mock = AsyncMock(spec=AsyncSession)
 
     with patch(
-        "backend.core.auth.is_creds_taken", new_callable=AsyncMock
+        "backend.core.auth_core.is_creds_taken",
+        new_callable=AsyncMock,
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = True
 
@@ -104,18 +119,21 @@ async def test_user_should_not_update_if_creds_taken():
             await update_user(user, session_mock, current_user)
 
     assert exc_info.value.status_code == 400
-    assert exc_info.value.detail == "Username or email is already taken"
+    assert (
+        exc_info.value.detail == "Username or email is already taken"
+    )
 
 
 @pytest.mark.asyncio
 async def test_user_should_update_with_no_password():
     user = _get_user_update()
-    current_user: User = User(id=1)
+    current_user: UserModel = UserModel(id=1)
 
     session_mock = AsyncMock(spec=AsyncSession)
 
     with patch(
-        "backend.core.auth.is_creds_taken", new_callable=AsyncMock
+        "backend.core.auth_core.is_creds_taken",
+        new_callable=AsyncMock,
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = False
         result = await update_user(user, session_mock, current_user)
@@ -134,12 +152,13 @@ async def test_user_should_update_with_password():
             "confirm_password": "123456qQ",
         }
     )
-    current_user: User = User(id=1)
+    current_user: UserModel = UserModel(id=1)
 
     session_mock = AsyncMock(spec=AsyncSession)
 
     with patch(
-        "backend.core.auth.is_creds_taken", new_callable=AsyncMock
+        "backend.core.auth_core.is_creds_taken",
+        new_callable=AsyncMock,
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = False
         result = await update_user(user, session_mock, current_user)

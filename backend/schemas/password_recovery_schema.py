@@ -3,13 +3,13 @@ from typing import Self
 from .validators import password_validator
 
 
-class PasswordRecoveryCodeBody(BaseModel):
+class PasswordRecoveryCodeRequestSchema(BaseModel):
     """Password restoration code request schema"""
 
     email: EmailStr
 
 
-class PasswordRecoverySubmitBody(BaseModel):
+class PasswordRecoverySubmitSchema(BaseModel):
     """Password restoration submit request schema"""
 
     code: str

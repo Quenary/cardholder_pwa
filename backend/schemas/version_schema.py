@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 
-class Version(BaseModel):
+class VersionSchema(BaseModel):
     """Versions schema"""
 
     image_version: Optional[str] = None

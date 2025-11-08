@@ -1,30 +1,39 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-import backend.db as db, backend.db.models as models, backend.schemas as schemas, backend.core.auth as auth
+from backend.schemas.card_schema import (
+    CardSchema,
+    CardCreateSchema,
+    CardUpdateSchema,
+    CardPatchSchema,
+)
+from backend.db.models.user_model import UserModel
+from backend.db.models.card_model import CardModel
+from backend.db.session import get_async_session
+from backend.core.auth_core import is_user
 from sqlalchemy import select
 
 router = APIRouter(tags=["card"])
 
 
-@router.get("/cards", response_model=list[schemas.Card])
+@router.get("/cards", response_model=list[CardSchema])
 async def get_cards(
-    session: AsyncSession = Depends(db.get_async_session),
-    user: models.User = Depends(auth.is_user),
+    session: AsyncSession = Depends(get_async_session),
+    user: UserModel = Depends(is_user),
 ):
-    stmt = select(models.Card).where(models.Card.user_id == user.id)
+    stmt = select(CardModel).where(CardModel.user_id == user.id)
     result = await session.execute(stmt)
     return result.scalars().all()
 
 
-@router.get("/cards/{card_id}", response_model=schemas.Card)
+@router.get("/cards/{card_id}", response_model=CardSchema)
 async def get_card(
     card_id: int,
-    session: AsyncSession = Depends(db.get_async_session),
-    user: models.User = Depends(auth.is_user),
+    session: AsyncSession = Depends(get_async_session),
+    user: UserModel = Depends(is_user),
 ):
     stmt = (
-        select(models.Card)
-        .where(models.Card.id == card_id, models.Card.user_id == user.id)
+        select(CardModel)
+        .where(CardModel.id == card_id, CardModel.user_id == user.id)
         .limit(1)
     )
     result = await session.execute(stmt)
@@ -34,29 +43,29 @@ async def get_card(
     return card
 
 
-@router.post("/cards", response_model=schemas.Card, status_code=201)
+@router.post("/cards", response_model=CardSchema, status_code=201)
 async def create_card(
-    card: schemas.CardCreate,
-    session: AsyncSession = Depends(db.get_async_session),
-    user: models.User = Depends(auth.is_user),
+    card: CardCreateSchema,
+    session: AsyncSession = Depends(get_async_session),
+    user: UserModel = Depends(is_user),
 ):
-    new_card = models.Card(**card.model_dump(), user_id=user.id)
+    new_card = CardModel(**card.model_dump(), user_id=user.id)
     session.add(new_card)
     await session.commit()
     await session.refresh(new_card)
     return new_card
 
 
-@router.put("/cards/{card_id}", response_model=schemas.Card)
+@router.put("/cards/{card_id}", response_model=CardSchema)
 async def update_card(
     card_id: int,
-    updated: schemas.CardUpdate,
-    session: AsyncSession = Depends(db.get_async_session),
-    user: models.User = Depends(auth.is_user),
+    updated: CardUpdateSchema,
+    session: AsyncSession = Depends(get_async_session),
+    user: UserModel = Depends(is_user),
 ):
     stmt = (
-        select(models.Card)
-        .where(models.Card.id == card_id, models.Card.user_id == user.id)
+        select(CardModel)
+        .where(CardModel.id == card_id, CardModel.user_id == user.id)
         .limit(1)
     )
     result = await session.execute(stmt)
@@ -75,12 +84,12 @@ async def update_card(
 @router.delete("/cards/{card_id}")
 async def delete_card(
     card_id: int,
-    session: AsyncSession = Depends(db.get_async_session),
-    user: models.User = Depends(auth.is_user),
+    session: AsyncSession = Depends(get_async_session),
+    user: UserModel = Depends(is_user),
 ):
     stmt = (
-        select(models.Card)
-        .where(models.Card.id == card_id, models.Card.user_id == user.id)
+        select(CardModel)
+        .where(CardModel.id == card_id, CardModel.user_id == user.id)
         .limit(1)
     )
     result = await session.execute(stmt)
@@ -95,13 +104,13 @@ async def delete_card(
 @router.patch("/cards/{card_id}")
 async def patch_card(
     card_id: int,
-    body: schemas.CardPatch,
-    session: AsyncSession = Depends(db.get_async_session),
-    user: models.User = Depends(auth.is_user),
+    body: CardPatchSchema,
+    session: AsyncSession = Depends(get_async_session),
+    user: UserModel = Depends(is_user),
 ):
     stmt = (
-        select(models.Card)
-        .where(models.Card.id == card_id, models.Card.user_id == user.id)
+        select(CardModel)
+        .where(CardModel.id == card_id, CardModel.user_id == user.id)
         .limit(1)
     )
     result = await session.execute(stmt)

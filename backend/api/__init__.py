@@ -1,6 +1,6 @@
-from .auth import router as auth_router
-from .user import router as user_router
-from .card import router as card_router
-from .password_recovery import router as password_recovery_router
-from .public import router as public_router
-from .admin import router as admin_router
+from .auth_api import router as auth_router
+from .user_api import router as user_router
+from .card_api import router as card_router
+from .password_recovery_api import router as password_recovery_router
+from .public_api import router as public_router
+from .admin_api import router as admin_router

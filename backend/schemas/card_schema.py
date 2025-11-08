@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 import re
 
 
-class CardBase(BaseModel):
+class CardBaseSchema(BaseModel):
     code: str
     code_type: str
     name: str
@@ -22,15 +22,15 @@ class CardBase(BaseModel):
         return v
 
 
-class CardCreate(CardBase):
+class CardCreateSchema(CardBaseSchema):
     pass
 
 
-class CardUpdate(CardBase):
+class CardUpdateSchema(CardBaseSchema):
     pass
 
 
-class CardPatch(BaseModel):
+class CardPatchSchema(BaseModel):
     code: Optional[str] = None
     code_type: Optional[str] = None
     name: Optional[str] = None
@@ -58,7 +58,7 @@ class CardPatch(BaseModel):
         return v
 
 
-class Card(CardBase):
+class CardSchema(CardBaseSchema):
     id: int
     used_at: Optional[datetime]
     created_at: datetime

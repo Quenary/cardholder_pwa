@@ -9,7 +9,7 @@ from backend.api import (
     admin_router,
 )
 import asyncio
-from backend.db import cleanup
+from backend.db.cleanup import cleanup
 from contextlib import asynccontextmanager
 
 

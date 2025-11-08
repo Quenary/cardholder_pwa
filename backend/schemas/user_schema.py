@@ -1,11 +1,17 @@
 from typing import Optional, Self
-from pydantic import BaseModel, EmailStr, field_validator, model_validator, ConfigDict
+from pydantic import (
+    BaseModel,
+    EmailStr,
+    field_validator,
+    model_validator,
+    ConfigDict,
+)
 from .validators import password_validator
-from backend.enums import EUserRole
+from backend.enums.user_role_enum import EUserRole
 from datetime import datetime
 
 
-class UserCreate(BaseModel):
+class UserCreateSchema(BaseModel):
     """User create schema. Passwords required."""
 
     username: str
@@ -25,7 +31,7 @@ class UserCreate(BaseModel):
         return self
 
 
-class UserUpdate(BaseModel):
+class UserUpdateSchema(BaseModel):
     """User update schema. Passwords optional"""
 
     username: str
@@ -47,7 +53,7 @@ class UserUpdate(BaseModel):
         return self
 
 
-class User(BaseModel):
+class UserSchema(BaseModel):
     id: int
     username: str
     email: EmailStr
