@@ -44,7 +44,7 @@ async def test_user_should_create_owner():
     session_mock.add.return_value = None
 
     with patch(
-        "backend.core.auth_core.is_creds_taken",
+        "backend.api.user_api.is_creds_taken",
         new_callable=AsyncMock,
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = False
@@ -68,7 +68,7 @@ async def test_user_should_create_member():
     session_mock.add.return_value = None
 
     with patch(
-        "backend.core.auth_core.is_creds_taken",
+        "backend.api.user_api.is_creds_taken",
         new_callable=AsyncMock,
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = False
@@ -88,7 +88,7 @@ async def test_user_should_not_create_if_creds_taken():
     session_mock = AsyncMock(spec=AsyncSession)
 
     with patch(
-        "backend.core.auth_core.is_creds_taken",
+        "backend.api.user_api.is_creds_taken",
         new_callable=AsyncMock,
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = True
@@ -110,7 +110,7 @@ async def test_user_should_not_update_if_creds_taken():
     session_mock = AsyncMock(spec=AsyncSession)
 
     with patch(
-        "backend.core.auth_core.is_creds_taken",
+        "backend.api.user_api.is_creds_taken",
         new_callable=AsyncMock,
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = True
@@ -132,7 +132,7 @@ async def test_user_should_update_with_no_password():
     session_mock = AsyncMock(spec=AsyncSession)
 
     with patch(
-        "backend.core.auth_core.is_creds_taken",
+        "backend.api.user_api.is_creds_taken",
         new_callable=AsyncMock,
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = False
@@ -157,7 +157,7 @@ async def test_user_should_update_with_password():
     session_mock = AsyncMock(spec=AsyncSession)
 
     with patch(
-        "backend.core.auth_core.is_creds_taken",
+        "backend.api.user_api.is_creds_taken",
         new_callable=AsyncMock,
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = False
