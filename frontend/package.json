@@ -3,7 +3,7 @@
   "version": "0.0.13",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --port=4207 --open",
+    "start": "ng serve --port=4207 --host=0.0.0.0 --open",
     "start:sw": "ng serve --configuration=production --port=4207 --open",
     "start:nohmr": "ng serve --port=4207 --open --no-hmr",
     "build": "ng build --configuration=production",

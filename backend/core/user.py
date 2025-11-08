@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import delete
 from fastapi import HTTPException
-from app.db.models import User, Card, RefreshToken, PasswordRecoveryCode
-import app.enums as enums
+from backend.db.models import User, Card, RefreshToken, PasswordRecoveryCode
+import backend.enums as enums
 
 
 async def delete_user(

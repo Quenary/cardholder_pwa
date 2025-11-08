@@ -3,8 +3,8 @@ from sqlalchemy import ForeignKey, Integer, String, DateTime, text, Enum as SQLE
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from datetime import datetime
 from typing import TYPE_CHECKING
-from app.helpers import now
-from app.enums import EUserRole
+from backend.helpers import now
+from backend.enums import EUserRole
 
 
 if TYPE_CHECKING:

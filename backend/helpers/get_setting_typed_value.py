@@ -1,4 +1,4 @@
-from app.enums import ESettingType
+from backend.enums import ESettingType
 
 
 def get_setting_typed_value(value: str, value_type: str):

@@ -3,11 +3,11 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
-from app.api.user import create_user, update_user
-from app.core.auth import verify_password
-from app.db.models import User
-from app.schemas import UserCreate, UserUpdate
-from app.enums import EUserRole
+from backend.api.user import create_user, update_user
+from backend.core.auth import verify_password
+from backend.db.models import User
+from backend.schemas import UserCreate, UserUpdate
+from backend.enums import EUserRole
 
 
 def _get_user_create(
@@ -41,7 +41,7 @@ async def test_user_should_create_owner():
     session_mock.add.return_value = None
 
     with patch(
-        "app.core.auth.is_creds_taken", new_callable=AsyncMock
+        "backend.core.auth.is_creds_taken", new_callable=AsyncMock
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = False
 
@@ -61,7 +61,7 @@ async def test_user_should_create_member():
     session_mock.add.return_value = None
 
     with patch(
-        "app.core.auth.is_creds_taken", new_callable=AsyncMock
+        "backend.core.auth.is_creds_taken", new_callable=AsyncMock
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = False
 
@@ -77,7 +77,7 @@ async def test_user_should_not_create_if_creds_taken():
     session_mock = AsyncMock(spec=AsyncSession)
 
     with patch(
-        "app.core.auth.is_creds_taken", new_callable=AsyncMock
+        "backend.core.auth.is_creds_taken", new_callable=AsyncMock
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = True
 
@@ -96,7 +96,7 @@ async def test_user_should_not_update_if_creds_taken():
     session_mock = AsyncMock(spec=AsyncSession)
 
     with patch(
-        "app.core.auth.is_creds_taken", new_callable=AsyncMock
+        "backend.core.auth.is_creds_taken", new_callable=AsyncMock
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = True
 
@@ -115,7 +115,7 @@ async def test_user_should_update_with_no_password():
     session_mock = AsyncMock(spec=AsyncSession)
 
     with patch(
-        "app.core.auth.is_creds_taken", new_callable=AsyncMock
+        "backend.core.auth.is_creds_taken", new_callable=AsyncMock
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = False
         result = await update_user(user, session_mock, current_user)
@@ -139,7 +139,7 @@ async def test_user_should_update_with_password():
     session_mock = AsyncMock(spec=AsyncSession)
 
     with patch(
-        "app.core.auth.is_creds_taken", new_callable=AsyncMock
+        "backend.core.auth.is_creds_taken", new_callable=AsyncMock
     ) as is_creds_taken_mock:
         is_creds_taken_mock.return_value = False
         result = await update_user(user, session_mock, current_user)

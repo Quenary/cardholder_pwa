@@ -1,4 +1,4 @@
-from app.db import Base, async_engine
+from backend.db import Base, async_engine
 from logging.config import fileConfig
 import asyncio
 from alembic import context

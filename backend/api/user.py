@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-import app.db.models as models, app.db as db, app.schemas as schemas, app.core.auth as auth, app.enums as enums
-from app.core.user import delete_user as _delete_user
+import backend.db.models as models, backend.db as db, backend.schemas as schemas, backend.core.auth as auth, backend.enums as enums
+from backend.core.user import delete_user as _delete_user
 from sqlalchemy import select
-from app.helpers import delay_to_minimum
+from backend.helpers import delay_to_minimum
 
 router = APIRouter(tags=["user"])
 

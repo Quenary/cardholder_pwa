@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
-import app.db.models as models, app.db as db, app.schemas as schemas, app.core.auth as auth
+import backend.db.models as models, backend.db as db, backend.schemas as schemas, backend.core.auth as auth
 from fastapi.security import OAuth2PasswordRequestForm
-from app.helpers import now
+from backend.helpers import now
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
-from app.helpers import delay_to_minimum
+from backend.helpers import delay_to_minimum
 
 router = APIRouter(tags=["auth"])
 

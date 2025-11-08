@@ -3,7 +3,7 @@ from sqlalchemy import Integer, String, Boolean, DateTime, ForeignKey, text
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
-from app.helpers import now
+from backend.helpers import now
 
 if TYPE_CHECKING:
     from .user import User

@@ -2,7 +2,7 @@ from .base import Base
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import TYPE_CHECKING
-from app.enums import EUserRole
+from backend.enums import EUserRole
 
 
 if TYPE_CHECKING:
