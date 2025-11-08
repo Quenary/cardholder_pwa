@@ -17,8 +17,11 @@ router = APIRouter(tags=["public"], prefix="/public")
 
 @router.get("/version", response_model=schemas.Version)
 def get_version():
-    image_version = os.getenv("VERSION") or None
-    return {"image_version": image_version}
+    try:
+        with open("/app/version", "r") as file:
+            return {"image_version": file.readline()}
+    except FileNotFoundError:
+        raise HTTPException(404, "Version file not found")
 
 
 @router.get("/health")
@@ -33,18 +36,27 @@ async def health(session: AsyncSession = Depends(get_async_session)):
 @router.get(
     "/settings",
     response_model=list[schemas.PublicSettingsItem],
-    description="Returns list of several app settings and environment variables. Key ",
+    description="Get list of several app settings and environment variables",
 )
-async def settings(session: AsyncSession = Depends(get_async_session)):
+async def settings(
+    session: AsyncSession = Depends(get_async_session),
+):
     result_list: list[dict[str, Any]] = []
 
     public_keys = [ESettingKey.ALLOW_REGISTRATION]
-    stmt = select(models.Setting).where(models.Setting.key.in_(public_keys))
+    stmt = select(models.Setting).where(
+        models.Setting.key.in_(public_keys)
+    )
     result = await session.execute(stmt)
     settings = result.scalars()
     for s in settings:
         result_list.append(
-            {"key": s.key, "value": get_setting_typed_value(s.value, s.value_type)}
+            {
+                "key": s.key,
+                "value": get_setting_typed_value(
+                    s.value, s.value_type
+                ),
+            }
         )
 
     public_keys = ["SMTP_DISABLED"]

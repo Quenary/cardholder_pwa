@@ -1,0 +1,21 @@
+networks:
+  cardholder_pwa:
+    driver: bridge
+volumes:
+  cardholder_pwa_data_dev:
+services:
+  app:
+    container_name: cardholder_pwa
+    build:
+      context: .
+      args:
+        VERSION: dev build
+    environment:
+      LOG_LEVEL: info
+    volumes:
+      - cardholder_pwa_data_dev:/cardholder_pwa
+    restart: unless-stopped
+    networks:
+      - cardholder_pwa
+    ports:
+      - '1337:80'

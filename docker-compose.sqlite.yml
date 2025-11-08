@@ -1,5 +1,3 @@
-version: '3.8'
-
 networks:
   cardholder_pwa:
     driver: bridge
@@ -11,10 +9,5 @@ services:
       - $HOME/.cardholder_pwa:/cardholder_pwa
     networks:
       - cardholder_pwa
-    healthcheck:
-      test: ["CMD-SHELL", "python -c 'import urllib.request; exit(0) if urllib.request.urlopen(\"http://localhost:8000/api/public/health\").getcode() == 200 else exit(1)'"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     ports:
       - "80:80"
