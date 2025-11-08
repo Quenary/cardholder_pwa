@@ -1,21 +1,22 @@
 from fastapi import APIRouter, Depends, HTTPException
-import os
 from sqlalchemy import text, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any
-
-from backend.db import get_async_session
-from backend.db import models
-import backend.schemas as schemas
-from backend.enums import ESettingKey
-from backend.helpers import get_setting_typed_value
+from backend.db.session import get_async_session
+from backend.db.models.settings_model import SettingModel
+from backend.schemas.version_schema import VersionSchema
+from backend.schemas.public_settings_schema import (
+    PublicSettingsItemSchema,
+)
+from backend.enums.settings_enum import ESettingKey
+from backend.helpers.get_setting_typed_value import get_setting_typed_value
 from backend.config import Config
 
 
 router = APIRouter(tags=["public"], prefix="/public")
 
 
-@router.get("/version", response_model=schemas.Version)
+@router.get("/version", response_model=VersionSchema)
 def get_version():
     try:
         with open("/app/version", "r") as file:
@@ -35,7 +36,7 @@ async def health(session: AsyncSession = Depends(get_async_session)):
 
 @router.get(
     "/settings",
-    response_model=list[schemas.PublicSettingsItem],
+    response_model=list[PublicSettingsItemSchema],
     description="Get list of several app settings and environment variables",
 )
 async def settings(
@@ -44,8 +45,8 @@ async def settings(
     result_list: list[dict[str, Any]] = []
 
     public_keys = [ESettingKey.ALLOW_REGISTRATION]
-    stmt = select(models.Setting).where(
-        models.Setting.key.in_(public_keys)
+    stmt = select(SettingModel).where(
+        SettingModel.key.in_(public_keys)
     )
     result = await session.execute(stmt)
     settings = result.scalars()

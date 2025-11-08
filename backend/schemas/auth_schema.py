@@ -1,16 +1,16 @@
 from pydantic import BaseModel
 
 
-class TokenResponse(BaseModel):
+class TokenResponseSchema(BaseModel):
     access_token: str
     token_type: str
     expires_in: int
     refresh_token: str
 
 
-class RefreshRequest(BaseModel):
+class RefreshRequestSchema(BaseModel):
     refresh_token: str
 
 
-class RevokeRequest(RefreshRequest):
+class RevokeRequestSchema(RefreshRequestSchema):
     pass

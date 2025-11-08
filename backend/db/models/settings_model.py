@@ -1,11 +1,11 @@
-from .base import Base
+from .base_model import BaseModel
 from sqlalchemy import String, DateTime, text
 from sqlalchemy.orm import mapped_column, Mapped
 from datetime import datetime
-from backend.helpers import now
+from backend.helpers.now import now
 
 
-class Setting(Base):
+class SettingModel(BaseModel):
     __tablename__ = "settings"
 
     key: Mapped[str] = mapped_column(String, primary_key=True, nullable=False)

@@ -1,5 +1,5 @@
-from backend.helpers import now
-from .base import Base
+from backend.helpers.now import now
+from .base_model import BaseModel
 from sqlalchemy import Integer, String, Text, DateTime, ForeignKey, text, Boolean
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from sqlalchemy.sql import func
@@ -7,10 +7,10 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from .user import User
+    from .user_model import UserModel
 
 
-class Card(Base):
+class CardModel(BaseModel):
     __tablename__ = "cards"
     id: Mapped[int] = mapped_column(
         Integer, primary_key=True, index=True, nullable=False
@@ -39,4 +39,4 @@ class Card(Base):
         nullable=False,
     )
 
-    user: Mapped["User"] = relationship("User", back_populates="cards")
+    user: Mapped["UserModel"] = relationship("UserModel", back_populates="cards")
