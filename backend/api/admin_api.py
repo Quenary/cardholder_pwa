@@ -1,20 +1,22 @@
+import asyncio
+
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from backend.core.auth_core import is_user_admin, is_user_owner
+from backend.core.smtp_core import EmailSender
+from backend.core.user_core import delete_user
+from backend.db.models.settings_model import SettingModel
+from backend.db.models.user_model import UserModel
+from backend.db.session import get_async_session
 from backend.enums.user_role_enum import EUserRole
+from backend.helpers.get_setting_typed_value import get_setting_typed_value
 from backend.schemas.settings_schema import (
     GetSettingsRequestItemSchema,
     PatchSettingsRequestItemSchema,
 )
 from backend.schemas.user_schema import UserSchema
-from backend.db.models.user_model import UserModel
-from backend.db.models.settings_model import SettingModel
-from backend.core.auth_core import is_user_admin, is_user_owner
-from backend.db.session import get_async_session
-from backend.core.user_core import delete_user
-from backend.core.smtp_core import EmailSender
-from backend.helpers.get_setting_typed_value import get_setting_typed_value
-
 
 router = APIRouter(tags=["admin"], prefix="/admin")
 
@@ -48,10 +50,7 @@ async def admin_delete_user(
     if not user:
         raise HTTPException(404, "User not found")
 
-    if (
-        admin.role_code == EUserRole.ADMIN
-        and user.role_code == EUserRole.ADMIN
-    ):
+    if admin.role_code == EUserRole.ADMIN and user.role_code == EUserRole.ADMIN:
         raise HTTPException(403, "Admin cannot delete admin.")
 
     return await delete_user(session, user)
@@ -67,9 +66,7 @@ async def owner_change_user_role(
     session: AsyncSession = Depends(get_async_session),
     owner: UserModel = Depends(is_user_owner),
 ):
-    owner_assign_error = HTTPException(
-        403, "Owner role cannot be reassigned."
-    )
+    owner_assign_error = HTTPException(403, "Owner role cannot be reassigned.")
 
     if role_code == EUserRole.OWNER:
         raise owner_assign_error
@@ -90,9 +87,7 @@ async def owner_change_user_role(
     return {"detail": "User role has been changed"}
 
 
-@router.get(
-    "/settings", response_model=list[GetSettingsRequestItemSchema]
-)
+@router.get("/settings", response_model=list[GetSettingsRequestItemSchema])
 async def get_system_settings(
     session: AsyncSession = Depends(get_async_session),
     _: UserModel = Depends(is_user_admin),
@@ -122,17 +117,11 @@ async def change_system_settings(
     _: UserModel = Depends(is_user_admin),
 ):
     for s in request:
-        stmt = (
-            select(SettingModel)
-            .where(SettingModel.key == s.key)
-            .limit(1)
-        )
+        stmt = select(SettingModel).where(SettingModel.key == s.key).limit(1)
         result = await session.execute(stmt)
         setting = result.scalar_one_or_none()
         if not setting:
-            raise HTTPException(
-                status_code=404, detail=f"Setting '{s.key}' not found"
-            )
+            raise HTTPException(status_code=404, detail=f"Setting '{s.key}' not found")
         if setting.value_type != type(s.value).__name__:
             raise HTTPException(
                 400,
@@ -156,7 +145,8 @@ async def get_smtp_status(
 async def send_test_email(
     admin: UserModel = Depends(is_user_admin),
 ):
-    EmailSender.send_email(
+    await asyncio.to_thread(
+        EmailSender.send_email,
         admin.email,
         "Test email from Cardholder PWA",
         "This is body of the test email.\nGood day!\n",

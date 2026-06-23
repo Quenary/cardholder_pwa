@@ -1,7 +1,11 @@
+import logging
 import os
 import secrets
+from typing import ClassVar, Final, Literal
+
 from dotenv import load_dotenv
-from typing import ClassVar
+
+SMTP_ENCRYPTION_TYPE = Literal["TLS", "STARTTLS", None]
 
 
 class Config:
@@ -17,12 +21,13 @@ class Config:
     DB_URL: ClassVar[str]
     DB_CLEANUP_INTERVAL_MIN: ClassVar[float]
     SMTP_DISABLED: ClassVar[bool]
-    SMTP_USE_TLS: ClassVar[bool]
+    SMTP_ENCRYPTION: ClassVar[SMTP_ENCRYPTION_TYPE]
     SMTP_SERVER: ClassVar[str]
     SMTP_PORT: ClassVar[int]
     SMTP_FROM_EMAIL: ClassVar[str]
     SMTP_USERNAME: ClassVar[str]
     SMTP_PASSWORD: ClassVar[str]
+    SMTP_TIMEOUT: ClassVar[int]
 
     @classmethod
     def load(cls):
@@ -50,15 +55,43 @@ class Config:
             cls.DB_CLEANUP_INTERVAL_MIN = float(
                 os.getenv("DB_CLEANUP_INTERVAL_MIN") or 360
             )
+
             cls.SMTP_DISABLED = os.getenv("SMTP_DISABLED", "false").lower() == "true"
-            cls.SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "false").lower() == "true"
-            defaultPort: int = 587 if cls.SMTP_USE_TLS else 25
+
+            raw_smtp_encryption: Final[str] = os.getenv("SMTP_ENCRYPTION", "").upper()
+            valid_smtp_encryptions: Final[set[SMTP_ENCRYPTION_TYPE]] = {
+                "TLS",
+                "STARTTLS",
+                None,
+            }
+
+            if raw_smtp_encryption in valid_smtp_encryptions:
+                cls.SMTP_ENCRYPTION = raw_smtp_encryption
+            elif os.getenv("SMTP_USE_TLS", "false").lower() == "true":
+                logging.warning(
+                    "SMTP_USE_TLS is deprecated. "
+                    "Use SMTP_ENCRYPTION instead. "
+                    "STARTTLS is used as fallback."
+                )
+                cls.SMTP_ENCRYPTION = "STARTTLS"
+            else:
+                cls.SMTP_ENCRYPTION = None
+
+            if cls.SMTP_ENCRYPTION == "TLS":
+                defaultPort = 465
+            elif cls.SMTP_ENCRYPTION == "STARTTLS":
+                defaultPort = 587
+            else:
+                defaultPort = 25
+
             cls.SMTP_SERVER = os.getenv("SMTP_SERVER", "")
             cls.SMTP_PORT = int(os.getenv("SMTP_PORT", defaultPort))
             cls.SMTP_FROM_EMAIL = os.getenv("SMTP_FROM_EMAIL", "")
             cls.SMTP_USERNAME = os.getenv("SMTP_USERNAME", "")
             cls.SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+            cls.SMTP_TIMEOUT = int(os.getenv("SMTP_TIMEOUT", 10))
             cls._loaded = True
+            print(cls.SMTP_ENCRYPTION, cls.SMTP_SERVER, cls.SMTP_PORT)
 
 
 Config.load()

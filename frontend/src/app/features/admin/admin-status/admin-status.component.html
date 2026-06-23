@@ -24,7 +24,7 @@
       <button
         class="mat-list-button"
         mat-button
-        [disabled]="!smtpStatus()"
+        [disabled]="!smtpStatus() || smtpLoading()"
         (click)="onSmtpTest()">
         <mat-icon>mail</mat-icon>
         {{ 'ADMIN.SMTP_TEST' | translate }}

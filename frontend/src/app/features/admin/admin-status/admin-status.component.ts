@@ -1,11 +1,11 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { map, retry, catchError, of } from 'rxjs';
+import { map, retry, catchError, of, finalize } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { AdminApiService } from 'src/app/entities/admin/admin-api.service';
 import { PublicApiService } from 'src/app/entities/public/public-api.service';
@@ -28,7 +28,7 @@ export class AdminStatusComponent {
   private readonly snackService = inject(SnackService);
   private readonly publicApiService = inject(PublicApiService);
 
-  public readonly health = toSignal(
+  protected readonly health = toSignal(
     this.publicApiService.health().pipe(
       map(() => true),
       retry({ count: 1, delay: 1000 }),
@@ -39,7 +39,7 @@ export class AdminStatusComponent {
     ),
     { initialValue: true },
   );
-  public readonly smtpStatus = toSignal(
+  protected readonly smtpStatus = toSignal(
     this.adminApiService.smtpStatus().pipe(
       retry({ count: 1, delay: 1000 }),
       catchError((error) => {
@@ -49,17 +49,26 @@ export class AdminStatusComponent {
     ),
     { initialValue: true },
   );
+  protected readonly smtpLoading = signal<boolean>(false);
 
-  onSmtpTest(): void {
-    this.adminApiService.smtpTest().subscribe({
-      next: () => {
-        this.snackService.success(
-          this.translateService.instant('ADMIN.SMTP_TEST_SUCCESS'),
-        );
-      },
-      error: (error) => {
-        this.snackService.error(error);
-      },
-    });
+  protected onSmtpTest(): void {
+    this.smtpLoading.set(true);
+    this.adminApiService
+      .smtpTest()
+      .pipe(
+        finalize(() => {
+          this.smtpLoading.set(false);
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.snackService.success(
+            this.translateService.instant('ADMIN.SMTP_TEST_SUCCESS'),
+          );
+        },
+        error: (error) => {
+          this.snackService.error(error);
+        },
+      });
   }
 }

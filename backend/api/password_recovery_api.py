@@ -1,26 +1,27 @@
+import asyncio
+import secrets
+from datetime import timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, Request
+from sqlalchemy import desc, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import update
-from backend.schemas.password_recovery_schema import (
-    PasswordRecoveryCodeRequestSchema,
-    PasswordRecoverySubmitSchema,
-)
-from backend.db.session import get_async_session
-from backend.db.models.user_model import UserModel
+from sqlalchemy.orm import selectinload
+
+from backend.config import Config
+from backend.core.auth_core import get_password_hash
+from backend.core.smtp_core import EmailSender
 from backend.db.models.password_recovery_code_model import (
     PasswordRecoveryCodeModel,
 )
 from backend.db.models.refresh_token_model import RefreshTokenModel
-from backend.core.auth_core import get_password_hash
-import secrets
-from datetime import timedelta
-from backend.helpers.now import now
-from backend.core.smtp_core import EmailSender
-from backend.config import Config
-from sqlalchemy import select, desc
-from sqlalchemy.orm import selectinload
-import asyncio
+from backend.db.models.user_model import UserModel
+from backend.db.session import get_async_session
 from backend.helpers.delay_to_minimum import delay_to_minimum
+from backend.helpers.now import now
+from backend.schemas.password_recovery_schema import (
+    PasswordRecoveryCodeRequestSchema,
+    PasswordRecoverySubmitSchema,
+)
 
 router = APIRouter(tags=["password recovery"], prefix="/recovery")
 
@@ -32,11 +33,7 @@ async def code(
     body: PasswordRecoveryCodeRequestSchema,
     session: AsyncSession = Depends(get_async_session),
 ):
-    stmt = (
-        select(UserModel)
-        .where(UserModel.email == body.email)
-        .limit(1)
-    )
+    stmt = select(UserModel).where(UserModel.email == body.email).limit(1)
     result = await session.execute(stmt)
 
     user = result.scalar_one_or_none()
@@ -45,8 +42,7 @@ async def code(
             select(PasswordRecoveryCodeModel)
             .where(
                 PasswordRecoveryCodeModel.user_id == user.id,
-                PasswordRecoveryCodeModel.created_at
-                > now() - timedelta(minutes=1),
+                PasswordRecoveryCodeModel.created_at > now() - timedelta(minutes=1),
             )
             .order_by(desc(PasswordRecoveryCodeModel.created_at))
             .limit(1)
@@ -66,13 +62,12 @@ async def code(
         scheme = request.scope["scheme"]
         if host and scheme:
             reset_url = f"{scheme}://{host}/password-recovery/submit?code={code}"
-        asyncio.create_task(
-            asyncio.to_thread(
-                EmailSender.send_password_reset_email,
-                body.email,
-                code,
-                reset_url,
-            )
+
+        await asyncio.to_thread(
+            EmailSender.send_password_reset_email,
+            body.email,
+            code,
+            reset_url,
         )
 
         db_code = PasswordRecoveryCodeModel(
@@ -84,9 +79,7 @@ async def code(
     return {}
 
 
-@router.put(
-    "/submit", description="Submit password recovery with secret code"
-)
+@router.put("/submit", description="Submit password recovery with secret code")
 async def password(
     body: PasswordRecoverySubmitSchema,
     session: AsyncSession = Depends(get_async_session),
@@ -104,9 +97,7 @@ async def password(
     result = await session.execute(stmt)
     db_code = result.scalar_one_or_none()
     if not db_code:
-        raise HTTPException(
-            status_code=401, detail="Invalid or expired code"
-        )
+        raise HTTPException(status_code=401, detail="Invalid or expired code")
 
     user = db_code.user
     user.hashed_password = get_password_hash(body.password)
