@@ -11,6 +11,19 @@
     "test": "ng test",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadless"
   },
+  "prettier": {
+    "htmlWhitespaceSensitivity": "strict",
+    "bracketSameLine": true,
+    "singleAttributePerLine": true,
+    "tabWidth": 2,
+    "useTabs": false,
+    "singleQuote": true,
+    "embeddedLanguageFormatting": "off",
+    "semi": true,
+    "quoteProps": "preserve",
+    "trailingComma": "all",
+    "endOfLine": "auto"
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "^19.0.0",
