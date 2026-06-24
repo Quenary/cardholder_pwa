@@ -1,4 +1,11 @@
-import { Component, computed, inject, Input, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  Input,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import {
@@ -26,6 +33,7 @@ export interface IChangelogDialogComponentData {
   selector: 'app-changelog',
   imports: [],
   templateUrl: './changelog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './changelog.component.scss',
 })
 export class ChangelogComponent {
@@ -55,6 +63,7 @@ export class ChangelogComponent {
 @Component({
   selector: 'app-changelog-dialog',
   imports: [MatDialogModule, TranslateModule, MatButton],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
   <h1 mat-dialog-title>{{'ABOUT.CHANGELOG' | translate}}</h1>
   <mat-dialog-content>
@@ -74,7 +83,8 @@ export class ChangelogDialogComponent
   implements IChangelogDialogComponentData
 {
   private readonly matDialogRef = inject(MatDialogRef);
-  private readonly data: IChangelogDialogComponentData = inject(MAT_DIALOG_DATA);
+  private readonly data: IChangelogDialogComponentData =
+    inject(MAT_DIALOG_DATA);
 
   constructor() {
     super();

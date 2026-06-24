@@ -1,4 +1,10 @@
-import { Component, ElementRef, forwardRef, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  forwardRef,
+  inject,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import {
   QuaggaJSCodeReader,
   QuaggaJSResultCallbackFunction,
@@ -22,6 +28,7 @@ import { IScannerResult } from '../card-scanner-base/scanner-interface';
   ],
   standalone: true,
   templateUrl: './card-scanner-quagga2.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './card-scanner-quagga2.component.scss',
 })
 export class CardScannerQuagga2Component extends CardScannerBaseComponent {

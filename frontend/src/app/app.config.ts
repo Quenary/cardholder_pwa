@@ -16,6 +16,7 @@ import {
   HttpClient,
   provideHttpClient,
   withInterceptors,
+  withXhr,
 } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -47,7 +48,7 @@ export const appConfig: ApplicationConfig = {
     provideState('user', userReducer),
     provideEffects([AppEffects, AuthEffects, UserEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
-    provideHttpClient(withInterceptors([getTokenInterceptor])),
+    provideHttpClient(withXhr(), withInterceptors([getTokenInterceptor])),
     provideNativeDateAdapter(),
     importProvidersFrom(
       TranslateModule.forRoot({

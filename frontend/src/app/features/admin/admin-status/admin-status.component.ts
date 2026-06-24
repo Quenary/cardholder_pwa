@@ -1,5 +1,10 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -20,6 +25,7 @@ import { PublicApiService } from 'src/app/entities/public/public-api.service';
     NgTemplateOutlet,
   ],
   templateUrl: './admin-status.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './admin-status.component.scss',
 })
 export class AdminStatusComponent {

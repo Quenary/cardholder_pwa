@@ -1,4 +1,10 @@
-import { Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  forwardRef,
+  ViewChild,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CardScannerBaseComponent } from '../card-scanner-base/card-scanner-base.component';
 import { BarcodeFormat, BrowserMultiFormatReader } from '@zxing/browser';
 import type { Result } from '@zxing/library';
@@ -18,6 +24,7 @@ import { IScannerResult } from '../card-scanner-base/scanner-interface';
   ],
   standalone: true,
   templateUrl: './card-scanner-zxing.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './card-scanner-zxing.component.scss',
 })
 export class CardScannerZxingComponent extends CardScannerBaseComponent {

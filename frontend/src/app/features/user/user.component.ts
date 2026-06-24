@@ -1,4 +1,11 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -47,6 +54,7 @@ import { MatCheckbox, MatCheckboxChange } from '@angular/material/checkbox';
     MatCheckbox,
   ],
   templateUrl: './user.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './user.component.scss',
 })
 export class UserComponent implements OnInit {

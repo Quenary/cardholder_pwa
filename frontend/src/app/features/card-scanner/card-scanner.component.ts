@@ -51,6 +51,7 @@ export interface ICardScannerResult {
 @Component({
   selector: 'app-card-scanner-device-sheet',
   imports: [MatListItem, MatListItemTitle, MatActionList, TranslateModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <mat-action-list>
       @for (device of devices; track device) {
