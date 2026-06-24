@@ -45,12 +45,12 @@ body {
   }
 }
 .mat-snack-error {
-  --mdc-snackbar-container-color: var(--mat-sys-error);
-  --mdc-snackbar-supporting-text-color: var(--mat-sys-on-error);
+  --mat-snackbar-container-color: var(--mat-sys-error);
+  --mat-snackbar-supporting-text-color: var(--mat-sys-on-error);
   --mat-snack-bar-button-color: var(--mat-sys-on-error);
 }
 .mat-snack-success {
-  --mdc-snackbar-container-color: var(--mat-sys-primary);
-  --mdc-snackbar-supporting-text-color: var(--mat-sys-on-primary);
+  --mat-snackbar-container-color: var(--mat-sys-primary);
+  --mat-snackbar-supporting-text-color: var(--mat-sys-on-primary);
   --mat-snack-bar-button-color: var(--mat-sys-on-primary);
 }
