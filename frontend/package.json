@@ -29,17 +29,17 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^19.0.0",
+    "@angular/animations": "^20.3.25",
     "@angular/cdk": "^19.2.18",
-    "@angular/common": "^19.0.0",
-    "@angular/compiler": "^19.0.0",
-    "@angular/core": "^19.0.0",
-    "@angular/forms": "^19.2.15",
+    "@angular/common": "^20.3.25",
+    "@angular/compiler": "^20.3.25",
+    "@angular/core": "^20.3.25",
+    "@angular/forms": "^20.3.25",
     "@angular/material": "^19.2.19",
-    "@angular/platform-browser": "^19.0.0",
-    "@angular/platform-browser-dynamic": "^19.2.15",
-    "@angular/router": "^19.2.15",
-    "@angular/service-worker": "^19.2.15",
+    "@angular/platform-browser": "^20.3.25",
+    "@angular/platform-browser-dynamic": "^20.3.25",
+    "@angular/router": "^20.3.25",
+    "@angular/service-worker": "^20.3.25",
     "@bwip-js/browser": "^4.7.0",
     "@ericblade/quagga2": "^1.8.4",
     "@ngrx/effects": "^19.2.1",
@@ -55,9 +55,9 @@
     "zone.js": "^0.15.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^19.2.19",
-    "@angular/cli": "^19.2.19",
-    "@angular/compiler-cli": "^19.2.15",
+    "@angular/build": "^20.3.30",
+    "@angular/cli": "^20.3.30",
+    "@angular/compiler-cli": "^20.3.25",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.4.0",
     "karma": "~6.4.0",
@@ -66,6 +66,6 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "prettier": "^3.6.2",
-    "typescript": "~5.6.2"
+    "typescript": "~5.9.3"
   }
 }
