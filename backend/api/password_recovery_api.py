@@ -88,7 +88,7 @@ async def password(
         select(PasswordRecoveryCodeModel)
         .where(
             PasswordRecoveryCodeModel.code == body.code,
-            PasswordRecoveryCodeModel.revoked == False,
+            PasswordRecoveryCodeModel.revoked.is_(False),
             PasswordRecoveryCodeModel.expires_at > now(),
         )
         .options(selectinload(PasswordRecoveryCodeModel.user))

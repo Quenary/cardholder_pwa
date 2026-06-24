@@ -15,12 +15,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install frontend dependencies
         run: npm ci
@@ -32,18 +32,25 @@ jobs:
     name: Run Backend Tests
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./backend
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        id: python
+        uses: actions/setup-python@v6
         with:
-          python-version: 3.11
+          python-version: 3.13
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: 3.13
+          activate-environment: true
+
+      - name: Install dependencies
+        run: uv sync --locked
+        shell: bash
 
       - name: Install backend dependencies
         run: |
@@ -51,4 +58,12 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run pytest
-        run: pytest
+        run: uv run pytest
+
+      - name: Run lint
+        if: always()
+        run: uv run ruff check backend
+
+      - name: Run typechecks
+        if: always()
+        run: uv run mypy backend

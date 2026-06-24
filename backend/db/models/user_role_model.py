@@ -1,9 +1,11 @@
-from .base_model import BaseModel
+from typing import TYPE_CHECKING
+
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import TYPE_CHECKING
+
 from backend.enums.user_role_enum import EUserRole
 
+from .base_model import BaseModel
 
 if TYPE_CHECKING:
     from .user_model import UserModel
@@ -17,6 +19,4 @@ class UserRoleModel(BaseModel):
         nullable=False,
     )
 
-    users: Mapped[list["UserModel"]] = relationship(
-        "UserModel", back_populates="role"
-    )
+    users: Mapped[list["UserModel"]] = relationship("UserModel", back_populates="role")

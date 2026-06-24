@@ -1,21 +1,23 @@
+import secrets
+from datetime import datetime, timedelta
+from typing import cast
+
+import bcrypt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
-from datetime import timedelta, datetime
-from backend.helpers.now import now
-import bcrypt
-from typing import cast
-import secrets
-from backend.config import Config
+from jose import JWTError, jwt
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, or_
-from backend.db.session import get_async_session
-from backend.db.models.user_model import UserModel
+
+from backend.config import Config
 from backend.db.models.refresh_token_model import RefreshTokenModel
 from backend.db.models.settings_model import SettingModel
-from backend.schemas.auth_schema import TokenResponseSchema
-from backend.enums.user_role_enum import EUserRole
+from backend.db.models.user_model import UserModel
+from backend.db.session import get_async_session
 from backend.enums.settings_enum import ESettingKey
+from backend.enums.user_role_enum import EUserRole
+from backend.helpers.now import now
+from backend.schemas.auth_schema import TokenResponseSchema
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
@@ -33,13 +35,10 @@ def get_password_hash(password: str) -> str:
     return hashed_password.decode("utf-8")
 
 
-def create_access_token(
-    data: dict, expires_delta: timedelta | None = None
-):
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     expire = now() + (
-        expires_delta
-        or timedelta(minutes=Config.ACCESS_TOKEN_LIFETIME_MIN)
+        expires_delta or timedelta(minutes=Config.ACCESS_TOKEN_LIFETIME_MIN)
     )
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
@@ -57,9 +56,7 @@ async def create_refresh_token(
     ip: str | None = None,
 ):
     token = secrets.token_urlsafe(32)
-    expires_at = now() + timedelta(
-        minutes=Config.REFRESH_TOKEN_LIFETIME_MIN
-    )
+    expires_at = now() + timedelta(minutes=Config.REFRESH_TOKEN_LIFETIME_MIN)
     db_token = RefreshTokenModel(
         token=token,
         user_id=user_id,
@@ -73,19 +70,11 @@ async def create_refresh_token(
     return db_token
 
 
-async def authenticate_user(
-    session: AsyncSession, username: str, password: str
-):
-    stmt = (
-        select(UserModel)
-        .where(UserModel.username == username)
-        .limit(1)
-    )
+async def authenticate_user(session: AsyncSession, username: str, password: str):
+    stmt = select(UserModel).where(UserModel.username == username).limit(1)
     result = await session.execute(stmt)
     user = result.scalar_one_or_none()
-    if not user or not verify_password(
-        password, user.hashed_password
-    ):
+    if not user or not verify_password(password, user.hashed_password):
         return None
     return user
 
@@ -112,9 +101,7 @@ async def is_user(
     Returns user.
     Raise 401 on fail
     """
-    credentials_exception = HTTPException(
-        status_code=401, detail="Invalid token"
-    )
+    credentials_exception = HTTPException(status_code=401, detail="Invalid token")
     try:
         payload = jwt.decode(
             token,
@@ -125,12 +112,8 @@ async def is_user(
         if not username:
             raise credentials_exception
     except JWTError:
-        raise credentials_exception
-    stmt = (
-        select(UserModel)
-        .where(UserModel.username == username)
-        .limit(1)
-    )
+        raise credentials_exception from None
+    stmt = select(UserModel).where(UserModel.username == username).limit(1)
     result = await session.execute(stmt)
     user = result.scalar_one_or_none()
     if not user:
@@ -181,9 +164,7 @@ async def allow_registration(
     result = await session.execute(stmt)
     setting = result.scalar_one_or_none()
     if not setting or setting.value.lower() != "true":
-        raise HTTPException(
-            403, "registration feature disabled in app settings"
-        )
+        raise HTTPException(403, "registration feature disabled in app settings")
     return True
 
 

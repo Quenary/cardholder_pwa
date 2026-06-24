@@ -30,11 +30,11 @@ class Config:
     SMTP_TIMEOUT: ClassVar[int]
 
     @classmethod
-    def load(cls):
+    def load(cls) -> None:
         if not cls._loaded:
             load_dotenv()
             cls.API_PATH = os.getenv("API_PATH", "/api")
-            cls.LOG_LEVEL = os.getenv("LOG_LEVEL") or "warning"
+            cls.LOG_LEVEL = (os.getenv("LOG_LEVEL") or "info").upper()
             cls.JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY") or secrets.token_urlsafe(
                 32
             )
@@ -91,7 +91,6 @@ class Config:
             cls.SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
             cls.SMTP_TIMEOUT = int(os.getenv("SMTP_TIMEOUT", 10))
             cls._loaded = True
-            print(cls.SMTP_ENCRYPTION, cls.SMTP_SERVER, cls.SMTP_PORT)
 
 
 Config.load()

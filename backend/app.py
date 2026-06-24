@@ -1,16 +1,28 @@
+import asyncio
+import logging
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
-from backend.config import Config
+
 from backend.api import (
+    admin_router,
     auth_router,
-    user_router,
     card_router,
     password_recovery_router,
     public_router,
-    admin_router,
+    user_router,
 )
-import asyncio
+from backend.config import Config
 from backend.db.cleanup import cleanup
-from contextlib import asynccontextmanager
+
+logging.basicConfig(
+    level=Config.LOG_LEVEL,
+    format="BACKEND - %(levelname)s - %(name)s: %(message)s",
+    force=True,
+)
+
+uvicorn_logger = logging.getLogger("uvicorn.access")
+uvicorn_logger.setLevel(Config.LOG_LEVEL)
 
 
 @asynccontextmanager

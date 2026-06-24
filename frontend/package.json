@@ -11,6 +11,9 @@
     "test": "ng test",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadless"
   },
+  "engine": {
+    "node": "^22.12.0 || ^24.0.0"
+  },
   "prettier": {
     "htmlWhitespaceSensitivity": "strict",
     "bracketSameLine": true,

@@ -1,11 +1,11 @@
-from pydantic import BaseModel, RootModel
-from typing import Union
 from datetime import datetime
+
+from pydantic import BaseModel
 
 
 class PatchSettingsRequestItemSchema(BaseModel):
     key: str
-    value: Union[bool, int, float, str]
+    value: bool | int | float | str
 
 
 class GetSettingsRequestItemSchema(PatchSettingsRequestItemSchema):

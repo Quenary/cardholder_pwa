@@ -3,7 +3,6 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate, make_msgid
-from typing import Optional
 
 from fastapi import HTTPException, status
 
@@ -21,17 +20,17 @@ class EmailSender:
     @classmethod
     def send_email(cls, to_email: str, subject: str, body: str) -> None:
         if Config.SMTP_DISABLED:
-            msg = "SMTP is disabled in environment variables, but the application tried to send email."
-            cls._LOGGER.error(msg)
+            message = "SMTP is disabled in environment variables, but the application tried to send email."
+            cls._LOGGER.error(message)
             raise HTTPException(
                 status.HTTP_403_FORBIDDEN,
-                detail="SMTP is disabled in environment variables",
+                detail=message,
             )
 
         if not cls.status():
-            msg = "SMTP configuration is incomplete. You need to set at least 'SMTP_SERVER', 'SMTP_PORT', 'SMTP_FROM_EMAIL' environment variables."
-            cls._LOGGER.error(msg)
-            raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=msg)
+            message = "SMTP configuration is incomplete. You need to set at least 'SMTP_SERVER', 'SMTP_PORT', 'SMTP_FROM_EMAIL' environment variables."
+            cls._LOGGER.error(message)
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=message)
 
         msg = MIMEMultipart()
         msg["From"] = Config.SMTP_FROM_EMAIL
@@ -44,6 +43,7 @@ class EmailSender:
         msg.attach(MIMEText(body, "plain", "utf-8"))
 
         try:
+            server_context: smtplib.SMTP_SSL | smtplib.SMTP
             if Config.SMTP_ENCRYPTION == "TLS":
                 server_context = smtplib.SMTP_SSL(
                     Config.SMTP_SERVER, Config.SMTP_PORT, timeout=Config.SMTP_TIMEOUT
@@ -69,7 +69,7 @@ class EmailSender:
 
     @classmethod
     def send_password_reset_email(
-        cls, to_email: str, code: str, reset_url: Optional[str] = None
+        cls, to_email: str, code: str, reset_url: str | None = None
     ) -> None:
         """Send password reset email to user"""
 

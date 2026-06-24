@@ -1,16 +1,16 @@
-from pydantic import BaseModel, field_validator, ConfigDict
-from typing import Optional
-from datetime import datetime, timezone
 import re
+from datetime import UTC, datetime
+
+from pydantic import BaseModel, ConfigDict, field_validator
 
 
 class CardBaseSchema(BaseModel):
     code: str
     code_type: str
     name: str
-    description: Optional[str] = None
-    color: Optional[str] = None
-    is_favorite: Optional[bool] = None
+    description: str | None = None
+    color: str | None = None
+    is_favorite: bool | None = None
 
     @field_validator("color")
     @classmethod
@@ -31,13 +31,13 @@ class CardUpdateSchema(CardBaseSchema):
 
 
 class CardPatchSchema(BaseModel):
-    code: Optional[str] = None
-    code_type: Optional[str] = None
-    name: Optional[str] = None
-    description: Optional[str] = None
-    color: Optional[str] = None
-    is_favorite: Optional[bool] = None
-    used_at: Optional[datetime] = None
+    code: str | None = None
+    code_type: str | None = None
+    name: str | None = None
+    description: str | None = None
+    color: str | None = None
+    is_favorite: bool | None = None
+    used_at: datetime | None = None
 
     @field_validator("used_at")
     @classmethod
@@ -45,7 +45,7 @@ class CardPatchSchema(BaseModel):
         if not v:
             return v
         if v.tzinfo:
-            return v.astimezone(timezone.utc).replace(tzinfo=None)
+            return v.astimezone(UTC).replace(tzinfo=None)
         return v
 
     @field_validator("color")
@@ -60,7 +60,7 @@ class CardPatchSchema(BaseModel):
 
 class CardSchema(CardBaseSchema):
     id: int
-    used_at: Optional[datetime]
+    used_at: datetime | None
     created_at: datetime
     updated_at: datetime
     model_config = ConfigDict(from_attributes=True)

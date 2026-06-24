@@ -1,16 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from backend.schemas.card_schema import (
-    CardSchema,
-    CardCreateSchema,
-    CardUpdateSchema,
-    CardPatchSchema,
-)
-from backend.db.models.user_model import UserModel
-from backend.db.models.card_model import CardModel
-from backend.db.session import get_async_session
-from backend.core.auth_core import is_user
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from backend.core.auth_core import is_user
+from backend.db.models.card_model import CardModel
+from backend.db.models.user_model import UserModel
+from backend.db.session import get_async_session
+from backend.schemas.card_schema import (
+    CardCreateSchema,
+    CardPatchSchema,
+    CardSchema,
+    CardUpdateSchema,
+)
 
 router = APIRouter(tags=["card"])
 

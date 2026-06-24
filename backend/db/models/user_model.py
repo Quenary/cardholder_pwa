@@ -1,25 +1,29 @@
-from .base_model import BaseModel
+from datetime import datetime
+from typing import TYPE_CHECKING
+
 from sqlalchemy import (
+    DateTime,
     ForeignKey,
     Integer,
     String,
-    DateTime,
     text,
+)
+from sqlalchemy import (
     Enum as SQLEnum,
 )
-from sqlalchemy.orm import relationship, mapped_column, Mapped
-from datetime import datetime
-from typing import TYPE_CHECKING
-from backend.helpers.now import now
-from backend.enums.user_role_enum import EUserRole
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from backend.enums.user_role_enum import EUserRole
+from backend.helpers.now import now
+
+from .base_model import BaseModel
 
 if TYPE_CHECKING:
     from .card_model import CardModel
-    from .refresh_token_model import RefreshTokenModel
     from .password_recovery_code_model import (
         PasswordRecoveryCodeModel,
     )
+    from .refresh_token_model import RefreshTokenModel
     from .user_role_model import UserRoleModel
 
 
@@ -31,12 +35,8 @@ class UserModel(BaseModel):
     username: Mapped[str] = mapped_column(
         String, unique=True, index=True, nullable=False
     )
-    email: Mapped[str] = mapped_column(
-        String, unique=True, index=True, nullable=False
-    )
-    hashed_password: Mapped[str] = mapped_column(
-        String, nullable=False
-    )
+    email: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         server_default=text("CURRENT_TIMESTAMP"),
@@ -59,15 +59,11 @@ class UserModel(BaseModel):
         nullable=False,
     )
 
-    cards: Mapped[list["CardModel"]] = relationship(
-        "CardModel", back_populates="user"
-    )
+    cards: Mapped[list["CardModel"]] = relationship("CardModel", back_populates="user")
     refresh_tokens: Mapped[list["RefreshTokenModel"]] = relationship(
         "RefreshTokenModel", back_populates="user"
     )
-    password_recovery_codes: Mapped[
-        list["PasswordRecoveryCodeModel"]
-    ] = relationship(
+    password_recovery_codes: Mapped[list["PasswordRecoveryCodeModel"]] = relationship(
         "PasswordRecoveryCodeModel", back_populates="user"
     )
     role: Mapped["UserRoleModel"] = relationship(
