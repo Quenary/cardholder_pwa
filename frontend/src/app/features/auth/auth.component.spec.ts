@@ -45,8 +45,8 @@ describe('AuthComponent', () => {
       username: 'somelogin',
       password: 'somepassword',
     };
-    component.form.patchValue(formData);
-    component.onSubmit();
+    component['form'].patchValue(formData);
+    component['onSubmit']();
     expect(dispatchSpy).toHaveBeenCalledTimes(1);
     expect(dispatchSpy).toHaveBeenCalledWith(
       AuthActions.token({

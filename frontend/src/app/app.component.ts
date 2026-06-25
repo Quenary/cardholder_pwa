@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import {
   MatSidenavContainer,
@@ -55,17 +49,14 @@ interface INavItem {
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
   private readonly store = inject(Store);
   private readonly translateService = inject(TranslateService);
 
-  public readonly isOffline = this.store.selectSignal(selectAppIsOffline);
+  protected readonly isOffline = this.store.selectSignal(selectAppIsOffline);
 
-  private readonly isAdmin = this.store.selectSignal(selectUserIsAdmin);
-  private readonly navTranslations = toSignal(this.translateService.getStreamOnTranslationChange('NAV'));
-  public readonly links = computed<INavItem[]>(() => {
+  protected readonly links = computed<INavItem[]>(() => {
     const isAdmin = this.isAdmin();
     const navTranslations = this.navTranslations();
     return [
@@ -105,11 +96,16 @@ export class AppComponent {
   /**
    * Whether to show authorized content (navigation, header, e.g.)
    */
-  public readonly isAuthorized = this.store.selectSignal(
+  protected readonly isAuthorized = this.store.selectSignal(
     selectAuthIsAuthorized,
   );
   /**
    * Side nav opened flag
    */
-  public readonly sidenavOpened = signal(false);
+  protected readonly sidenavOpened = signal(false);
+
+  private readonly isAdmin = this.store.selectSignal(selectUserIsAdmin);
+  private readonly navTranslations = toSignal(
+    this.translateService.getStreamOnTranslationChange('NAV'),
+  );
 }

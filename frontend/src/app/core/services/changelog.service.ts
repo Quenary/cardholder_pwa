@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { inject, Injectable, SecurityContext } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { marked } from 'marked';
 import {
   catchError,
@@ -38,7 +38,7 @@ export class ChangelogService {
       }),
     ),
     switchMap((changelog) => from(marked(changelog, { async: true }))),
-    map((res) => this.domSanitizer.bypassSecurityTrustHtml(res)),
+    map((res) => this.domSanitizer.sanitize(SecurityContext.HTML, res)),
     retry({ count: 1, delay: 1000 }),
     catchError((error) => {
       this.snackService.error(error);
@@ -47,7 +47,7 @@ export class ChangelogService {
     shareReplay(1),
   );
 
-  getChangelogHtml(): Observable<SafeHtml> {
+  getChangelogHtml(): Observable<string> {
     return this.changelogHtml$;
   }
 
@@ -58,7 +58,7 @@ export class ChangelogService {
    */
   getChangelogHtmlByVersion(
     versionPredicate: (v: string) => boolean,
-  ): Observable<SafeHtml> {
+  ): Observable<string> {
     return this.changelogHtml$.pipe(
       map((res) => this.filterChangelogHtml(res, versionPredicate)),
     );
@@ -70,12 +70,12 @@ export class ChangelogService {
    * @param versionPredicate
    * @returns
    */
-  public filterChangelogHtml(
-    html: SafeHtml,
+  filterChangelogHtml(
+    html: string,
     versionPredicate: (v: string) => boolean,
   ): string {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(html as string, 'text/html');
+    const doc = parser.parseFromString(html, 'text/html');
 
     const container = document.createElement('div');
     const body = doc.body;

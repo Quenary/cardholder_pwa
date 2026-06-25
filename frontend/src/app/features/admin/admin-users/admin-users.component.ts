@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -19,7 +14,6 @@ import type { IAdminUserDialogData } from '../admin-user-dialog/admin-user-dialo
   imports: [MatTableModule, TranslatePipe, MatIconButton, MatIcon],
   templateUrl: './admin-users.component.html',
   styleUrl: './admin-users.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminUsersComponent {
   private readonly adminApiService = inject(AdminApiService);
@@ -27,10 +21,10 @@ export class AdminUsersComponent {
   private readonly matDialog = inject(MatDialog);
   private readonly translateService = inject(TranslateService);
 
-  public readonly rolesTranslates =
+  protected readonly rolesTranslations =
     this.translateService.instant('ADMIN.USERS.ROLES');
-  public readonly displayedColumns = ['username', 'role_code', 'open_user'];
-  public readonly users = signal<IUser[]>([]);
+  protected readonly displayedColumns = ['username', 'role_code', 'open_user'];
+  protected readonly users = signal<IUser[]>([]);
 
   ngOnInit(): void {
     this.getUsers();
@@ -47,7 +41,7 @@ export class AdminUsersComponent {
     });
   }
 
-  public openUserDialog(user: IUser): void {
+  protected openUserDialog(user: IUser): void {
     import('../admin-user-dialog/admin-user-dialog.component').then((c) => {
       this.matDialog
         .open(c.AdminUserDialogComponent, {

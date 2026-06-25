@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -37,7 +32,6 @@ import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
   ],
   templateUrl: './password-recovery-request.component.html',
   styleUrl: './password-recovery-request.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PasswordRecoveryRequestComponent {
   private readonly passwordRecoveryApiService = inject(
@@ -47,17 +41,17 @@ export class PasswordRecoveryRequestComponent {
   private readonly router = inject(Router);
   private readonly snackService = inject(SnackService);
 
-  public readonly isLoading = signal(false);
-  public readonly form = new FormGroup<TInterfaceToForm<IPasswordRecoveryCode>>(
-    {
-      email: new FormControl<string>(null, [
-        Validators.required,
-        Validators.email,
-      ]),
-    },
-  );
+  protected readonly isLoading = signal(false);
+  protected readonly form = new FormGroup<
+    TInterfaceToForm<IPasswordRecoveryCode>
+  >({
+    email: new FormControl<string>(null, [
+      Validators.required,
+      Validators.email,
+    ]),
+  });
 
-  onSubmit(): void {
+  protected onSubmit(): void {
     if (this.form.invalid) {
       return;
     }

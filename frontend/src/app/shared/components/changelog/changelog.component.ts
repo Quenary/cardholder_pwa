@@ -1,11 +1,4 @@
-import {
-  Component,
-  computed,
-  inject,
-  Input,
-  signal,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import {
@@ -31,39 +24,34 @@ export interface IChangelogDialogComponentData {
 
 @Component({
   selector: 'app-changelog',
-  imports: [],
   templateUrl: './changelog.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './changelog.component.scss',
 })
 export class ChangelogComponent {
   protected readonly changelogService = inject(ChangelogService);
 
-  @Input() set versionPredicate(value: (version: string) => boolean) {
-    this._versionPredicate.set(value);
-  }
-  protected readonly _versionPredicate =
+  protected readonly versionPredicate =
     signal<(version: string) => boolean>(null);
-  protected readonly _changelog = toSignal(
+  protected readonly changelog = toSignal(
     this.changelogService.getChangelogHtml(),
   );
-  public readonly changelog = computed(() => {
-    const _versionPredicate = this._versionPredicate();
-    const _changelog = this._changelog();
-    if (_versionPredicate) {
+  protected readonly filteredChangelog = computed(() => {
+    const versionPredicate = this.versionPredicate();
+    const changelog = this.changelog();
+
+    if (versionPredicate) {
       return this.changelogService.filterChangelogHtml(
-        _changelog,
-        _versionPredicate,
+        changelog,
+        versionPredicate,
       );
     }
-    return _changelog;
+    return changelog;
   });
 }
 
 @Component({
   selector: 'app-changelog-dialog',
   imports: [MatDialogModule, TranslatePipe, MatButton],
-  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
   <h1 mat-dialog-title>{{'ABOUT.CHANGELOG' | translate}}</h1>
   <mat-dialog-content>
@@ -78,20 +66,17 @@ export class ChangelogComponent {
   </mat-dialog-actions>
   `,
 })
-export class ChangelogDialogComponent
-  extends ChangelogComponent
-  implements IChangelogDialogComponentData
-{
+export class ChangelogDialogComponent extends ChangelogComponent {
   private readonly matDialogRef = inject(MatDialogRef);
   private readonly data: IChangelogDialogComponentData =
     inject(MAT_DIALOG_DATA);
 
   constructor() {
     super();
-    this._versionPredicate.set(this.data.versionPredicate);
+    this.versionPredicate.set(this.data.versionPredicate);
   }
 
-  public close(): void {
+  protected close(): void {
     this.matDialogRef.close();
   }
 }

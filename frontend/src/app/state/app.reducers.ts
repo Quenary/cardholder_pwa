@@ -43,12 +43,8 @@ export const appReducer = createReducer(
     ...state,
     version: null,
   })),
-  on(AppActions.networkOnline, (state, payload) => ({
+  on(AppActions.setNetworkStatus, (state, { isOnline }) => ({
     ...state,
-    isOnline: true,
-  })),
-  on(AppActions.networkOffline, (state, payload) => ({
-    ...state,
-    isOnline: false,
+    isOnline,
   })),
 );

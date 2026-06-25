@@ -122,7 +122,7 @@ describe('CardScannerComponent', () => {
     component = fixture.componentInstance;
     fixture.autoDetectChanges();
     await fixture.whenStable();
-    expect(component.selectedDevice()).toEqual(testMediaDevices[2]);
+    expect(component['selectedDevice']()).toEqual(testMediaDevices[2]);
   });
 
   it('should display scanner if permission granted', async () => {

@@ -1,4 +1,4 @@
-import { Premitive } from './premitive';
+import { PrimitiveStringType } from './premitive';
 
 /**
  * App sorting namespace
@@ -29,10 +29,10 @@ export namespace Sorting {
    * @param type type of key
    * @returns
    */
-  export const sortBy = <T extends unknown, K extends keyof T>(
+  export const sortBy = <T extends object, K extends keyof T>(
     items: T[],
     model: Model<T, K>,
-    type: Premitive,
+    type: PrimitiveStringType,
   ): T[] => {
     try {
       let comperator: (a: any, b: any) => number;

@@ -7,7 +7,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
   name: 'naiveDate',
   pure: true,
-  standalone: true,
 })
 export class NaiveDatePipe implements PipeTransform {
   transform(value: string): string {

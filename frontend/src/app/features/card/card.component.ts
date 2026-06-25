@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
@@ -76,7 +75,6 @@ import { IsOldCodeType } from 'src/app/shared/pipes/is-old-code-type.pipe';
   ],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardComponent implements OnInit, OnDestroy {
   private readonly store = inject(Store);
@@ -84,21 +82,28 @@ export class CardComponent implements OnInit, OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
   private readonly matDialog = inject(MatDialog);
 
-  public readonly card = this.store.selectSignal(selectCardsActiveInfo);
-  public readonly isLoading = this.store.selectSignal(selectCardsIsLoading);
-  public readonly canDelete = this.store.selectSignal(
+  protected readonly card = this.store.selectSignal(selectCardsActiveInfo);
+  protected readonly isLoading = this.store.selectSignal(selectCardsIsLoading);
+  protected readonly canDelete = this.store.selectSignal(
     selectCardsActiveCanDelete,
   );
-  public readonly hasChanges = this.store.selectSignal(
+  protected readonly hasChanges = this.store.selectSignal(
     selectCardsActiveHasChanges,
   );
-
-  public readonly form = new FormGroup<TInterfaceToForm<ICardBase>>({
+  protected readonly form = new FormGroup<TInterfaceToForm<ICardBase>>({
     code: new FormControl<string>(null, [Validators.required]),
     code_type: new FormControl<string>(null, [Validators.required]),
     name: new FormControl<string>(null, [Validators.required]),
     description: new FormControl<string>(null),
     color: new FormControl<string>(null, [Validators.pattern(ERegexp.color)]),
+  });
+  protected readonly codeTypeAutocompleteList = computed(() => {
+    let codeType = this.codeType();
+    if (!codeType) {
+      return this._codeTypeAutocompleteList;
+    }
+    codeType = codeType.toLowerCase();
+    return this._codeTypeAutocompleteList.filter((c) => c.includes(codeType));
   });
 
   private readonly _codeTypeAutocompleteList: string[] =
@@ -107,14 +112,6 @@ export class CardComponent implements OnInit, OnDestroy {
     this.form.controls.code_type.valueChanges,
     { initialValue: null },
   );
-  public readonly codeTypeAutocompleteList = computed(() => {
-    let codeType = this.codeType();
-    if (!codeType) {
-      return this._codeTypeAutocompleteList;
-    }
-    codeType = codeType.toLowerCase();
-    return this._codeTypeAutocompleteList.filter((c) => c.includes(codeType));
-  });
 
   ngOnInit(): void {
     this.activatedRoute.params
@@ -147,18 +144,18 @@ export class CardComponent implements OnInit, OnDestroy {
     this.store.dispatch(CardsActions.exitCard());
   }
 
-  public onSubmit(): void {
+  protected onSubmit(): void {
     if (this.form.invalid) {
       return;
     }
     this.store.dispatch(CardsActions.saveCard());
   }
 
-  public onDelete(): void {
+  protected onDelete(): void {
     this.store.dispatch(CardsActions.deleteAttempt());
   }
 
-  public scanCode() {
+  protected scanCode() {
     import('../card-scanner/card-scanner.component').then((c) => {
       this.matDialog
         .open(c.CardScannerComponent, {

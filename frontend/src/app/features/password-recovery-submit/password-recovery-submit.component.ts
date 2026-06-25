@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -46,7 +40,6 @@ import { passwordMatchValidator } from 'src/app/shared/validators/passwords-matc
   ],
   templateUrl: './password-recovery-submit.component.html',
   styleUrl: './password-recovery-submit.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PasswordRecoverySubmitComponent implements OnInit {
   private readonly passwordRecoveryApiService = inject(
@@ -57,11 +50,10 @@ export class PasswordRecoverySubmitComponent implements OnInit {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly snackService = inject(SnackService);
 
-  public readonly isLoading = signal(false);
-  public readonly hidePassword = signal(true);
-  public readonly hideConfirmPassword = signal(true);
-
-  public readonly form = new FormGroup<
+  protected readonly isLoading = signal(false);
+  protected readonly hidePassword = signal(true);
+  protected readonly hideConfirmPassword = signal(true);
+  protected readonly form = new FormGroup<
     TInterfaceToForm<IPasswordRecoverySubmit>
   >(
     {
@@ -88,7 +80,7 @@ export class PasswordRecoverySubmitComponent implements OnInit {
     });
   }
 
-  onSubmit(): void {
+  protected onSubmit(): void {
     if (this.form.invalid) {
       return;
     }

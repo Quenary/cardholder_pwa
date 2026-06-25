@@ -1,15 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-} from '@angular/core';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
-import { map } from 'rxjs';
 import {
   MatAutocomplete,
   MatOption,
@@ -72,51 +64,29 @@ import { MatBadgeModule } from '@angular/material/badge';
   ],
   templateUrl: './cards.component.html',
   styleUrl: './cards.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardsComponent {
   private readonly store = inject(Store);
-  private readonly router = inject(Router);
   private readonly matDialog = inject(MatDialog);
 
-  public readonly showParent = toSignal(
-    this.router.events.pipe(map(() => this.router.url === '/cards')),
-    { initialValue: this.router.url === '/cards' },
-  );
-  public readonly cardsPlaceholder = Array(6).fill(null);
-  public readonly isLoading = this.store.selectSignal(selectCardsIsLoading);
+  protected readonly showParent = signal<boolean>(true);
+  protected readonly cardsPlaceholder: number[] = Array(6).fill(Math.random());
+  protected readonly isLoading = this.store.selectSignal(selectCardsIsLoading);
   /**
    * Form control for search field
    */
-  public readonly searchControl = new FormControl<string>(null);
-
+  protected readonly searchControl = new FormControl<string>(null);
   /**
-   * All cards
+   * Count of active filters
    */
-  private readonly _cards = this.store.selectSignal(selectCardsList);
-  private readonly _sorting = signal<Sorting.Model<ICard, keyof ICard>>(
-    localStorage.getItemJson(ELocalStorageKey.CARD_SORTING) ?? {
-      key: 'name',
-      direction: 'asc',
-    },
-  );
-  private readonly _filters = signal<Filter.Model<ICard, keyof ICard>[]>(
-    localStorage.getItemJson(ELocalStorageKey.CARD_FILTERS),
-  );
-  public readonly filtersCount = computed(() => {
+  protected readonly filtersCount = computed(() => {
     const filters = this._filters();
     return filters?.length ?? 0;
   });
   /**
-   * Search signal
-   */
-  private readonly _search = toSignal(this.searchControl.valueChanges, {
-    initialValue: null,
-  });
-  /**
    * Filtered cards
    */
-  public readonly cards = computed(() => {
+  protected readonly cards = computed(() => {
     let cards = this._cards();
     let search = this._search();
     const sorting = this._sorting();
@@ -137,9 +107,29 @@ export class CardsComponent {
   /**
    * Filtered autocomplete list
    */
-  public readonly autocompleteOptions = computed(() =>
+  protected readonly autocompleteOptions = computed(() =>
     this.cards().map((item) => item.name),
   );
+
+  /**
+   * All cards
+   */
+  private readonly _cards = this.store.selectSignal(selectCardsList);
+  private readonly _sorting = signal<Sorting.Model<ICard, keyof ICard>>(
+    localStorage.getItemJson(ELocalStorageKey.CARD_SORTING) ?? {
+      key: 'name',
+      direction: 'asc',
+    },
+  );
+  private readonly _filters = signal<Filter.Model<ICard, keyof ICard>[]>(
+    localStorage.getItemJson(ELocalStorageKey.CARD_FILTERS),
+  );
+  /**
+   * Search signal
+   */
+  private readonly _search = toSignal(this.searchControl.valueChanges, {
+    initialValue: null,
+  });
 
   constructor() {
     effect(() => {
@@ -150,7 +140,7 @@ export class CardsComponent {
     });
   }
 
-  public toggleFavorite(card: ICard): void {
+  protected toggleFavorite(card: ICard): void {
     const is_favorite = !card.is_favorite;
     this.store.dispatch(
       CardsActions.patchListItem({
@@ -162,7 +152,7 @@ export class CardsComponent {
     );
   }
 
-  public updateUsedDate(card: ICard): void {
+  protected updateUsedDate(card: ICard): void {
     const used_at = new Date().toJSON();
     this.store.dispatch(
       CardsActions.patchListItem({
@@ -174,7 +164,7 @@ export class CardsComponent {
     );
   }
 
-  public openSortFilterDialog(): void {
+  protected openSortFilterDialog(): void {
     const data: ISortFilterDialogData<ICard> = {
       sorting: {
         options: [

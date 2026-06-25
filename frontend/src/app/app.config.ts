@@ -17,7 +17,6 @@ import {
   withXhr,
 } from '@angular/common/http';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { authReducer } from './entities/auth/state/auth.reducers';
 import { AuthEffects } from './entities/auth/state/auth.effects';
 import { authInitializer } from './core/app-initializers/auth-initializer';
@@ -26,7 +25,6 @@ import { getTokenInterceptor } from './core/interceptors/token.interceptor';
 import { provideServiceWorker } from '@angular/service-worker';
 import { appReducer } from './state/app.reducers';
 import { AppEffects } from './state/app.effects';
-import { NetworkService } from './core/services/network.service';
 import { UpdateService } from './core/services/update.service';
 import { userReducer } from './entities/user/state/user.reducers';
 import { UserEffects } from './entities/user/state/user.effects';
@@ -53,7 +51,7 @@ export const appConfig: ApplicationConfig = {
         suffix: '.json',
       }),
       fallbackLang: 'en',
-      lang: navigator.language,
+      lang: navigator.language.split('-').at(0) || 'en',
     }),
     {
       provide: LOCALE_ID,
@@ -67,14 +65,9 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => authInitializer()),
     provideAppInitializer(() => userInitializer()),
     provideAppInitializer(() => {
-      const networkService = inject(NetworkService);
-      return networkService.init();
-    }),
-    provideAppInitializer(() => {
       const updateService = inject(UpdateService);
       return updateService.init();
     }),
-    provideAnimationsAsync(),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',

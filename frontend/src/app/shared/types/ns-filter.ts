@@ -1,4 +1,4 @@
-import { Premitive } from './premitive';
+import { PrimitiveStringType } from './premitive';
 import { TypeToString } from './type-to-string';
 
 /**
@@ -46,7 +46,7 @@ export namespace Filter {
   export const filterBy = <T extends unknown, K extends keyof T>(
     items: T[],
     model: Model<T, K>,
-    type: Premitive,
+    type: PrimitiveStringType,
   ): T[] => {
     try {
       switch (model.criteria) {

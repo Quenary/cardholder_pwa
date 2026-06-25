@@ -80,7 +80,7 @@ describe('ConfirmDialogComponent', () => {
     expect(
       template.querySelector('mat-dialog-actions>button:last-child:disabled'),
     ).toBeTruthy();
-    component.confirmCheckbox.set(true);
+    component['confirmCheckbox'].set(true);
     fixture.detectChanges();
     expect(
       template.querySelector('mat-dialog-actions>button:last-child:disabled'),

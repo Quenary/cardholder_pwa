@@ -1,16 +1,12 @@
 import {
-  ChangeDetectionStrategy,
   Component,
+  effect,
   ElementRef,
-  EventEmitter,
   inject,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
+  model,
+  output,
   signal,
-  SimpleChanges,
-  ViewChild,
+  viewChild,
 } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import {
@@ -46,31 +42,32 @@ export interface ICardCodeViewerData {
   color: string;
 }
 
+/**
+ * Barcode drawing component
+ */
 @Component({
   selector: 'app-card-code-viewer',
-  standalone: true,
   templateUrl: './card-code-viewer.component.html',
   styleUrl: './card-code-viewer.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CardCodeViewerComponent
-  implements OnInit, OnChanges, ICardCodeViewerData
-{
+export class CardCodeViewerComponent {
   protected readonly matDialog = inject(MatDialog);
 
-  @Input() card: Partial<ICardBase> = null;
-  @Input() scale: number = 3;
-  @Input('color') set _color(value: string) {
-    if (value) {
-      this.color = value;
-    }
-  }
-  color: string = this.getCssVariableValue('--mat-sys-on-surface');
   /**
-   * Barcode canvas element ref
+   * Card info
    */
-  @ViewChild('canvas', { read: ElementRef<HTMLCanvasElement>, static: true })
-  private readonly canvasRef: ElementRef<HTMLCanvasElement>;
+  public readonly card = model<Partial<ICardBase> | null>(null);
+  /**
+   * Code scale
+   * @default 3
+   */
+  public readonly scale = model<number>(3);
+  /**
+   * Background color
+   */
+  public readonly color = model<string>(
+    this.getCssVariableValue('--mat-sys-on-surface'),
+  );
   /**
    * Event on new code type.
    * @description
@@ -78,18 +75,28 @@ export class CardCodeViewerComponent
    * @deprecated
    * Remove it somewhere in the future.
    */
-  @Output() readonly OnNewType = new EventEmitter<string>();
+  public readonly OnNewType = output<string>();
 
-  ngOnInit(): void {
-    if (this.card) {
-      this.tryDrawCode(this.card.code, this.card.code_type, this.color);
-    }
-  }
+  /**
+   * Barcode canvas element ref
+   */
+  protected readonly canvasRef = viewChild.required<
+    unknown,
+    ElementRef<HTMLCanvasElement>
+  >('canvas', { read: ElementRef });
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.card) {
-      this.tryDrawCode(this.card.code, this.card.code_type, this.color);
-    }
+  constructor() {
+    effect(() => {
+      const card = this.card();
+      const scale = this.scale() || 3;
+      const color =
+        this.color() || this.getCssVariableValue('--mat-sys-on-surface');
+      const canvas = this.canvasRef()?.nativeElement;
+
+      if (card && canvas) {
+        this.tryDrawCode(canvas, card.code, card.code_type, color, scale);
+      }
+    });
   }
 
   protected getCssVariableValue(variable: string): string {
@@ -98,17 +105,22 @@ export class CardCodeViewerComponent
     );
   }
 
-  protected tryDrawCode(text: string, format: string, color: string): void {
-    if (format in ZxingToBwipMap) {
-      format = ZxingToBwipMap[format];
-      this.OnNewType.emit(format);
+  protected tryDrawCode(
+    canvas: HTMLCanvasElement,
+    code: string,
+    codeType: string,
+    color: string,
+    scale: number,
+  ): void {
+    if (codeType in ZxingToBwipMap) {
+      codeType = ZxingToBwipMap[codeType];
+      this.OnNewType.emit(codeType);
     }
-    const canvas = this.canvasRef.nativeElement;
     try {
       Bwip.toCanvas(canvas, {
-        bcid: format,
-        text,
-        scale: 3,
+        bcid: codeType,
+        text: code,
+        scale,
         includetext: true,
         textcolor: color,
         barcolor: color,
@@ -120,7 +132,7 @@ export class CardCodeViewerComponent
     }
   }
 
-  public viewInDialog(): MatDialogRef<
+  protected viewInDialog(): MatDialogRef<
     CardCodeViewerDialogComponent,
     ICardCodeViewerData
   > {
@@ -128,8 +140,8 @@ export class CardCodeViewerComponent
       width: 'calc(100% - 50px)',
       height: 'calc(100% - 50px)',
       data: <ICardCodeViewerData>{
-        card: this.card,
-        scale: this.scale * 2,
+        card: this.card(),
+        scale: this.scale() * 2,
       },
     });
   }
@@ -137,7 +149,6 @@ export class CardCodeViewerComponent
 
 @Component({
   selector: 'app-card-code-viewer-dialog',
-  standalone: true,
   imports: [
     MatButton,
     MatIcon,
@@ -147,7 +158,7 @@ export class CardCodeViewerComponent
     TranslatePipe,
   ],
   template: `
-    <h2 mat-dialog-title>{{ card.name }}</h2>
+    <h2 mat-dialog-title>{{ card()?.name }}</h2>
     <mat-dialog-content
       class="mat-dialog-content"
       [class.invert]="invert()">
@@ -156,8 +167,8 @@ export class CardCodeViewerComponent
         #canvas
         (click)="toggleInvert()">
       </canvas>
-      @if (card.description) {
-        <pre class="desc" [innerHTML]="card.description"></pre>
+      @if (card()?.description; as d) {
+        <pre class="desc" [innerHTML]="d"></pre>
       }
     </mat-dialog-content>
     <mat-dialog-actions class="mat-dialog-actions">
@@ -200,28 +211,29 @@ export class CardCodeViewerComponent
     }
   }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardCodeViewerDialogComponent extends CardCodeViewerComponent {
   private readonly matDialogRef = inject(MatDialogRef);
   private readonly data: ICardCodeViewerData = inject(MAT_DIALOG_DATA);
 
-  public readonly invert = signal<boolean>(
+  protected readonly invert = signal<boolean>(
     localStorage.getItemJson(ELocalStorageKey.CODE_COLOR_INVERSION),
   );
 
   constructor() {
     super();
-    Object.assign(this, this.data);
+    this.card.set(this.data.card);
+    this.scale.set(this.data.scale);
+    this.color.set(this.data.color);
   }
 
-  public toggleInvert(): void {
+  protected toggleInvert(): void {
     const invert = !this.invert();
     this.invert.set(invert);
     localStorage.setItemJson(ELocalStorageKey.CODE_COLOR_INVERSION, invert);
   }
 
-  public close(): void {
+  protected close(): void {
     this.matDialogRef.close();
   }
 }

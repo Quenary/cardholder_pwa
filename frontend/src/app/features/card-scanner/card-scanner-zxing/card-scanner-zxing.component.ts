@@ -1,10 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  forwardRef,
-  ViewChild,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, ElementRef, forwardRef, viewChild } from '@angular/core';
 import { CardScannerBaseComponent } from '../card-scanner-base/card-scanner-base.component';
 import { BarcodeFormat, BrowserMultiFormatReader } from '@zxing/browser';
 import type { Result } from '@zxing/library';
@@ -14,7 +8,6 @@ import { IScannerResult } from '../card-scanner-base/scanner-interface';
 
 @Component({
   selector: 'app-card-scanner-zxing',
-  imports: [],
   providers: [
     {
       provide: CardScannerBaseComponent,
@@ -22,39 +15,16 @@ import { IScannerResult } from '../card-scanner-base/scanner-interface';
       multi: true,
     },
   ],
-  standalone: true,
   templateUrl: './card-scanner-zxing.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './card-scanner-zxing.component.scss',
 })
 export class CardScannerZxingComponent extends CardScannerBaseComponent {
   private readonly reader = new BrowserMultiFormatReader();
 
-  @ViewChild('video', { static: true, read: ElementRef })
-  private readonly videoRef: ElementRef<HTMLVideoElement>;
-
-  protected override start(): Observable<IScannerResult> {
-    return new Observable((observer) => {
-      this.reader
-        .decodeFromVideoDevice(
-          this.deviceId,
-          this.videoRef.nativeElement,
-          (result, error, controls) => {
-            if (!!result) {
-              observer.next(this.prepareResult(result));
-            }
-          },
-        )
-        .then((controls) => {
-          observer.add(() => {
-            controls.stop();
-          });
-        })
-        .catch((e) => {
-          observer.error(e);
-        });
-    });
-  }
+  private readonly videoRef = viewChild.required<
+    unknown,
+    ElementRef<HTMLVideoElement>
+  >('video', { read: ElementRef });
 
   public override scanFile(file: File): Observable<IScannerResult | null> {
     if (!file) {
@@ -83,6 +53,29 @@ export class CardScannerZxingComponent extends CardScannerBaseComponent {
         observer.error(error);
       };
       reader.readAsDataURL(file);
+    });
+  }
+
+  protected override start(deviceId: string): Observable<IScannerResult> {
+    return new Observable((observer) => {
+      this.reader
+        .decodeFromVideoDevice(
+          deviceId,
+          this.videoRef().nativeElement,
+          (result, error, controls) => {
+            if (!!result) {
+              observer.next(this.prepareResult(result));
+            }
+          },
+        )
+        .then((controls) => {
+          observer.add(() => {
+            controls.stop();
+          });
+        })
+        .catch((e) => {
+          observer.error(e);
+        });
     });
   }
 

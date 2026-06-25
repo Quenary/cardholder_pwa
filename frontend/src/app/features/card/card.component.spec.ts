@@ -41,12 +41,12 @@ describe('CardComponent', () => {
     const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
-    component.form.patchValue({
+    component['form'].patchValue({
       code: '12345678',
       code_type: 'ean8',
       name: 'newcard',
     });
-    component.onSubmit();
+    component['onSubmit']();
 
     expect(dispatchSpy).toHaveBeenCalledWith(CardsActions.saveCard());
   });
@@ -57,26 +57,26 @@ describe('CardComponent', () => {
     const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
-    component.form.patchValue({
+    component['form'].patchValue({
       code: '12345678',
       code_type: null,
       name: 'newcard',
     });
-    component.onSubmit();
+    component['onSubmit']();
 
-    component.form.patchValue({
+    component['form'].patchValue({
       code: null,
       code_type: 'ean8',
       name: 'newcard',
     });
-    component.onSubmit();
+    component['onSubmit']();
 
-    component.form.patchValue({
+    component['form'].patchValue({
       code: '12345678',
       code_type: 'ean8',
       name: null,
     });
-    component.onSubmit();
+    component['onSubmit']();
 
     expect(dispatchSpy).not.toHaveBeenCalledWith(
       expect.objectContaining({ type: CardsActions.update.type }),

@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
@@ -46,7 +41,6 @@ import { SnackService } from 'src/app/core/services/snack.service';
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterComponent {
   private readonly userApiService = inject(UserApiService);
@@ -54,11 +48,10 @@ export class RegisterComponent {
   private readonly translateService = inject(TranslateService);
   private readonly snackService = inject(SnackService);
 
-  public readonly isLoading = signal(false);
-  public readonly hidePassword = signal(true);
-  public readonly hideConfirmPassword = signal(true);
-
-  public readonly form = new FormGroup<
+  protected readonly isLoading = signal(false);
+  protected readonly hidePassword = signal(true);
+  protected readonly hideConfirmPassword = signal(true);
+  protected readonly form = new FormGroup<
     TInterfaceToForm<IUserCreate & IUserUpdate>
   >(
     {
@@ -82,7 +75,7 @@ export class RegisterComponent {
     [passwordMatchValidator()],
   );
 
-  onSubmit(): void {
+  protected onSubmit(): void {
     if (this.form.invalid) {
       return;
     }

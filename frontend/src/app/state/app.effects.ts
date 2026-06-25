@@ -5,7 +5,9 @@ import {
   catchError,
   first,
   from,
+  fromEvent,
   map,
+  merge,
   of,
   switchMap,
   tap,
@@ -36,7 +38,7 @@ export class AppEffects {
   private readonly publicApiService = inject(PublicApiService);
   private readonly snackService = inject(SnackService);
 
-  init$ = createEffect(
+  readonly init$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(AppActions.init),
@@ -86,7 +88,19 @@ export class AppEffects {
     { dispatch: false },
   );
 
-  versionReady$ = createEffect(
+  readonly networkStatus$ = createEffect(() =>
+    merge(
+      of(navigator.onLine),
+      fromEvent(window, 'online').pipe(map(() => true)),
+      fromEvent(window, 'offline').pipe(map(() => false)),
+    ).pipe(
+      map((isOnline) => {
+        return AppActions.setNetworkStatus({ isOnline });
+      }),
+    ),
+  );
+
+  readonly versionReady$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(AppActions.versionReady),
@@ -112,7 +126,7 @@ export class AppEffects {
     { dispatch: false },
   );
 
-  unrecoverable$ = createEffect(
+  readonly unrecoverable$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(AppActions.unrecoverable),
@@ -123,7 +137,7 @@ export class AppEffects {
     { dispatch: false },
   );
 
-  getPublicSettings$ = createEffect(() =>
+  readonly getPublicSettings$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AppActions.getPublicSettings),
       switchMap(() =>
@@ -137,7 +151,7 @@ export class AppEffects {
     ),
   );
 
-  getVersion$ = createEffect(() =>
+  readonly getVersion$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AppActions.getVersion),
       switchMap(() =>
@@ -149,7 +163,7 @@ export class AppEffects {
     ),
   );
 
-  showErrors$ = createEffect(
+  readonly showErrors$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(AppActions.getPublicSettingsError, AppActions.getVersionError),

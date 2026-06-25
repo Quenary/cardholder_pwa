@@ -1,11 +1,10 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   effect,
   inject,
   OnDestroy,
   signal,
-  ViewChild,
+  viewChild,
 } from '@angular/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { catchError, from, map, of, switchMap } from 'rxjs';
@@ -50,11 +49,10 @@ export interface ICardScannerResult {
 
 @Component({
   selector: 'app-card-scanner-device-sheet',
-  imports: [MatListItem, MatListItemTitle, MatActionList, TranslatePipe],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [MatListItem, MatListItemTitle, MatActionList],
   template: `
     <mat-action-list>
-      @for (device of devices; track device) {
+      @for (device of devices; track device.deviceId) {
       <mat-list-item (click)="onSelectDevice(device)">
         <span matListItemTitle>
           {{ device.label }}
@@ -68,9 +66,9 @@ export class CardScannerDeviceSheetComponent {
   private readonly matBottomSheetRef = inject(MatBottomSheetRef);
   private readonly data = inject(MAT_BOTTOM_SHEET_DATA);
 
-  public readonly devices: MediaDeviceInfo[] = this.data.devices ?? [];
+  protected readonly devices: MediaDeviceInfo[] = this.data.devices ?? [];
 
-  onSelectDevice(device: MediaDeviceInfo): void {
+  protected onSelectDevice(device: MediaDeviceInfo): void {
     this.matBottomSheetRef.dismiss({ device });
   }
 }
@@ -92,7 +90,6 @@ export class CardScannerDeviceSheetComponent {
   ],
   templateUrl: './card-scanner.component.html',
   styleUrl: './card-scanner.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardScannerComponent implements OnDestroy {
   private readonly matDialogRef = inject(MatDialogRef);
@@ -102,16 +99,11 @@ export class CardScannerComponent implements OnDestroy {
   private readonly matDialog = inject(MatDialog);
   private readonly mediaDevicesService = inject(MediaDevicesService);
 
-  public readonly EScanner = EScanner;
-  @ViewChild('scanner', {
-    static: false,
-  })
-  private scannerComponent: CardScannerBaseComponent;
-
+  protected readonly EScanner = EScanner;
   /**
    * List of scanners
    */
-  public readonly scanners: IScanner[] = [
+  protected readonly scanners: IScanner[] = [
     {
       name: 'Zxing',
       code: EScanner.ZXING,
@@ -124,7 +116,17 @@ export class CardScannerComponent implements OnDestroy {
   /**
    * Selected scanner
    */
-  public readonly selectedScanner = signal<IScanner>(this.scanners[0]);
+  protected readonly selectedScanner = signal<IScanner>(this.scanners[0]);
+  /**
+   * Selected media device
+   */
+  protected readonly selectedDevice = signal<MediaDeviceInfo>(null);
+
+  private readonly scannerComponent = viewChild.required<
+    unknown,
+    CardScannerBaseComponent
+  >('scanner', { read: CardScannerBaseComponent });
+
   /**
    * Media device list.
    * That is also initiates permission dialog.
@@ -144,10 +146,6 @@ export class CardScannerComponent implements OnDestroy {
     ),
     { initialValue: [] },
   );
-  /**
-   * Selected media device
-   */
-  public readonly selectedDevice = signal<MediaDeviceInfo>(null);
 
   constructor() {
     effect(() => {
@@ -164,21 +162,12 @@ export class CardScannerComponent implements OnDestroy {
     this.matBottomSheet.dismiss();
   }
 
-  private getDefaultDeviceByLabel(devices: MediaDeviceInfo[]): MediaDeviceInfo {
-    if (!devices?.length) {
-      return null;
-    }
-    return (
-      devices.find((d) => /back|rear|environment/i.test(d.label)) || devices[0]
-    );
-  }
-
   /**
    * Callback to scanner result
    * @param res
    * @returns
    */
-  public onResult(res: IScannerResult): void {
+  protected onResult(res: IScannerResult): void {
     if (!res) {
       return;
     }
@@ -193,30 +182,32 @@ export class CardScannerComponent implements OnDestroy {
    * @param $event
    * @returns
    */
-  public async decodeFromFile($event: Event & { target: HTMLInputElement }) {
+  protected async decodeFromFile($event: Event & { target: HTMLInputElement }) {
     const file = $event.target.files[0];
     if (!file) {
       return;
     }
     if (this.scannerComponent) {
-      this.scannerComponent.scanFile(file).subscribe({
-        next: (res) => {
-          if (res) {
-            this.onResult(res);
-          }
-        },
-        error: (error) => {
-          this.snackService.error(error);
-        },
-      });
+      this.scannerComponent()
+        .scanFile(file)
+        .subscribe({
+          next: (res) => {
+            if (res) {
+              this.onResult(res);
+            }
+          },
+          error: (error) => {
+            this.snackService.error(error);
+          },
+        });
     }
   }
 
-  public close($event?: ICardScannerResult) {
+  protected close($event?: ICardScannerResult) {
     this.matDialogRef.close($event);
   }
 
-  public onClickSelectDevice(): void {
+  protected onClickSelectDevice(): void {
     const devices = this.devices();
     this.matBottomSheet
       .open(CardScannerDeviceSheetComponent, {
@@ -232,7 +223,16 @@ export class CardScannerComponent implements OnDestroy {
       });
   }
 
-  openScannersHelp() {
+  protected openScannersHelp() {
     this.matDialog.open(CardScannerHelpDialogComponent);
+  }
+
+  private getDefaultDeviceByLabel(devices: MediaDeviceInfo[]): MediaDeviceInfo {
+    if (!devices?.length) {
+      return null;
+    }
+    return (
+      devices.find((d) => /back|rear|environment/i.test(d.label)) || devices[0]
+    );
   }
 }

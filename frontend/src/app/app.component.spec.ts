@@ -49,7 +49,7 @@ describe('AppComponent', () => {
     component = fixture.componentInstance;
     fixture.autoDetectChanges();
     await fixture.whenStable();
-    expect(component.isAuthorized()).toBeFalsy();
+    expect(component['isAuthorized']()).toBeFalsy();
     const deferBlocks = await fixture.getDeferBlocks();
     expect(deferBlocks.length).toBe(0);
     const compiled = fixture.nativeElement as HTMLElement;

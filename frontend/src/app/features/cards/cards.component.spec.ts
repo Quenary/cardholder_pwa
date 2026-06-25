@@ -66,11 +66,11 @@ describe('CardsComponent', () => {
     fixture = TestBed.createComponent(CardsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    component.searchControl.setValue('tes');
-    expect(component.cards()).toEqual([list[1]]);
-    component.searchControl.setValue('rep');
-    expect(component.cards()).toEqual([list[0]]);
-    component.searchControl.setValue('qwerty');
-    expect(component.cards()).toEqual([]);
+    component['searchControl'].setValue('tes');
+    expect(component['cards']()).toEqual([list[1]]);
+    component['searchControl'].setValue('rep');
+    expect(component['cards']()).toEqual([list[0]]);
+    component['searchControl'].setValue('qwerty');
+    expect(component['cards']()).toEqual([]);
   });
 });

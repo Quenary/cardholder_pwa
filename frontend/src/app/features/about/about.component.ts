@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   MatList,
   MatListItem,
@@ -28,10 +28,9 @@ import { selectAppVersion } from 'src/app/state/app.selectors';
   ],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutComponent {
   private readonly store = inject(Store);
 
-  public readonly version = this.store.selectSignal(selectAppVersion);
+  protected readonly version = this.store.selectSignal(selectAppVersion);
 }

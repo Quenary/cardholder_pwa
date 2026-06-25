@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  input,
-} from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import {
   MAT_DIALOG_DATA,
@@ -79,29 +74,29 @@ type TFilterFormArrayItem<T extends unknown, K extends keyof T> = FormGroup<{
   ],
   templateUrl: './sort-filter-dialog.component.html',
   styleUrl: './sort-filter-dialog.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SortFilterDialogComponent<T> {
   private readonly matDialogRef = inject(MatDialogRef);
   private readonly data: ISortFilterDialogData<T> = inject(MAT_DIALOG_DATA);
   private readonly translateService = inject(TranslateService);
+
   /**
    * Maximum number of filters
    * @default 10
    */
-  public readonly maxFilters = input<number>(10);
+  protected readonly maxFilters = input<number>(10);
   /**
    * Title of the dialog
    */
-  public readonly title = this.data?.title ?? 'SORT_FILTER.TITLE';
+  protected readonly title = this.data?.title ?? 'SORT_FILTER.TITLE';
   /**
    * Sorting options
    */
-  public readonly sortingOptions = this.data?.sorting?.options;
+  protected readonly sortingOptions = this.data?.sorting?.options;
   /**
    * Sorting orders
    */
-  public readonly sortingOrders: {
+  protected readonly sortingOrders: {
     value: Sorting.Direction;
     label: string;
     icon: string;
@@ -116,7 +111,7 @@ export class SortFilterDialogComponent<T> {
   /**
    * Sorting form
    */
-  public readonly sortingForm = new FormGroup({
+  protected readonly sortingForm = new FormGroup({
     key: new FormControl<keyof T>(this.data?.sorting?.value?.key ?? null, [
       Validators.required,
     ]),
@@ -129,31 +124,32 @@ export class SortFilterDialogComponent<T> {
   /**
    * Options for select of boolean typed filter
    */
-  public readonly booleanOption: { value: boolean; label: string }[] = (() => {
-    const labels = this.translateService.instant('SORT_FILTER.BOOL_LABEL');
-    return [
-      { value: true, label: labels.TRUE },
-      { value: false, label: labels.FALSE },
-    ];
-  })();
+  protected readonly booleanOption: { value: boolean; label: string }[] =
+    (() => {
+      const labels = this.translateService.instant('SORT_FILTER.BOOL_LABEL');
+      return [
+        { value: true, label: labels.TRUE },
+        { value: false, label: labels.FALSE },
+      ];
+    })();
   /**
    * Enum of filter criterias
    */
-  public readonly FilterCriteria = Filter.Criteria;
+  protected readonly FilterCriteria = Filter.Criteria;
   /**
    * Filter options
    */
-  public readonly filterOptions = this.data?.filter?.options;
+  protected readonly filterOptions = this.data?.filter?.options;
   /**
    * Names of the criterias
    */
-  public readonly criteriasNames = this.translateService.instant(
+  protected readonly criteriasNames = this.translateService.instant(
     'SORT_FILTER.CRITERIAS',
   );
   /**
    * Array of filter forms
    */
-  public readonly filterFormArray = new FormArray<
+  protected readonly filterFormArray = new FormArray<
     TFilterFormArrayItem<T, keyof T>
   >([]);
 
@@ -166,30 +162,16 @@ export class SortFilterDialogComponent<T> {
     }
   }
 
-  private getFilterFormArrayItem(
-    value?: Filter.Model<T, keyof T>,
-  ): TFilterFormArrayItem<T, keyof T> {
-    const option = value
-      ? this.filterOptions.find((o) => o.key == value.key)
-      : null;
-    const form: TFilterFormArrayItem<T, keyof T> = new FormGroup({
-      option: new FormControl(option, [Validators.required]),
-      criteria: new FormControl(value?.criteria, [Validators.required]),
-      value: new FormControl(value?.value),
-    });
-    return form;
-  }
-
-  public addFilter(): void {
+  protected addFilter(): void {
     this.filterFormArray.push(this.getFilterFormArrayItem());
   }
 
-  public removeFilter(form: TFilterFormArrayItem<T, keyof T>): void {
+  protected removeFilter(form: TFilterFormArrayItem<T, keyof T>): void {
     const index = this.filterFormArray.controls.findIndex((f) => f === form);
     this.filterFormArray.controls.splice(index, 1);
   }
 
-  public confirm(): void {
+  protected confirm(): void {
     const data: ISortFilterDialogResult<T> = {};
     if (this.sortingForm.valid) {
       data.sortingModel = this.sortingForm.getRawValue();
@@ -224,7 +206,21 @@ export class SortFilterDialogComponent<T> {
     this.matDialogRef.close(data);
   }
 
-  public cancel(): void {
+  protected cancel(): void {
     this.matDialogRef.close();
+  }
+
+  private getFilterFormArrayItem(
+    value?: Filter.Model<T, keyof T>,
+  ): TFilterFormArrayItem<T, keyof T> {
+    const option = value
+      ? this.filterOptions.find((o) => o.key == value.key)
+      : null;
+    const form: TFilterFormArrayItem<T, keyof T> = new FormGroup({
+      option: new FormControl(option, [Validators.required]),
+      criteria: new FormControl(value?.criteria, [Validators.required]),
+      value: new FormControl(value?.value),
+    });
+    return form;
   }
 }

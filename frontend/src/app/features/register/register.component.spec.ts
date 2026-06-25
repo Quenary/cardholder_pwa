@@ -42,7 +42,7 @@ describe('RegisterComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
 
-    component.form.patchValue({
+    component['form'].patchValue({
       username: 'user1',
       email: 'testemail@google.com',
       password: '123456Qq',
@@ -50,7 +50,7 @@ describe('RegisterComponent', () => {
     });
     fixture.detectChanges();
 
-    component.onSubmit();
+    component['onSubmit']();
 
     expect(userApiServiceMock.create).toHaveBeenCalledTimes(1);
   });
@@ -61,35 +61,35 @@ describe('RegisterComponent', () => {
     fixture.detectChanges();
 
     // empty form
-    component.form.patchValue({});
-    component.onSubmit();
+    component['form'].patchValue({});
+    component['onSubmit']();
 
     // passwords does not match
-    component.form.patchValue({
+    component['form'].patchValue({
       username: 'user1',
       email: 'testemail@google.com',
       password: '123456Qq',
       confirm_password: '1234',
     });
-    component.onSubmit();
+    component['onSubmit']();
 
     // invalid username
-    component.form.patchValue({
+    component['form'].patchValue({
       username: '1',
       email: 'testemail@google.com',
       password: '123456Qq',
       confirm_password: '123456Qq',
     });
-    component.onSubmit();
+    component['onSubmit']();
 
     // invalid email
-    component.form.patchValue({
+    component['form'].patchValue({
       username: 'user1',
       email: 'invalidemail',
       password: '123456Qq',
       confirm_password: '123456Qq',
     });
-    component.onSubmit();
+    component['onSubmit']();
 
     expect(userApiServiceMock.create).toHaveBeenCalledTimes(0);
   });

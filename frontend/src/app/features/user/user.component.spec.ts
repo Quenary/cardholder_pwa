@@ -44,8 +44,8 @@ describe('UserComponent', () => {
       username: 'user1',
       email: 'testemail1@example.com',
     };
-    component.form.patchValue(body);
-    component.onSubmit();
+    component['form'].patchValue(body);
+    component['onSubmit']();
 
     expect(dispatchSpy).toHaveBeenCalledWith(UserActions.update({ body }));
   });
@@ -57,22 +57,22 @@ describe('UserComponent', () => {
     fixture.detectChanges();
 
     // empty form
-    component.form.reset();
-    component.onSubmit();
+    component['form'].reset();
+    component['onSubmit']();
 
     // invalid username
-    component.form.patchValue({
+    component['form'].patchValue({
       username: '1',
       email: 'testemail1@example.com',
     });
-    component.onSubmit();
+    component['onSubmit']();
 
     // invalid email
-    component.form.patchValue({
+    component['form'].patchValue({
       username: 'user1',
       email: 'invalidemail',
     });
-    component.onSubmit();
+    component['onSubmit']();
 
     expect(dispatchSpy).not.toHaveBeenCalledWith(
       expect.objectContaining({ type: UserActions.update.type }),
@@ -85,15 +85,15 @@ describe('UserComponent', () => {
     const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
-    component.onChangePasswordCheck({ checked: true, source: null });
+    component['onChangePasswordCheck']({ checked: true, source: null });
     const body = {
       username: 'user1',
       email: 'testemail1@example.com',
       password: '12345678qQ',
       confirm_password: '12345678qQ',
     };
-    component.form.patchValue(body);
-    component.onSubmit();
+    component['form'].patchValue(body);
+    component['onSubmit']();
 
     expect(dispatchSpy).toHaveBeenCalledWith(UserActions.update({ body }));
   });
@@ -104,16 +104,16 @@ describe('UserComponent', () => {
     const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
-    component.onChangePasswordCheck({ checked: true, source: null });
+    component['onChangePasswordCheck']({ checked: true, source: null });
     const body = {
       username: 'user1',
       email: 'testemail1@example.com',
       password: '12345678qQ',
       confirm_password: '12345678qQ',
     };
-    component.form.patchValue(body);
-    component.onChangePasswordCheck({ checked: false, source: null });
-    component.onSubmit();
+    component['form'].patchValue(body);
+    component['onChangePasswordCheck']({ checked: false, source: null });
+    component['onSubmit']();
 
     expect(dispatchSpy).toHaveBeenCalledWith(
       UserActions.update({

@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
@@ -8,13 +8,12 @@ import { TranslatePipe } from '@ngx-translate/core';
   selector: 'app-card-scanner-help-dialog',
   imports: [MatDialogModule, MatButton, TranslatePipe, MatListModule],
   templateUrl: './card-scanner-help-dialog.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './card-scanner-help-dialog.component.scss',
 })
 export class CardScannerHelpDialogComponent {
   private readonly matDialogRef = inject(MatDialogRef);
 
-  public close(): void {
+  protected close(): void {
     this.matDialogRef.close();
   }
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatInput } from '@angular/material/input';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatButton } from '@angular/material/button';
@@ -39,24 +39,25 @@ import { MatTooltip } from '@angular/material/tooltip';
   ],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthComponent {
   private readonly store = inject(Store);
 
-  public readonly isLoading = this.store.selectSignal(selectAuthIsLoading);
-  public readonly allowRegistration = this.store.selectSignal(
+  protected readonly isLoading = this.store.selectSignal(selectAuthIsLoading);
+  protected readonly allowRegistration = this.store.selectSignal(
     selectAppAllowRegistration,
   );
-  public readonly smtpDisabled = this.store.selectSignal(selectAppSmtpDisabled);
-  public readonly form = new FormGroup<
+  protected readonly smtpDisabled = this.store.selectSignal(
+    selectAppSmtpDisabled,
+  );
+  protected readonly form = new FormGroup<
     TInterfaceToForm<Omit<IOAuth2PasswordRequestForm, 'grant_type'>>
   >({
     username: new FormControl<string>(null, [Validators.required]),
     password: new FormControl<string>(null, [Validators.required]),
   });
 
-  public onSubmit(): void {
+  protected onSubmit(): void {
     const form = this.form.value;
     this.store.dispatch(
       AuthActions.token({

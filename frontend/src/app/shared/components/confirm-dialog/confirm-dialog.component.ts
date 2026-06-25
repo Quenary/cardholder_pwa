@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -36,7 +31,6 @@ export interface IConfirmDialogData {
  */
 @Component({
   selector: 'app-confirm-dialog',
-  standalone: true,
   imports: [
     MatButton,
     MatDialogActions,
@@ -48,21 +42,23 @@ export interface IConfirmDialogData {
   ],
   templateUrl: './confirm-dialog.component.html',
   styleUrl: './confirm-dialog.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfirmDialogComponent {
   private readonly dialogRef = inject(MatDialogRef);
   private readonly data = inject(MAT_DIALOG_DATA);
-  public readonly addCheckbox = this.data?.addCheckbox ?? false;
-  public readonly title = this.data?.title ?? 'GENERAL.UNSAVED_WARN';
-  public readonly subtitle = this.data?.subtitle ?? null;
-  public readonly cancelText = this.data?.cancelText ?? 'GENERAL.CANCEL';
-  public readonly confirmText = this.data?.confirmText ?? 'GENERAL.CONFIRM';
-  public readonly confirmCheckbox = signal(false);
-  public cancel(): void {
+
+  protected readonly addCheckbox = this.data?.addCheckbox ?? false;
+  protected readonly title = this.data?.title ?? 'GENERAL.UNSAVED_WARN';
+  protected readonly subtitle = this.data?.subtitle ?? null;
+  protected readonly cancelText = this.data?.cancelText ?? 'GENERAL.CANCEL';
+  protected readonly confirmText = this.data?.confirmText ?? 'GENERAL.CONFIRM';
+  protected readonly confirmCheckbox = signal(false);
+
+  protected cancel(): void {
     this.dialogRef.close(false);
   }
-  public confirm(): void {
+
+  protected confirm(): void {
     this.dialogRef.close(true);
   }
 }
