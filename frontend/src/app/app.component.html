@@ -8,7 +8,7 @@
       class="sidenav-list"
       aria-label="Main navigation"
       (click)="sidenavOpened.set(false)">
-      @for (item of links(); track item) {
+      @for (item of links(); track item.link) {
       <a
         mat-list-item
         [routerLink]="item.link"

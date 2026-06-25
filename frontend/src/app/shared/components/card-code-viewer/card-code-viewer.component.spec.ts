@@ -4,17 +4,14 @@ import {
   CardCodeViewerDialogComponent,
   ICardCodeViewerData,
 } from './card-code-viewer.component';
-import {
-  createMatDialogMock,
-  createMatDialogRefMock,
-  TestTranslateModule,
-} from 'src/app/test';
+import { createMatDialogMock, createMatDialogRefMock } from 'src/testing';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
   MatDialogRef,
 } from '@angular/material/dialog';
 import { ELocalStorageKey } from 'src/app/app.consts';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CardCodeViewerComponent', () => {
   let fixture: ComponentFixture<CardCodeViewerComponent>;
@@ -24,6 +21,8 @@ describe('CardCodeViewerComponent', () => {
 
   beforeEach(async () => {
     matDialogMock = createMatDialogMock();
+
+    vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await TestBed.configureTestingModule({
       providers: [{ provide: MatDialog, useValue: matDialogMock }],
@@ -46,7 +45,6 @@ describe('CardCodeViewerComponent', () => {
     };
     const canvasElement: HTMLCanvasElement =
       fixture.nativeElement.querySelector('.canvas');
-    spyOn(console, 'error');
     fixture.detectChanges();
 
     expect(canvasElement).toBeTruthy();
@@ -62,7 +60,6 @@ describe('CardCodeViewerComponent', () => {
     };
     const canvasElement: HTMLCanvasElement =
       fixture.nativeElement.querySelector('.canvas');
-    spyOn(console, 'error');
     fixture.detectChanges();
 
     expect(canvasElement).toBeTruthy();
@@ -102,12 +99,12 @@ describe('CardCodeViewerDialogComponent', () => {
         code_type: 'ean13',
       },
       scale: 3,
-      color: 'black',
+      color: '#000000',
     };
 
     await TestBed.configureTestingModule({
-      imports: [TestTranslateModule],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: matDialogRefMock },
         { provide: MAT_DIALOG_DATA, useValue: matDialogDataMock },
       ],
@@ -122,16 +119,16 @@ describe('CardCodeViewerDialogComponent', () => {
   });
 
   it('should preserve color inversion in local storage', () => {
-    const lsGetSpy = spyOn(localStorage, 'getItemJson').and.callFake(
-      () => true as any,
-    );
-    const lsSetSpy = spyOn(localStorage, 'setItemJson').and.callFake(() => {});
+    const lsGetSpy = vi
+      .spyOn(Storage.prototype, 'getItemJson')
+      .mockReturnValue(true);
+    const lsSetSpy = vi.spyOn(Storage.prototype, 'setItemJson');
     fixture = TestBed.createComponent(CardCodeViewerDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
 
     expect(lsGetSpy).toHaveBeenCalledTimes(1);
-    expect(component.invert()).toBeTrue();
+    expect(component.invert()).toBe(true);
 
     component.toggleInvert();
 
@@ -140,6 +137,6 @@ describe('CardCodeViewerDialogComponent', () => {
       ELocalStorageKey.CODE_COLOR_INVERSION,
       false,
     );
-    expect(component.invert()).toBeFalse();
+    expect(component.invert()).toBe(false);
   });
 });

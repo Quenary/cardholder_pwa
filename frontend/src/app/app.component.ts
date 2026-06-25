@@ -11,7 +11,7 @@ import {
   MatSidenav,
   MatSidenavContent,
 } from '@angular/material/sidenav';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatToolbar } from '@angular/material/toolbar';
@@ -42,7 +42,7 @@ interface INavItem {
     MatSidenavContainer,
     MatSidenav,
     MatSidenavContent,
-    TranslateModule,
+    TranslatePipe,
     RouterLink,
     MatIcon,
     MatToolbar,
@@ -64,37 +64,37 @@ export class AppComponent {
   public readonly isOffline = this.store.selectSignal(selectAppIsOffline);
 
   private readonly isAdmin = this.store.selectSignal(selectUserIsAdmin);
-  private readonly navTranslates = toSignal(this.translateService.get('NAV'));
+  private readonly navTranslations = toSignal(this.translateService.getStreamOnTranslationChange('NAV'));
   public readonly links = computed<INavItem[]>(() => {
     const isAdmin = this.isAdmin();
-    const navTranslates = this.navTranslates();
+    const navTranslations = this.navTranslations();
     return [
       {
-        name: navTranslates.CARD,
+        name: navTranslations.CARD,
         icon: 'credit_card_outlined',
         link: '/cards',
       },
       {
-        name: navTranslates.USER,
+        name: navTranslations.USER,
         icon: 'person_outlined',
         link: '/user',
       },
       ...(isAdmin
         ? [
             {
-              name: navTranslates.ADMIN,
+              name: navTranslations.ADMIN,
               icon: 'admin_panel_settings',
               link: '/admin',
             },
           ]
         : []),
       {
-        name: navTranslates.ABOUT,
+        name: navTranslations.ABOUT,
         icon: 'info_outlined',
         link: '/about',
       },
       {
-        name: navTranslates.EXIT,
+        name: navTranslations.EXIT,
         icon: 'logout',
         onClick: () => {
           this.store.dispatch(AuthActions.logout());

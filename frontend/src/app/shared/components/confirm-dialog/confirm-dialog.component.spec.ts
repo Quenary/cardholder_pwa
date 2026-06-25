@@ -3,9 +3,10 @@ import {
   ConfirmDialogComponent,
   IConfirmDialogData,
 } from './confirm-dialog.component';
-import { createMatDialogRefMock, TestTranslateModule } from 'src/app/test';
+import { createMatDialogRefMock } from 'src/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('ConfirmDialogComponent', () => {
   let component: ConfirmDialogComponent;
@@ -20,8 +21,9 @@ describe('ConfirmDialogComponent', () => {
       providers: [
         { provide: MatDialogRef, useValue: matDialogRefMock },
         { provide: MAT_DIALOG_DATA, useValue: {} },
+        provideTranslateService(),
       ],
-      imports: [ConfirmDialogComponent, TestTranslateModule, MatCheckbox],
+      imports: [ConfirmDialogComponent, MatCheckbox],
     }).compileComponents();
   });
 

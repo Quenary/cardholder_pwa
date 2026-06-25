@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { catchError, from, map, of, switchMap } from 'rxjs';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   MatDialog,
   MatDialogActions,
@@ -50,7 +50,7 @@ export interface ICardScannerResult {
 
 @Component({
   selector: 'app-card-scanner-device-sheet',
-  imports: [MatListItem, MatListItemTitle, MatActionList, TranslateModule],
+  imports: [MatListItem, MatListItemTitle, MatActionList, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <mat-action-list>
@@ -80,7 +80,7 @@ export class CardScannerDeviceSheetComponent {
   imports: [
     MatButton,
     MatIconButton,
-    TranslateModule,
+    TranslatePipe,
     MatIcon,
     MatDialogActions,
     MatDialogContent,

@@ -2,8 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AuthComponent } from './auth.component';
 import { provideRouter } from '@angular/router';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { ITestAppState, testAppState, TestTranslateModule } from 'src/app/test';
+import { ITestAppState, testAppState } from 'src/testing';
 import { AuthActions } from 'src/app/entities/auth/state/auth.actions';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AuthComponent', () => {
   let component: AuthComponent;
@@ -16,8 +17,12 @@ describe('AuthComponent', () => {
     initialState = { ...testAppState };
 
     await TestBed.configureTestingModule({
-      providers: [provideMockStore({ initialState }), provideRouter([])],
-      imports: [AuthComponent, TestTranslateModule],
+      providers: [
+        provideMockStore({ initialState }),
+        provideRouter([]),
+        provideTranslateService(),
+      ],
+      imports: [AuthComponent],
     }).compileComponents();
 
     storeMock = TestBed.inject(MockStore);
@@ -33,7 +38,7 @@ describe('AuthComponent', () => {
   it('should sign-in', () => {
     fixture = TestBed.createComponent(AuthComponent);
     component = fixture.componentInstance;
-    const dispatchSpy = spyOn(storeMock, 'dispatch');
+    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
     const formData = {
@@ -42,7 +47,8 @@ describe('AuthComponent', () => {
     };
     component.form.patchValue(formData);
     component.onSubmit();
-    expect(dispatchSpy).toHaveBeenCalledOnceWith(
+    expect(dispatchSpy).toHaveBeenCalledTimes(1);
+    expect(dispatchSpy).toHaveBeenCalledWith(
       AuthActions.token({
         body: {
           ...formData,

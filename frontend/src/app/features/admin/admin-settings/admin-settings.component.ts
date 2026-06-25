@@ -9,7 +9,7 @@ import {
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatInput } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { AdminApiService } from 'src/app/entities/admin/admin-api.service';
@@ -28,7 +28,7 @@ import { AppActions } from 'src/app/state/app.actions';
     MatCheckbox,
     MatInput,
     MatTableModule,
-    TranslateModule,
+    TranslatePipe,
     DatePipe,
     NaiveDatePipe,
     MatTooltip,

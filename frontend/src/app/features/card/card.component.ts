@@ -28,7 +28,7 @@ import {
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ICardBase } from 'src/app/entities/cards/cards-interface';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
 import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
@@ -62,7 +62,7 @@ import { IsOldCodeType } from 'src/app/shared/pipes/is-old-code-type.pipe';
     MatButton,
     MatIconButton,
     ReactiveFormsModule,
-    TranslateModule,
+    TranslatePipe,
     MatProgressSpinner,
     RouterLink,
     MatFabButton,

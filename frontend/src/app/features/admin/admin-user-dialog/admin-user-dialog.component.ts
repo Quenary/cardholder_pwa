@@ -18,7 +18,7 @@ import {
 import { MatIcon } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { Store } from '@ngrx/store';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { switchMap, finalize, EMPTY, tap } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { AdminApiService } from 'src/app/entities/admin/admin-api.service';
@@ -41,7 +41,7 @@ export interface IAdminUserDialogData {
     MatDialogActions,
     MatDialogContent,
     MatDialogTitle,
-    TranslateModule,
+    TranslatePipe,
     FormsModule,
     MatListModule,
     DatePipe,

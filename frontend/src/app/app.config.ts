@@ -1,6 +1,5 @@
 import {
   ApplicationConfig,
-  importProvidersFrom,
   inject,
   isDevMode,
   LOCALE_ID,
@@ -9,20 +8,18 @@ import {
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { provideState, provideStore, Store } from '@ngrx/store';
+import { provideState, provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import {
-  HttpClient,
   provideHttpClient,
   withInterceptors,
   withXhr,
 } from '@angular/common/http';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { authReducer } from './entities/auth/state/auth.reducers';
 import { AuthEffects } from './entities/auth/state/auth.effects';
-import { translateInitializer } from './core/app-initializers/translate-initializer';
 import { authInitializer } from './core/app-initializers/auth-initializer';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { getTokenInterceptor } from './core/interceptors/token.interceptor';
@@ -50,16 +47,14 @@ export const appConfig: ApplicationConfig = {
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
     provideHttpClient(withXhr(), withInterceptors([getTokenInterceptor])),
     provideNativeDateAdapter(),
-    importProvidersFrom(
-      TranslateModule.forRoot({
-        loader: {
-          provide: TranslateLoader,
-          useFactory: (httpClient: HttpClient) =>
-            new TranslateHttpLoader(httpClient, '/i18n/', '.json'),
-          deps: [HttpClient],
-        },
+    provideTranslateService({
+      loader: provideTranslateHttpLoader({
+        prefix: '/i18n/',
+        suffix: '.json',
       }),
-    ),
+      fallbackLang: 'en',
+      lang: navigator.language,
+    }),
     {
       provide: LOCALE_ID,
       useFactory: () => {
@@ -68,7 +63,6 @@ export const appConfig: ApplicationConfig = {
       },
     },
     provideAppInitializer(() => appInitializer()),
-    provideAppInitializer(() => translateInitializer()),
     provideAppInitializer(() => localeInitializer()),
     provideAppInitializer(() => authInitializer()),
     provideAppInitializer(() => userInitializer()),

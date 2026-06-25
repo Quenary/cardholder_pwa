@@ -21,7 +21,7 @@ import {
 } from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { finalize, first } from 'rxjs';
 import { ERegexp } from 'src/app/app.consts';
 import { SnackService } from 'src/app/core/services/snack.service';
@@ -40,7 +40,7 @@ import { passwordMatchValidator } from 'src/app/shared/validators/passwords-matc
     MatFormField,
     MatLabel,
     ReactiveFormsModule,
-    TranslateModule,
+    TranslatePipe,
     MatProgressSpinner,
     MatSuffix,
   ],

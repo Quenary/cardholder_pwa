@@ -7,7 +7,7 @@ import {
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { UserApiService } from 'src/app/entities/user/user-api.service';
 import { IUserCreate, IUserUpdate } from 'src/app/entities/user/user-interface';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -34,7 +34,7 @@ import { SnackService } from 'src/app/core/services/snack.service';
   imports: [
     MatIcon,
     MatButton,
-    TranslateModule,
+    TranslatePipe,
     MatProgressSpinner,
     RouterLink,
     MatInput,

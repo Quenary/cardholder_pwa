@@ -14,7 +14,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Filter, Sorting } from 'src/app/shared/types';
 import {
   FormArray,
@@ -69,7 +69,7 @@ type TFilterFormArrayItem<T extends unknown, K extends keyof T> = FormGroup<{
     MatFormFieldModule,
     MatCheckboxModule,
     MatDatepickerModule,
-    TranslateModule,
+    TranslatePipe,
     MatSelectModule,
     MatButtonModule,
     ReactiveFormsModule,

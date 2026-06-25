@@ -10,7 +10,7 @@ import {
 } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AuthActions } from '../../entities/auth/state/auth.actions';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { IOAuth2PasswordRequestForm } from 'src/app/entities/auth/auth-interface';
@@ -32,7 +32,7 @@ import { MatTooltip } from '@angular/material/tooltip';
     MatLabel,
     MatButton,
     ReactiveFormsModule,
-    TranslateModule,
+    TranslatePipe,
     RouterLink,
     MatProgressSpinner,
     MatTooltip,

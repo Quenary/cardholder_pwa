@@ -1,8 +1,8 @@
-import { IAuthState } from '../entities/auth/state/auth.reducers';
-import { ICardsState } from '../entities/cards/state/cards.reducers';
-import { IUserState } from '../entities/user/state/user.reducers';
-import { EUserRole } from '../entities/user/user-interface';
-import { IAppState } from '../state/app.reducers';
+import { IAuthState } from '../app/entities/auth/state/auth.reducers';
+import { ICardsState } from '../app/entities/cards/state/cards.reducers';
+import { IUserState } from '../app/entities/user/state/user.reducers';
+import { EUserRole } from '../app/entities/user/user-interface';
+import { IAppState } from '../app/state/app.reducers';
 
 export interface ITestAppState {
   app: IAppState;

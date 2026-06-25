@@ -13,7 +13,7 @@ import {
   MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ChangelogService } from 'src/app/core/services/changelog.service';
 
 /**
@@ -62,7 +62,7 @@ export class ChangelogComponent {
 
 @Component({
   selector: 'app-changelog-dialog',
-  imports: [MatDialogModule, TranslateModule, MatButton],
+  imports: [MatDialogModule, TranslatePipe, MatButton],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `
   <h1 mat-dialog-title>{{'ABOUT.CHANGELOG' | translate}}</h1>

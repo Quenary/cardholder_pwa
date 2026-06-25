@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UserComponent } from './user.component';
-import { ITestAppState, testAppState, TestTranslateModule } from 'src/app/test';
+import { ITestAppState, testAppState } from 'src/testing';
 import { provideRouter } from '@angular/router';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { UserActions } from 'src/app/entities/user/state/user.actions';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('UserComponent', () => {
   let component: UserComponent;
@@ -15,8 +16,12 @@ describe('UserComponent', () => {
   beforeEach(async () => {
     initialState = { ...testAppState };
     await TestBed.configureTestingModule({
-      providers: [provideMockStore({ initialState }), provideRouter([])],
-      imports: [UserComponent, TestTranslateModule],
+      providers: [
+        provideMockStore({ initialState }),
+        provideRouter([]),
+        provideTranslateService(),
+      ],
+      imports: [UserComponent],
     }).compileComponents();
 
     storeMock = TestBed.inject(MockStore);
@@ -32,7 +37,7 @@ describe('UserComponent', () => {
   it('should update username and email', () => {
     fixture = TestBed.createComponent(UserComponent);
     component = fixture.componentInstance;
-    const dispatchSpy = spyOn(storeMock, 'dispatch');
+    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
     const body = {
@@ -48,7 +53,7 @@ describe('UserComponent', () => {
   it('should not update user on invalid form', () => {
     fixture = TestBed.createComponent(UserComponent);
     component = fixture.componentInstance;
-    const dispatchSpy = spyOn(storeMock, 'dispatch');
+    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
     // empty form
@@ -69,17 +74,15 @@ describe('UserComponent', () => {
     });
     component.onSubmit();
 
-    expect(
-      dispatchSpy.calls
-        .all()
-        .some((call) => (call.args[0] as any).type == UserActions.update.type),
-    ).toBeFalse();
+    expect(dispatchSpy).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: UserActions.update.type }),
+    );
   });
 
   it('should update password if checked', () => {
     fixture = TestBed.createComponent(UserComponent);
     component = fixture.componentInstance;
-    const dispatchSpy = spyOn(storeMock, 'dispatch');
+    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
     component.onChangePasswordCheck({ checked: true, source: null });
@@ -98,7 +101,7 @@ describe('UserComponent', () => {
   it('should not update password if unchecked', () => {
     fixture = TestBed.createComponent(UserComponent);
     component = fixture.componentInstance;
-    const dispatchSpy = spyOn(storeMock, 'dispatch');
+    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
     component.onChangePasswordCheck({ checked: true, source: null });

@@ -23,7 +23,7 @@ import {
 } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import Bwip from '@bwip-js/browser';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ELocalStorageKey } from 'src/app/app.consts';
 import { ZxingToBwipMap } from 'src/app/entities/cards/cards-const';
 import { ICardBase } from 'src/app/entities/cards/cards-interface';
@@ -144,7 +144,7 @@ export class CardCodeViewerComponent
     MatDialogActions,
     MatDialogContent,
     MatDialogTitle,
-    TranslateModule,
+    TranslatePipe,
   ],
   template: `
     <h2 mat-dialog-title>{{ card.name }}</h2>

@@ -9,7 +9,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { map, retry, catchError, of, finalize } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { AdminApiService } from 'src/app/entities/admin/admin-api.service';
@@ -17,13 +17,7 @@ import { PublicApiService } from 'src/app/entities/public/public-api.service';
 
 @Component({
   selector: 'app-admin-status',
-  imports: [
-    MatListModule,
-    MatButton,
-    MatIcon,
-    TranslateModule,
-    NgTemplateOutlet,
-  ],
+  imports: [MatListModule, MatButton, MatIcon, TranslatePipe, NgTemplateOutlet],
   templateUrl: './admin-status.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './admin-status.component.scss',

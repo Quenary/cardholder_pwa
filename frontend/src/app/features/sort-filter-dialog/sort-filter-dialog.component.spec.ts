@@ -6,8 +6,9 @@ import {
 } from './sort-filter-dialog.component';
 import { ICard } from 'src/app/entities/cards/cards-interface';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { createMatDialogRefMock, TestTranslateModule } from 'src/app/test';
+import { createMatDialogRefMock } from 'src/testing';
 import { Filter } from 'src/app/shared/types';
+import { provideTranslateService } from '@ngx-translate/core';
 
 const dialogData: ISortFilterDialogData<ICard> = {
   title: 'TEST TITLE',
@@ -79,8 +80,9 @@ describe('SortFilterDialogComponent', () => {
     matDialogRefMock = createMatDialogRefMock();
 
     TestBed.configureTestingModule({
-      imports: [TestTranslateModule],
+      imports: [],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: matDialogRefMock },
         { provide: MAT_DIALOG_DATA, useValue: dialogData },
       ],

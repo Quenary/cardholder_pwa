@@ -10,7 +10,6 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { Store } from '@ngrx/store';
-import { TranslateModule } from '@ngx-translate/core';
 import { IUserCreate, IUserUpdate } from 'src/app/entities/user/user-interface';
 import {
   selectUserHasChanges,
@@ -36,20 +35,20 @@ import { ERegexp } from 'src/app/app.consts';
 import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
 import { passwordMatchValidator } from 'src/app/shared/validators/passwords-match.validator';
 import { MatCheckbox, MatCheckboxChange } from '@angular/material/checkbox';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-user',
   imports: [
     MatIcon,
     MatButton,
-    TranslateModule,
+    TranslatePipe,
     MatProgressSpinner,
     MatInput,
     MatIcon,
     MatFormField,
     MatLabel,
     ReactiveFormsModule,
-    TranslateModule,
     MatSuffix,
     MatCheckbox,
   ],

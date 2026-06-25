@@ -1,27 +1,27 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RegisterComponent } from './register.component';
-import { TestTranslateModule } from 'src/app/test';
 import { provideRouter } from '@angular/router';
 import { UserApiService } from 'src/app/entities/user/user-api.service';
+import { Mocked } from 'vitest';
+import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
 
-  let userApiServiceMock: jasmine.SpyObj<UserApiService>;
+  let userApiServiceMock: Partial<Mocked<UserApiService>>;
 
   beforeEach(async () => {
-    userApiServiceMock = jasmine.createSpyObj<UserApiService>(
-      'UserApiService',
-      ['create'],
-    );
-    userApiServiceMock.create.and.returnValue(of({} as any));
+    userApiServiceMock = {
+      create: vi.fn().mockReturnValue(of({})),
+    };
 
     await TestBed.configureTestingModule({
-      imports: [RegisterComponent, TestTranslateModule],
+      imports: [RegisterComponent],
       providers: [
         provideRouter([]),
+        provideTranslateService(),
         {
           provide: UserApiService,
           useValue: userApiServiceMock,
@@ -48,6 +48,7 @@ describe('RegisterComponent', () => {
       password: '123456Qq',
       confirm_password: '123456Qq',
     });
+    fixture.detectChanges();
 
     component.onSubmit();
 

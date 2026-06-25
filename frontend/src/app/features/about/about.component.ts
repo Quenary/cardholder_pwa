@@ -5,7 +5,7 @@ import {
   MatListItemIcon,
   MatListItemTitle,
 } from '@angular/material/list';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MatIcon } from '@angular/material/icon';
 import { CodeExamplesComponent } from '../code-examples/code-examples.component';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -18,7 +18,7 @@ import { selectAppVersion } from 'src/app/state/app.selectors';
   imports: [
     MatList,
     MatListItem,
-    TranslateModule,
+    TranslatePipe,
     MatIcon,
     MatListItemTitle,
     MatListItemIcon,

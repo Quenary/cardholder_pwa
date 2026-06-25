@@ -12,9 +12,9 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /**
  * Data interface for {@link ConfirmDialogComponent}
@@ -42,7 +42,7 @@ export interface IConfirmDialogData {
     MatDialogActions,
     MatDialogContent,
     MatDialogTitle,
-    TranslateModule,
+    TranslatePipe,
     MatCheckbox,
     FormsModule,
   ],

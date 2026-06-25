@@ -22,7 +22,7 @@ import {
   MatLabel,
   MatSuffix,
 } from '@angular/material/input';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MatIcon } from '@angular/material/icon';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatRipple } from '@angular/material/core';
@@ -57,7 +57,7 @@ import { MatBadgeModule } from '@angular/material/badge';
     MatInput,
     MatFormField,
     MatLabel,
-    TranslateModule,
+    TranslatePipe,
     MatIcon,
     MatSuffix,
     ReactiveFormsModule,

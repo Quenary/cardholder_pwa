@@ -9,7 +9,7 @@
     "build": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:ci": "ng test --watch=false --browsers=ChromeHeadless"
+    "test:ci": "ng test --watch=false --coverage"
   },
   "engine": {
     "node": "^22.22.3 || ^24.15.0 || ^26.0.0"
@@ -28,6 +28,17 @@
     "endOfLine": "auto"
   },
   "private": true,
+  "overrides": {
+    "@ngrx/store": {
+      "@angular/core": "^22"
+    },
+    "@ngrx/effects": {
+      "@angular/core": "^22"
+    },
+    "@ngrx/store-devtools": {
+      "@angular/core": "^22"
+    }
+  },
   "dependencies": {
     "@angular/animations": "^22.0.2",
     "@angular/cdk": "^22.0.2",
@@ -47,8 +58,10 @@
     "@ngrx/store-devtools": "^21.1.1",
     "@ngx-translate/core": "^18.0.0",
     "@ngx-translate/http-loader": "^18.0.0",
+    "@vitest/coverage-v8": "^4.1.9",
     "@zxing/browser": "^0.1.5",
     "@zxing/library": "^0.21.3",
+    "jsdom": "^29.1.1",
     "marked": "^15.0.12",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
@@ -58,14 +71,7 @@
     "@angular/build": "^22.0.4",
     "@angular/cli": "^22.0.4",
     "@angular/compiler-cli": "^22.0.2",
-    "@types/jasmine": "~5.1.0",
-    "istanbul-lib-instrument": "^6.0.3",
-    "jasmine-core": "~5.4.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
+    "canvas": "^3.2.3",
     "prettier": "^3.6.2",
     "typescript": "~6.0.0",
     "vitest": "^4.0.8"

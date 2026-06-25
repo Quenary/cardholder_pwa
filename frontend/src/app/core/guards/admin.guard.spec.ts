@@ -1,24 +1,14 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  ActivatedRouteSnapshot,
-  CanActivateFn,
-  GuardResult,
-  RouterStateSnapshot,
-} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { adminGuard } from './admin.guard';
-import { Observable, of } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { ITestAppState, testAppState } from 'src/app/test';
+import { ITestAppState, testAppState } from 'src/testing';
 import { EUserRole } from 'src/app/entities/user/user-interface';
 
 describe('adminGuard', () => {
-  const dummyRoute = {} as ActivatedRouteSnapshot;
-  const dummyState = {} as RouterStateSnapshot;
   let storeMock: MockStore;
   let initialState: ITestAppState;
-
-  const executeGuard: CanActivateFn = (...guardParameters) =>
-    TestBed.runInInjectionContext(() => adminGuard(...guardParameters));
 
   beforeEach(() => {
     initialState = { ...testAppState };
@@ -30,11 +20,17 @@ describe('adminGuard', () => {
     storeMock = TestBed.inject(MockStore);
   });
 
-  it('should be created', () => {
-    expect(executeGuard).toBeTruthy();
-  });
+  function runGuard() {
+    return TestBed.runInInjectionContext(
+      () =>
+        adminGuard(
+          {} as ActivatedRouteSnapshot,
+          {} as RouterStateSnapshot,
+        ) as Observable<boolean>,
+    );
+  }
 
-  it('should allow admin', (done) => {
+  it('should allow admin', async () => {
     storeMock.setState({
       user: {
         info: {
@@ -42,17 +38,13 @@ describe('adminGuard', () => {
         },
       },
     });
-    const result$ = executeGuard(
-      dummyRoute,
-      dummyState,
-    ) as Observable<GuardResult>;
-    result$.subscribe((canActivate) => {
-      expect(canActivate).toBeTrue();
-      done();
-    });
+
+    const result = await firstValueFrom(runGuard());
+
+    expect(result).toBe(true);
   });
 
-  it('should reject not admin', (done) => {
+  it('should reject not admin', async () => {
     storeMock.setState({
       user: {
         info: {
@@ -60,13 +52,8 @@ describe('adminGuard', () => {
         },
       },
     });
-    const result$ = executeGuard(
-      dummyRoute,
-      dummyState,
-    ) as Observable<GuardResult>;
-    result$.subscribe((canActivate) => {
-      expect(canActivate).toBeFalse();
-      done();
-    });
+    const result = await firstValueFrom(runGuard());
+
+    expect(result).toBe(false);
   });
 });
