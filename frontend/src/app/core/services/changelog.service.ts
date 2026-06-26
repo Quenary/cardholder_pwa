@@ -30,7 +30,7 @@ export class ChangelogService {
 
   private readonly changelogHtml$ = this.store.select(selectAppVersion).pipe(
     first((version) => !!version),
-    timeout({ first: 1000, with: () => of(<IVersion>{}) }),
+    timeout({ first: 1000, with: () => of({} as IVersion) }),
     switchMap((version) =>
       // query parameter is a hack for bypass cache and get new file
       this.httpClient.get(`/CHANGELOG.md?v=${version.image_version}`, {

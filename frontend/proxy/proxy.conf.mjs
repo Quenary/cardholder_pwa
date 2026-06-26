@@ -1,9 +1,9 @@
 export default [
-    {
-        context: ["/api"],
-        target: "http://localhost:8000",
-        secure: false,
-        logLevel: 'debug',
-        changeOrigin: true,
-    }
-]
+  {
+    context: ['/api'],
+    target: 'http://localhost:8000',
+    secure: false,
+    logLevel: 'debug',
+    changeOrigin: true,
+  },
+];

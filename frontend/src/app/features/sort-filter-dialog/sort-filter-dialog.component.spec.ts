@@ -80,7 +80,6 @@ describe('SortFilterDialogComponent', () => {
     matDialogRefMock = createMatDialogRefMock();
 
     TestBed.configureTestingModule({
-      imports: [],
       providers: [
         provideTranslateService(),
         { provide: MatDialogRef, useValue: matDialogRefMock },
@@ -101,20 +100,14 @@ describe('SortFilterDialogComponent', () => {
   it('should display forms from data', () => {
     fixture.detectChanges();
 
-    let formsElements = template.querySelectorAll('form');
+    const formsElements = template.querySelectorAll('form');
     expect(formsElements.length).toEqual(3);
-
-    const anotherFilter: Filter.Model<ICard, keyof ICard> = {
-      key: 'used_at',
-      criteria: Filter.Criteria.GREATER_OR_EQUALS,
-      value: '2025-07-04T21:00:00.000Z',
-    };
   });
 
   it('should add filter', () => {
     fixture.detectChanges();
 
-    let addFiterButton: HTMLButtonElement = template.querySelector(
+    const addFiterButton: HTMLButtonElement = template.querySelector(
       'mat-dialog-content > button',
     );
     expect(addFiterButton).toBeTruthy();
@@ -122,7 +115,7 @@ describe('SortFilterDialogComponent', () => {
     addFiterButton.click();
     fixture.detectChanges();
 
-    let formsElements = template.querySelectorAll('form');
+    const formsElements = template.querySelectorAll('form');
     expect(formsElements.length).toEqual(4);
   });
 
@@ -137,7 +130,7 @@ describe('SortFilterDialogComponent', () => {
     filterFormRemoveButton.click();
     fixture.detectChanges();
 
-    let formsElements = template.querySelectorAll('form');
+    const formsElements = template.querySelectorAll('form');
     expect(formsElements.length).toEqual(2);
   });
 });

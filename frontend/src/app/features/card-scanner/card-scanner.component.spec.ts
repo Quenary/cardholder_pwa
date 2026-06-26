@@ -110,7 +110,7 @@ describe('CardScannerComponent', () => {
 
   it('should select first environment camera as default', async () => {
     if (typeof globalThis.MediaStream === 'undefined') {
-      globalThis.MediaStream = class {} as any;
+      globalThis.MediaStream = class {} as typeof MediaStream;
     }
     mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
       new globalThis.MediaStream(),

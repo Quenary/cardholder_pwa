@@ -76,8 +76,6 @@ export class AdminSettingsComponent implements OnInit {
       case ESettingValueType.BOOL:
         value = Boolean(value);
         break;
-      default:
-        value = value;
     }
 
     this.adminApiService

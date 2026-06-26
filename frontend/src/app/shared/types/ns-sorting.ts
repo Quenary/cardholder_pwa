@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace, @typescript-eslint/no-explicit-any */
 import { PrimitiveStringType } from './premitive';
 
 /**
@@ -11,7 +12,7 @@ export namespace Sorting {
   /**
    * Model of sorting
    */
-  export interface Model<T extends unknown, K extends keyof T> {
+  export interface Model<T, K extends keyof T> {
     key: K;
     direction: Direction;
   }

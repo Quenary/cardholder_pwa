@@ -60,7 +60,7 @@
     }
   }
   @if (
-    user.role_code == EUserRole.MEMBER || (user.role_code == EUserRole.ADMIN && isOwner())
+    user.role_code === EUserRole.MEMBER || (user.role_code === EUserRole.ADMIN && isOwner())
   ) {
     <button
       class="warn-color"

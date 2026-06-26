@@ -35,10 +35,10 @@ export class AuthEffects {
             this.router.navigate(['/cards']);
           }),
           map((tokenResponse) => AuthActions.tokenSuccess({ tokenResponse })),
-          catchError((error) => of(AuthActions.tokenError({ error })))
-        )
-      )
-    )
+          catchError((error) => of(AuthActions.tokenError({ error }))),
+        ),
+      ),
+    ),
   );
 
   refreshToken$ = createEffect(() =>
@@ -47,15 +47,15 @@ export class AuthEffects {
       switchMap((action) =>
         this.authApiService.tokenRefresh(action.refreshToken).pipe(
           map((tokenResponse) =>
-            AuthActions.refreshTokenSuccess({ tokenResponse })
+            AuthActions.refreshTokenSuccess({ tokenResponse }),
           ),
           catchError((error) => {
             this.onLogout();
             return of(AuthActions.refreshTokenError({ error }));
-          })
-        )
-      )
-    )
+          }),
+        ),
+      ),
+    ),
   );
 
   getUserInfo = createEffect(
@@ -64,9 +64,9 @@ export class AuthEffects {
         ofType(AuthActions.tokenSuccess),
         tap(() => {
           this.store.dispatch(UserActions.read());
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   saveTokens$ = createEffect(
@@ -76,27 +76,27 @@ export class AuthEffects {
         tap((action) => {
           localStorage.setItemJson(
             ELocalStorageKey.TOKEN_RESPONSE,
-            action.tokenResponse
+            action.tokenResponse,
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.logout),
       withLatestFrom(this.store.select(selectAuthTokenResponse)),
-      switchMap(([action, tokens]) =>
+      switchMap(([_, tokens]) =>
         this.authApiService.logout(tokens.refresh_token).pipe(
           map(() => AuthActions.logoutSuccess()),
           catchError((error) => of(AuthActions.logoutError({ error }))),
           finalize(() => {
             this.onLogout();
-          })
-        )
-      )
-    )
+          }),
+        ),
+      ),
+    ),
   );
 
   $logoutSilent = createEffect(
@@ -105,9 +105,9 @@ export class AuthEffects {
         ofType(AuthActions.logoutSilent),
         tap(() => {
           this.onLogout();
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   showErrors$ = createEffect(
@@ -116,13 +116,13 @@ export class AuthEffects {
         ofType(
           AuthActions.tokenError,
           AuthActions.refreshTokenError,
-          AuthActions.logoutError
+          AuthActions.logoutError,
         ),
         tap((action) => {
           this.snackService.error(action.error);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   /**

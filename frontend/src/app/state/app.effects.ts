@@ -73,9 +73,9 @@ export class AppEffects {
                 // Versions in changelog saved without prefix
                 const compareTo = lastVersion.replace('v', '');
                 this.matDialog.open(ChangelogDialogComponent, {
-                  data: <IChangelogDialogComponentData>{
+                  data: {
                     versionPredicate: (v) => v > compareTo,
-                  },
+                  } as IChangelogDialogComponentData,
                   autoFocus: false,
                 });
               }
@@ -104,7 +104,7 @@ export class AppEffects {
     () =>
       this.actions$.pipe(
         ofType(AppActions.versionReady),
-        tap((action) => {
+        tap(() => {
           const {
             TITLE: title,
             SUBTITLE: subtitle,
@@ -112,7 +112,7 @@ export class AppEffects {
           } = this.translateService.instant('UPDATE');
           this.matDialog
             .open(ConfirmDialogComponent, {
-              data: <IConfirmDialogData>{ title, subtitle, confirmText },
+              data: { title, subtitle, confirmText } as IConfirmDialogData,
             })
             .afterClosed()
             .subscribe((res) => {
@@ -130,7 +130,7 @@ export class AppEffects {
     () =>
       this.actions$.pipe(
         ofType(AppActions.unrecoverable),
-        tap((action) => {
+        tap(() => {
           document.location.reload();
         }),
       ),

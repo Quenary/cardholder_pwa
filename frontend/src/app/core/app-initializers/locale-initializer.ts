@@ -3,7 +3,7 @@ import { inject, EnvironmentInjector } from '@angular/core';
 import { from, switchMap, first, catchError, of, tap } from 'rxjs';
 
 const importLocale = (locale: string) => {
-  let _import: Promise<any> = import('@angular/common/locales/en');
+  let _import: Promise<object> = import('@angular/common/locales/en');
   locale = locale.split('-')[0];
   switch (locale) {
     case 'ru':
@@ -28,25 +28,25 @@ const importLocale = (locale: string) => {
       _import = import('@angular/common/locales/zh');
       break;
   }
-  return from(_import.then((c) => c.default));
+  return from(_import.then((c) => c['default']));
 };
 
 export const localeInitializer = () => {
   const environmentInjector = inject(EnvironmentInjector);
   const locationInitialized = environmentInjector.get(
     LOCATION_INITIALIZED,
-    Promise.resolve(null)
+    Promise.resolve(null),
   );
   return from(locationInitialized).pipe(
     switchMap(() => {
-      let lang = navigator.language || 'en';
+      const lang = navigator.language || 'en';
       return importLocale(lang).pipe(
         tap((data) => {
           registerLocaleData(data);
         }),
         first(),
-        catchError(() => of(null))
+        catchError(() => of(null)),
       );
-    })
+    }),
   );
 };

@@ -62,8 +62,8 @@ export class CardScannerZxingComponent extends CardScannerBaseComponent {
         .decodeFromVideoDevice(
           deviceId,
           this.videoRef().nativeElement,
-          (result, error, controls) => {
-            if (!!result) {
+          (result) => {
+            if (result) {
               observer.next(this.prepareResult(result));
             }
           },
@@ -83,7 +83,7 @@ export class CardScannerZxingComponent extends CardScannerBaseComponent {
     const code = result.getText();
     const intFormat = result.getBarcodeFormat();
     const zFormat = Object.entries(BarcodeFormat).find(
-      ([key, value]) => value === intFormat,
+      ([_, value]) => value === intFormat,
     )[0];
     const type = ZxingToBwipMap[zFormat];
     return {

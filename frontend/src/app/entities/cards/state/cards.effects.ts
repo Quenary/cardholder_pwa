@@ -35,7 +35,7 @@ export class CardsEffects {
   list$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CardsActions.list),
-      switchMap((action) =>
+      switchMap(() =>
         this.cardsApiService.list().pipe(
           map((list) => CardsActions.listSuccess({ list })),
           catchError((error) => of(CardsActions.listError({ error }))),
@@ -60,9 +60,9 @@ export class CardsEffects {
     this.actions$.pipe(
       ofType(CardsActions.saveCard),
       withLatestFrom(this.store.select(selectCardsActive)),
-      switchMap(([action, active]) =>
+      switchMap(([, active]) =>
         of(
-          !!active.info
+          active.info
             ? CardsActions.update({ id: active.info.id, body: active.form })
             : CardsActions.create({ body: active.form }),
         ),
@@ -124,10 +124,10 @@ export class CardsEffects {
     this.actions$.pipe(
       ofType(CardsActions.deleteAttempt),
       withLatestFrom(this.store.select(selectCardsActiveInfo)),
-      switchMap(([action, info]) =>
+      switchMap(([_, info]) =>
         this.matDialog
           .open(ConfirmDialogComponent, {
-            data: <IConfirmDialogData>{ title: 'GENERAL.DELETE_WARN' },
+            data: { title: 'GENERAL.DELETE_WARN' } as IConfirmDialogData,
           })
           .afterClosed()
           .pipe(
@@ -155,7 +155,7 @@ export class CardsEffects {
     () =>
       this.actions$.pipe(
         ofType(CardsActions.deleteSuccess),
-        tap((action) => {
+        tap(() => {
           this.snackService.success(
             this.translateService.instant('CARDS.CARD.SUCCESS.DELETE'),
           );

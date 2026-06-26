@@ -66,11 +66,11 @@ export class AdminUserDialogComponent {
   protected deleteUser(): void {
     this.matDialog
       .open(ConfirmDialogComponent, {
-        data: <IConfirmDialogData>{
+        data: {
           addCheckbox: true,
           title: 'GENERAL.DELETE_WARN',
           subtitle: 'USER.DELETE_WARN',
-        },
+        } as IConfirmDialogData,
         minHeight: '220px',
       })
       .afterClosed()
@@ -105,11 +105,11 @@ export class AdminUserDialogComponent {
     );
     this.matDialog
       .open(ConfirmDialogComponent, {
-        data: <IConfirmDialogData>{
+        data: {
           addCheckbox: true,
           title,
           subtitle,
-        },
+        } as IConfirmDialogData,
         minHeight: '220px',
       })
       .afterClosed()

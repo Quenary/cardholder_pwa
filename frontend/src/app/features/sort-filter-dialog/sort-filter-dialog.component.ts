@@ -50,7 +50,7 @@ export interface ISortFilterDialogResult<T> {
 /**
  * Yupe of filter form
  */
-type TFilterFormArrayItem<T extends unknown, K extends keyof T> = FormGroup<{
+type TFilterFormArrayItem<T, K extends keyof T> = FormGroup<{
   option: FormControl<Filter.Option<T, K>>;
   criteria: FormControl<Filter.Criteria>;
   value: FormControl<T[K]>;
@@ -179,7 +179,7 @@ export class SortFilterDialogComponent<T> {
     const filterModels: Filter.Model<T, keyof T>[] = [];
     for (const f of this.filterFormArray.controls) {
       if (f.valid) {
-        const _value = f.controls.value.value as any;
+        const _value = f.controls.value.value;
         let value = null;
         if (_value) {
           switch (f.controls.option.value.type) {
@@ -187,7 +187,7 @@ export class SortFilterDialogComponent<T> {
               value = Number(_value);
               break;
             case 'bigint':
-              value = BigInt(_value);
+              value = BigInt(_value as string);
               break;
             default:
               value = _value;

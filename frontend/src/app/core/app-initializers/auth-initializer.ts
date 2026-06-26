@@ -9,7 +9,7 @@ import { selectAuth } from 'src/app/entities/auth/state/auth.selectors';
 export const authInitializer = () => {
   const store = inject(Store);
   const tokenResponse = localStorage.getItemJson<ITokenResponse>(
-    ELocalStorageKey.TOKEN_RESPONSE
+    ELocalStorageKey.TOKEN_RESPONSE,
   );
   store.dispatch(AuthActions.init({ tokenResponse }));
   return store.select(selectAuth).pipe(first((res) => res.init));

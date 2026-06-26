@@ -139,10 +139,10 @@ export class CardCodeViewerComponent {
     return this.matDialog.open(CardCodeViewerDialogComponent, {
       width: 'calc(100% - 50px)',
       height: 'calc(100% - 50px)',
-      data: <ICardCodeViewerData>{
+      data: {
         card: this.card(),
         scale: this.scale() * 2,
-      },
+      } as ICardCodeViewerData,
     });
   }
 }

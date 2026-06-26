@@ -12,11 +12,11 @@ import { BaseApiService } from '../base/base-api.service';
 export class PasswordRecoveryApiService extends BaseApiService<'recovery'> {
   protected override readonly prefix = 'recovery';
 
-  code(body: IPasswordRecoveryCode): Observable<any> {
+  code(body: IPasswordRecoveryCode): Observable<unknown> {
     return this.httpClient.post(`${this.basePath}/code`, body);
   }
 
-  submit(body: IPasswordRecoverySubmit): Observable<any> {
+  submit(body: IPasswordRecoverySubmit): Observable<unknown> {
     return this.httpClient.put(`${this.basePath}/submit`, body);
   }
 }

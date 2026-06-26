@@ -1,4 +1,4 @@
 export interface IEnvironment {
-    production: boolean;
-    api: string;
+  production: boolean;
+  api: string;
 }

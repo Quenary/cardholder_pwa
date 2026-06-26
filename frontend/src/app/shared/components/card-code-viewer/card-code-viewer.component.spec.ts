@@ -22,7 +22,7 @@ describe('CardCodeViewerComponent', () => {
   beforeEach(async () => {
     matDialogMock = createMatDialogMock();
 
-    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => 1);
 
     await TestBed.configureTestingModule({
       providers: [{ provide: MatDialog, useValue: matDialogMock }],

@@ -2,7 +2,7 @@ import { AbstractControl, FormGroup, ValidatorFn } from '@angular/forms';
 
 export const passwordMatchValidator = (
   field1 = 'password',
-  field2 = 'confirm_password'
+  field2 = 'confirm_password',
 ): ValidatorFn => {
   return (control: AbstractControl) => {
     const form = control as FormGroup;

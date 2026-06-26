@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { MatIconButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -15,7 +15,7 @@ import type { IAdminUserDialogData } from '../admin-user-dialog/admin-user-dialo
   templateUrl: './admin-users.component.html',
   styleUrl: './admin-users.component.scss',
 })
-export class AdminUsersComponent {
+export class AdminUsersComponent implements OnInit {
   private readonly adminApiService = inject(AdminApiService);
   private readonly snackService = inject(SnackService);
   private readonly matDialog = inject(MatDialog);
@@ -45,9 +45,9 @@ export class AdminUsersComponent {
     import('../admin-user-dialog/admin-user-dialog.component').then((c) => {
       this.matDialog
         .open(c.AdminUserDialogComponent, {
-          data: <IAdminUserDialogData>{
+          data: {
             user,
-          },
+          } as IAdminUserDialogData,
           width: 'calc(100% - 50px)',
           height: 'calc(100% - 50px)',
         })

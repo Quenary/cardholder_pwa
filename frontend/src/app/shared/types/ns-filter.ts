@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import { PrimitiveStringType } from './premitive';
 import { TypeToString } from './type-to-string';
 
@@ -22,7 +23,7 @@ export namespace Filter {
   /**
    * Model of app filters
    */
-  export interface Model<T extends unknown, K extends keyof T> {
+  export interface Model<T, K extends keyof T> {
     key: K;
     criteria: Criteria;
     value: T[K];
@@ -30,7 +31,7 @@ export namespace Filter {
   /**
    * Option of filtering
    */
-  export interface Option<T extends unknown, K extends keyof T> {
+  export interface Option<T, K extends keyof T> {
     key: K;
     label: string;
     type: TypeToString<T[K]>;
@@ -43,7 +44,7 @@ export namespace Filter {
    * @param type type of key
    * @returns
    */
-  export const filterBy = <T extends unknown, K extends keyof T>(
+  export const filterBy = <T, K extends keyof T>(
     items: T[],
     model: Model<T, K>,
     type: PrimitiveStringType,

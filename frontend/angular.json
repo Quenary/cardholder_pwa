@@ -99,12 +99,19 @@
             "runner": "vitest",
             "setupFiles": ["src/testing/setup-file.ts"]
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+          }
         }
       }
     }
   },
   "cli": {
-    "analytics": "4c4a29f3-c386-48be-8596-1b14a8a53110"
+    "analytics": "4c4a29f3-c386-48be-8596-1b14a8a53110",
+    "schematicCollections": ["angular-eslint"]
   },
   "schematics": {
     "@schematics/angular:component": {

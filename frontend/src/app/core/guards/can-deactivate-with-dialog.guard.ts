@@ -13,7 +13,7 @@ import {
 import { ConfirmDialogComponent } from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
 
 export const canDeactivateWithDialogGuard = (
-  hasChanges: MaybeAsync<boolean>[]
+  hasChanges: MaybeAsync<boolean>[],
 ): Observable<boolean> => {
   const matDialog = inject(MatDialog);
   const asyncHasChanges: Observable<boolean>[] = hasChanges.map((item) => {
@@ -31,6 +31,6 @@ export const canDeactivateWithDialogGuard = (
         return matDialog.open(ConfirmDialogComponent).afterClosed();
       }
       return of(true);
-    })
+    }),
   );
 };

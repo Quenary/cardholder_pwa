@@ -21,7 +21,7 @@ export class UserApiService extends BaseApiService<'user'> {
     return this.httpClient.put<IUser>(this.basePath, body);
   }
 
-  delete(): Observable<any> {
+  delete(): Observable<unknown> {
     return this.httpClient.delete(this.basePath);
   }
 }

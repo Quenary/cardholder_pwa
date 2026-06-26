@@ -23,22 +23,17 @@ export const userReducer = createReducer(
     info: payload.info,
     init: true,
   })),
-  on(
-    UserActions.read,
-    UserActions.update,
-    UserActions.delete,
-    (state, payload) => ({
-      ...state,
-      isLoading: true,
-    })
-  ),
+  on(UserActions.read, UserActions.update, UserActions.delete, (state) => ({
+    ...state,
+    isLoading: true,
+  })),
   on(UserActions.updateSuccess, UserActions.readSuccess, (state, payload) => ({
     ...state,
     info: payload.info,
     hasChanges: false,
     isLoading: false,
   })),
-  on(UserActions.deleteSuccess, (state, payload) => ({
+  on(UserActions.deleteSuccess, (state) => ({
     ...state,
     ...initialState,
   })),
@@ -46,10 +41,10 @@ export const userReducer = createReducer(
     UserActions.readError,
     UserActions.updateError,
     UserActions.deleteError,
-    (state, payload) => ({
+    (state) => ({
       ...state,
       isLoading: false,
-    })
+    }),
   ),
   on(UserActions.setForm, (state, payload) => {
     const info = state.info ?? { username: null, email: null };
@@ -64,5 +59,5 @@ export const userReducer = createReducer(
       form,
       hasChanges,
     };
-  })
+  }),
 );

@@ -14,11 +14,11 @@ export class AdminApiService extends BaseApiService<'admin'> {
     return this.httpClient.get<IUser[]>(`${this.basePath}/users`);
   }
 
-  deleteUser(user_id: number): Observable<any> {
+  deleteUser(user_id: number): Observable<unknown> {
     return this.httpClient.delete(`${this.basePath}/users/${user_id}`);
   }
 
-  changeUserRole(user_id: number, role_code: EUserRole): Observable<any> {
+  changeUserRole(user_id: number, role_code: EUserRole): Observable<unknown> {
     return this.httpClient.put(
       `${this.basePath}/users/role`,
       {},
@@ -35,7 +35,7 @@ export class AdminApiService extends BaseApiService<'admin'> {
     return this.httpClient.get<ISetting[]>(`${this.basePath}/settings`);
   }
 
-  setSettings(settings: ISettingUpdate[]): Observable<any> {
+  setSettings(settings: ISettingUpdate[]): Observable<unknown> {
     return this.httpClient.patch(`${this.basePath}/settings`, settings);
   }
 
@@ -43,7 +43,7 @@ export class AdminApiService extends BaseApiService<'admin'> {
     return this.httpClient.get<boolean>(`${this.basePath}/smtp/status`);
   }
 
-  smtpTest(): Observable<any> {
+  smtpTest(): Observable<unknown> {
     return this.httpClient.post(`${this.basePath}/smtp/test`, {});
   }
 }

@@ -26,7 +26,7 @@ interface INavItem {
   name: string;
   icon: string;
   link?: string;
-  onClick?: Function;
+  onClick?: () => unknown;
 }
 
 @Component({
