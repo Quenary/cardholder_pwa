@@ -1,6 +1,6 @@
 <router-outlet
   (activate)="showParent.set(false)"
-  (deactivate)="showParent.set(false)">
+  (deactivate)="showParent.set(true)">
 </router-outlet>
 
 @if (showParent()) {

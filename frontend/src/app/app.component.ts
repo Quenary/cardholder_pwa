@@ -107,5 +107,6 @@ export class AppComponent {
   private readonly isAdmin = this.store.selectSignal(selectUserIsAdmin);
   private readonly navTranslations = toSignal(
     this.translateService.getStreamOnTranslationChange('NAV'),
+    { initialValue: {} as object },
   );
 }

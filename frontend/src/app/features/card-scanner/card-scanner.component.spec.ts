@@ -19,6 +19,7 @@ import { provideMockStore } from '@ngrx/store/testing';
 import { MediaDevicesService } from 'src/app/core/services/media-devices.service';
 import { Mocked } from 'vitest';
 import { provideTranslateService } from '@ngx-translate/core';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 const testMediaDevices: MediaDeviceInfo[] = [
   {
@@ -80,6 +81,7 @@ describe('CardScannerComponent', () => {
         { provide: SnackService, useValue: snackServiceMock },
         { provide: MediaDevicesService, useValue: mediaDevicesServiceMock },
         provideTranslateService(),
+        provideZonelessChangeDetection(),
       ],
       imports: [CardScannerComponent],
     }).compileComponents();
@@ -120,8 +122,12 @@ describe('CardScannerComponent', () => {
     );
     fixture = TestBed.createComponent(CardScannerComponent);
     component = fixture.componentInstance;
-    fixture.autoDetectChanges();
+
+    fixture.detectChanges();
     await fixture.whenStable();
+    await fixture.whenRenderingDone();
+    TestBed.tick();
+
     expect(component['selectedDevice']()).toEqual(testMediaDevices[2]);
   });
 
@@ -132,10 +138,15 @@ describe('CardScannerComponent', () => {
     );
     fixture = TestBed.createComponent(CardScannerComponent);
     component = fixture.componentInstance;
-    fixture.autoDetectChanges();
+
+    fixture.detectChanges();
     await fixture.whenStable();
+    await fixture.whenRenderingDone();
+    TestBed.tick();
+
     const deferBlocks = await fixture.getDeferBlocks();
     expect(deferBlocks.length).toEqual(1);
+
     await deferBlocks[0].render(DeferBlockState.Complete);
     expect(
       fixture.nativeElement.querySelector('app-card-scanner-zxing'),
