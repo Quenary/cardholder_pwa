@@ -62,7 +62,7 @@
     "@angular/router": "^22.0.2",
     "@angular/service-worker": "^22.0.2",
     "@bwip-js/browser": "^4.7.0",
-    "@ericblade/quagga2": "^1.8.4",
+    "@ericblade/quagga2": "^1.12.1",
     "@ngrx/effects": "^21.1.1",
     "@ngrx/store": "^21.1.1",
     "@ngrx/store-devtools": "^21.1.1",

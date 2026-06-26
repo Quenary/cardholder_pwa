@@ -220,12 +220,14 @@ export type QuaggaJSCodeFormat =
   | 'ean_13'
   | 'i2of5'
   | 'upc_e'
-  | 'upc_a';
+  | 'upc_a'
+  | 'pharmacode';
 
 export const Quagga2ReaderToFormat: Record<
   QuaggaJSCodeReader,
   QuaggaJSCodeFormat
 > = {
+  'pharmacode_reader': 'pharmacode',
   '2of5_reader': '2of5',
   'codabar_reader': 'codabar',
   'code_128_reader': 'code_128',
@@ -259,5 +261,6 @@ export const Quagga2ToBwipMap: Record<
   'i2of5': 'iata2of5',
   'upc_e': 'upce',
   'upc_a': 'upca',
+  'pharmacode': 'pharmacode',
 };
 //#endregion

@@ -122,8 +122,8 @@ export class CardScannerComponent implements OnDestroy {
    */
   protected readonly selectedDevice = signal<MediaDeviceInfo>(null);
 
-  private readonly scannerComponent = viewChild.required<
-    unknown,
+  private readonly scannerComponent = viewChild<
+    CardScannerBaseComponent,
     CardScannerBaseComponent
   >('scanner', { read: CardScannerBaseComponent });
 
@@ -187,19 +187,18 @@ export class CardScannerComponent implements OnDestroy {
     if (!file) {
       return;
     }
-    if (this.scannerComponent) {
-      this.scannerComponent()
-        .scanFile(file)
-        .subscribe({
-          next: (res) => {
-            if (res) {
-              this.onResult(res);
-            }
-          },
-          error: (error) => {
-            this.snackService.error(error);
-          },
-        });
+    const comp = this.scannerComponent();
+    if (comp) {
+      comp.scanFile(file).subscribe({
+        next: (res) => {
+          if (res) {
+            this.onResult(res);
+          }
+        },
+        error: (error) => {
+          this.snackService.error(error);
+        },
+      });
     }
   }
 

@@ -11,7 +11,7 @@ import { IScannerResult } from '../card-scanner-base/scanner-interface';
   providers: [
     {
       provide: CardScannerBaseComponent,
-      useValue: forwardRef(() => CardScannerZxingComponent),
+      useExisting: forwardRef(() => CardScannerZxingComponent),
       multi: true,
     },
   ],

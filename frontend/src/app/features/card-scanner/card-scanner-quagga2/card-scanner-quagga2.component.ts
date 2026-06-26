@@ -15,7 +15,7 @@ import { IScannerResult } from '../card-scanner-base/scanner-interface';
   providers: [
     {
       provide: CardScannerBaseComponent,
-      useValue: forwardRef(() => CardScannerQuagga2Component),
+      useExisting: forwardRef(() => CardScannerQuagga2Component),
       multi: true,
     },
   ],
@@ -40,6 +40,7 @@ export class CardScannerQuagga2Component extends CardScannerBaseComponent {
     '2of5_reader',
     'code_93_reader',
     'code_32_reader',
+    'pharmacode_reader',
   ];
 
   public override scanFile(file: File): Observable<IScannerResult | null> {
