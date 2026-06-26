@@ -1,5 +1,5 @@
 # Stage 1 - frontend build
-FROM node:22 AS frontend-builder
+FROM node:24 AS frontend-builder
 WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci

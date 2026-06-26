@@ -14,7 +14,7 @@
     "prettier:check": "prettier --check ."
   },
   "engine": {
-    "node": "^22.22.3 || ^24.15.0 || ^26.0.0"
+    "node": "^24.15.0 || ^26.0.0"
   },
   "prettier": {
     "htmlWhitespaceSensitivity": "strict",
