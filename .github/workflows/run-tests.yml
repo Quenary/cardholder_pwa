@@ -28,6 +28,14 @@ jobs:
       - name: Run tests
         run: npm run test:ci
 
+      - name: Run lint
+        if: always()
+        run: npm run lint
+
+      - name: Run Prettier Check
+        if: always()
+        run: npm run prettier:check
+
   backend-tests:
     name: Run Backend Tests
     runs-on: ubuntu-latest

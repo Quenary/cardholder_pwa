@@ -11,7 +11,7 @@
     "test": "ng test",
     "test:ci": "ng test --watch=false --coverage",
     "lint": "ng lint",
-    "prettier-check": "prettier --check ."
+    "prettier:check": "prettier --check ."
   },
   "engine": {
     "node": "^22.22.3 || ^24.15.0 || ^26.0.0"
