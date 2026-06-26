@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v1.8.2 (2026-06-26)
+
+### Bug Fixes
+
+- **build**: Use node 24, drop armv7
+  ([`a75b2b2`](https://github.com/Quenary/cardholder_pwa/commit/a75b2b2acd1a8e7bf4867d4ebe85918422c84d45))
+
+
 ## v1.8.1 (2026-06-26)
 
 ### Bug Fixes
