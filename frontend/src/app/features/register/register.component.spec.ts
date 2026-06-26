@@ -5,6 +5,10 @@ import { UserApiService } from 'src/app/entities/user/user-api.service';
 import { Mocked } from 'vitest';
 import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
+import { Component } from '@angular/core';
+
+@Component({})
+class DummyComponent {}
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
@@ -20,7 +24,12 @@ describe('RegisterComponent', () => {
     await TestBed.configureTestingModule({
       imports: [RegisterComponent],
       providers: [
-        provideRouter([]),
+        provideRouter([
+          {
+            path: 'auth',
+            component: DummyComponent,
+          },
+        ]),
         provideTranslateService(),
         {
           provide: UserApiService,
