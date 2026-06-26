@@ -8,7 +8,6 @@ import { ICardBase } from 'src/app/entities/cards/cards-interface';
 @Pipe({
   name: 'isValidCard',
   pure: true,
-  standalone: true,
 })
 export class IsValidCardPipe implements PipeTransform {
   transform(value: Partial<ICardBase>): boolean {

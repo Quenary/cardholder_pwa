@@ -1,10 +1,5 @@
 import { DatePipe } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import {
@@ -18,7 +13,7 @@ import {
 import { MatIcon } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { Store } from '@ngrx/store';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { switchMap, finalize, EMPTY, tap } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { AdminApiService } from 'src/app/entities/admin/admin-api.service';
@@ -41,7 +36,7 @@ export interface IAdminUserDialogData {
     MatDialogActions,
     MatDialogContent,
     MatDialogTitle,
-    TranslateModule,
+    TranslatePipe,
     FormsModule,
     MatListModule,
     DatePipe,
@@ -50,7 +45,6 @@ export interface IAdminUserDialogData {
   ],
   templateUrl: './admin-user-dialog.component.html',
   styleUrl: './admin-user-dialog.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminUserDialogComponent {
   private readonly adminApiService = inject(AdminApiService);
@@ -61,22 +55,22 @@ export class AdminUserDialogComponent {
   private readonly translateService = inject(TranslateService);
   private readonly store = inject(Store);
 
-  public readonly isOwner = this.store.selectSignal(selectUserIsOwner);
-  public readonly isLoading = signal(false);
+  protected readonly isOwner = this.store.selectSignal(selectUserIsOwner);
+  protected readonly isLoading = signal(false);
 
-  public readonly EUserRole = EUserRole;
-  public readonly rolesTranslates =
+  protected readonly EUserRole = EUserRole;
+  protected readonly rolesTranslations =
     this.translateService.instant('ADMIN.USERS.ROLES');
-  public user = this.data.user;
+  protected user = this.data.user;
 
-  public deleteUser(): void {
+  protected deleteUser(): void {
     this.matDialog
       .open(ConfirmDialogComponent, {
-        data: <IConfirmDialogData>{
+        data: {
           addCheckbox: true,
           title: 'GENERAL.DELETE_WARN',
           subtitle: 'USER.DELETE_WARN',
-        },
+        } as IConfirmDialogData,
         minHeight: '220px',
       })
       .afterClosed()
@@ -103,19 +97,19 @@ export class AdminUserDialogComponent {
       });
   }
 
-  public changeUserRole(role: EUserRole): void {
+  protected changeUserRole(role: EUserRole): void {
     const title = 'ADMIN.USERS.CHANGE_ROLE.CONFIRM';
     const subtitle = this.translateService.instant(
       'ADMIN.USERS.CHANGE_ROLE.CONFIRM_SUBTITLE',
-      { role: this.rolesTranslates[role] },
+      { role: this.rolesTranslations[role] },
     );
     this.matDialog
       .open(ConfirmDialogComponent, {
-        data: <IConfirmDialogData>{
+        data: {
           addCheckbox: true,
           title,
           subtitle,
-        },
+        } as IConfirmDialogData,
         minHeight: '220px',
       })
       .afterClosed()
@@ -144,7 +138,7 @@ export class AdminUserDialogComponent {
       });
   }
 
-  public close(): void {
+  protected close(): void {
     this.matDialogRef.close();
   }
 }

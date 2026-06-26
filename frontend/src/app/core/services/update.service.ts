@@ -28,7 +28,7 @@ export class UpdateService {
   private readonly applicationRef = inject(ApplicationRef);
   private readonly init$ = new Subject<void>();
 
-  public init(): void {
+  init(): void {
     this.init$.next();
 
     this.swUpdate.versionUpdates

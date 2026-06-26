@@ -12,15 +12,13 @@ import { IScannerResult } from '../card-scanner-base/scanner-interface';
 
 @Component({
   selector: 'app-card-scanner-quagga2',
-  imports: [],
   providers: [
     {
       provide: CardScannerBaseComponent,
-      useValue: forwardRef(() => CardScannerQuagga2Component),
+      useExisting: forwardRef(() => CardScannerQuagga2Component),
       multi: true,
     },
   ],
-  standalone: true,
   templateUrl: './card-scanner-quagga2.component.html',
   styleUrl: './card-scanner-quagga2.component.scss',
 })
@@ -42,41 +40,8 @@ export class CardScannerQuagga2Component extends CardScannerBaseComponent {
     '2of5_reader',
     'code_93_reader',
     'code_32_reader',
+    'pharmacode_reader',
   ];
-
-  protected override start(): Observable<IScannerResult> {
-    return new Observable((observer) => {
-      Quagga2.init({
-        inputStream: {
-          target: this.host.nativeElement,
-          constraints: {
-            deviceId: this.deviceId,
-            facingMode: 'environment',
-          },
-        },
-        decoder: {
-          readers: this.readers,
-        },
-      })
-        .then(() => {
-          Quagga2.start();
-          const onDetected: QuaggaJSResultCallbackFunction = (data) => {
-            if (data?.codeResult) {
-              observer.next(this.prepareResult(data.codeResult));
-            }
-          };
-          Quagga2.onDetected(onDetected);
-          observer.add(() => {
-            Quagga2.offDetected(onDetected);
-            Quagga2.stop();
-          });
-        })
-        .catch((error) => {
-          Quagga2.stop();
-          observer.error(error);
-        });
-    });
-  }
 
   public override scanFile(file: File): Observable<IScannerResult | null> {
     if (!file) {
@@ -109,7 +74,41 @@ export class CardScannerQuagga2Component extends CardScannerBaseComponent {
     });
   }
 
-  public override prepareResult(
+  protected override start(deviceId: string): Observable<IScannerResult> {
+    return new Observable((observer) => {
+      Quagga2.init({
+        inputStream: {
+          target: this.host.nativeElement,
+          constraints: {
+            deviceId,
+            facingMode: 'environment',
+          },
+        },
+        decoder: {
+          readers: this.readers,
+        },
+      })
+        .then(() => {
+          Quagga2.start();
+          const onDetected: QuaggaJSResultCallbackFunction = (data) => {
+            if (data?.codeResult) {
+              observer.next(this.prepareResult(data.codeResult));
+            }
+          };
+          Quagga2.onDetected(onDetected);
+          observer.add(() => {
+            Quagga2.offDetected(onDetected);
+            Quagga2.stop();
+          });
+        })
+        .catch((error) => {
+          Quagga2.stop();
+          observer.error(error);
+        });
+    });
+  }
+
+  protected override prepareResult(
     result: QuaggaJSResultObject_CodeResult,
   ): IScannerResult {
     return {

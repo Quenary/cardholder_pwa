@@ -4,7 +4,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "outDir": "./dist/out-tsc",
-    "strictNullChecks":false,
+    "strictNullChecks": false,
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": false,
@@ -18,12 +18,11 @@
     "importHelpers": true,
     "noImplicitAny": false,
     "target": "ES2022",
-    "module": "ES2022",
+    "module": "preserve",
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
-      "@env/*": [
-        "src/environments/*"
-      ]
+      "@env/*": ["src/environments/*"]
     }
   },
   "angularCompilerOptions": {
@@ -31,5 +30,13 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
 }

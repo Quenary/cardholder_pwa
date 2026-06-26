@@ -1,9 +1,10 @@
-from fastapi import HTTPException
-import pytest
+from typing import Any, cast
 from unittest.mock import AsyncMock, MagicMock
-from sqlalchemy.ext.asyncio import AsyncSession
+
+import pytest
 from fastapi import HTTPException
-from typing import cast, Any
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from backend.api.admin_api import admin_delete_user
 from backend.db.models.user_model import UserModel
 from backend.enums.user_role_enum import EUserRole
@@ -32,14 +33,10 @@ async def test_admin__should_not_delete_self():
     session_mock = AsyncMock()
 
     with pytest.raises(HTTPException) as exc_info:
-        await admin_delete_user(
-            user_id=1, session=session_mock, admin=admin
-        )
+        await admin_delete_user(user_id=1, session=session_mock, admin=admin)
 
     assert exc_info.value.status_code == 403
-    assert "cannot delete his own account" in str(
-        exc_info.value.detail
-    )
+    assert "cannot delete his own account" in str(exc_info.value.detail)
 
 
 @pytest.mark.asyncio
@@ -52,9 +49,7 @@ async def test_admin__user_not_found():
     session_mock.execute.return_value = result_mock
 
     with pytest.raises(HTTPException) as exc_info:
-        await admin_delete_user(
-            user_id=999, session=session_mock, admin=admin
-        )
+        await admin_delete_user(user_id=999, session=session_mock, admin=admin)
 
     assert exc_info.value.status_code == 404
 
@@ -70,9 +65,7 @@ async def test_admin__should_not_delete_other_admin():
     session_mock.execute.return_value = result_mock
 
     with pytest.raises(HTTPException) as exc_info:
-        await admin_delete_user(
-            user_id=2, session=session_mock, admin=admin
-        )
+        await admin_delete_user(user_id=2, session=session_mock, admin=admin)
 
     assert exc_info.value.status_code == 403
     assert "Admin cannot delete admin" in str(exc_info.value.detail)

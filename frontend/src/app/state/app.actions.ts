@@ -22,8 +22,7 @@ export const AppActions = createActionGroup({
     getVersion: emptyProps(),
     getVersionSuccess: props<{ version: IVersion }>(),
     getVersionError: props<{ error: HttpErrorResponse }>(),
-    networkOnline: emptyProps(),
-    networkOffline: emptyProps(),
+    setNetworkStatus: props<{ isOnline: boolean }>(),
     versionDetected: props<{ event: VersionDetectedEvent }>(),
     versionInstallationFailed: props<{
       event: VersionInstallationFailedEvent;

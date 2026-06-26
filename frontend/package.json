@@ -9,47 +9,85 @@
     "build": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:ci": "ng test --watch=false --browsers=ChromeHeadless"
+    "test:ci": "ng test --watch=false --coverage",
+    "lint": "ng lint",
+    "prettier:check": "prettier --check ."
+  },
+  "engine": {
+    "node": "^22.22.3 || ^24.15.0 || ^26.0.0"
+  },
+  "prettier": {
+    "htmlWhitespaceSensitivity": "strict",
+    "bracketSameLine": true,
+    "singleAttributePerLine": true,
+    "tabWidth": 2,
+    "useTabs": false,
+    "singleQuote": true,
+    "embeddedLanguageFormatting": "off",
+    "semi": true,
+    "quoteProps": "preserve",
+    "trailingComma": "all",
+    "endOfLine": "auto"
+  },
+  "lint-staged": {
+    "*.{ts,js,html,css,scss,json,md}": [
+      "prettier --write"
+    ],
+    "*.{ts,js,html}": [
+      "eslint --fix"
+    ]
   },
   "private": true,
+  "overrides": {
+    "@ngrx/store": {
+      "@angular/core": "^22"
+    },
+    "@ngrx/effects": {
+      "@angular/core": "^22"
+    },
+    "@ngrx/store-devtools": {
+      "@angular/core": "^22"
+    }
+  },
   "dependencies": {
-    "@angular/animations": "^19.0.0",
-    "@angular/cdk": "^19.2.18",
-    "@angular/common": "^19.0.0",
-    "@angular/compiler": "^19.0.0",
-    "@angular/core": "^19.0.0",
-    "@angular/forms": "^19.2.15",
-    "@angular/material": "^19.2.19",
-    "@angular/platform-browser": "^19.0.0",
-    "@angular/platform-browser-dynamic": "^19.2.15",
-    "@angular/router": "^19.2.15",
-    "@angular/service-worker": "^19.2.15",
+    "@angular/animations": "^22.0.2",
+    "@angular/cdk": "^22.0.2",
+    "@angular/common": "^22.0.2",
+    "@angular/compiler": "^22.0.2",
+    "@angular/core": "^22.0.2",
+    "@angular/forms": "^22.0.2",
+    "@angular/material": "^22.0.2",
+    "@angular/platform-browser": "^22.0.2",
+    "@angular/platform-browser-dynamic": "^22.0.2",
+    "@angular/router": "^22.0.2",
+    "@angular/service-worker": "^22.0.2",
     "@bwip-js/browser": "^4.7.0",
-    "@ericblade/quagga2": "^1.8.4",
-    "@ngrx/effects": "^19.2.1",
-    "@ngrx/store": "^19.2.1",
-    "@ngrx/store-devtools": "^19.2.1",
-    "@ngx-translate/core": "^16.0.4",
-    "@ngx-translate/http-loader": "^16.0.1",
+    "@ericblade/quagga2": "^1.12.1",
+    "@ngrx/effects": "^21.1.1",
+    "@ngrx/store": "^21.1.1",
+    "@ngrx/store-devtools": "^21.1.1",
+    "@ngx-translate/core": "^18.0.0",
+    "@ngx-translate/http-loader": "^18.0.0",
+    "@vitest/coverage-v8": "^4.1.9",
     "@zxing/browser": "^0.1.5",
     "@zxing/library": "^0.21.3",
+    "jsdom": "^29.1.1",
     "marked": "^15.0.12",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0",
-    "zone.js": "^0.15.1"
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^19.2.19",
-    "@angular/cli": "^19.2.19",
-    "@angular/compiler-cli": "^19.2.15",
-    "@types/jasmine": "~5.1.0",
-    "jasmine-core": "~5.4.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
-    "prettier": "^3.6.2",
-    "typescript": "~5.6.2"
+    "@angular/build": "^22.0.4",
+    "@angular/cli": "^22.0.4",
+    "@angular/compiler-cli": "^22.0.2",
+    "@eslint/js": "^10.0.1",
+    "angular-eslint": "22.0.0",
+    "canvas": "^3.2.3",
+    "eslint": "^10.3.0",
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.8.4",
+    "typescript": "~6.0.0",
+    "typescript-eslint": "8.60.1",
+    "vitest": "^4.0.8"
   }
 }

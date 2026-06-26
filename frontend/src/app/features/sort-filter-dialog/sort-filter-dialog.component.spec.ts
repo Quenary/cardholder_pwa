@@ -6,8 +6,9 @@ import {
 } from './sort-filter-dialog.component';
 import { ICard } from 'src/app/entities/cards/cards-interface';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { createMatDialogRefMock, TestTranslateModule } from 'src/app/test';
+import { createMatDialogRefMock } from 'src/testing';
 import { Filter } from 'src/app/shared/types';
+import { provideTranslateService } from '@ngx-translate/core';
 
 const dialogData: ISortFilterDialogData<ICard> = {
   title: 'TEST TITLE',
@@ -79,8 +80,8 @@ describe('SortFilterDialogComponent', () => {
     matDialogRefMock = createMatDialogRefMock();
 
     TestBed.configureTestingModule({
-      imports: [TestTranslateModule],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: matDialogRefMock },
         { provide: MAT_DIALOG_DATA, useValue: dialogData },
       ],
@@ -99,20 +100,14 @@ describe('SortFilterDialogComponent', () => {
   it('should display forms from data', () => {
     fixture.detectChanges();
 
-    let formsElements = template.querySelectorAll('form');
+    const formsElements = template.querySelectorAll('form');
     expect(formsElements.length).toEqual(3);
-
-    const anotherFilter: Filter.Model<ICard, keyof ICard> = {
-      key: 'used_at',
-      criteria: Filter.Criteria.GREATER_OR_EQUALS,
-      value: '2025-07-04T21:00:00.000Z',
-    };
   });
 
   it('should add filter', () => {
     fixture.detectChanges();
 
-    let addFiterButton: HTMLButtonElement = template.querySelector(
+    const addFiterButton: HTMLButtonElement = template.querySelector(
       'mat-dialog-content > button',
     );
     expect(addFiterButton).toBeTruthy();
@@ -120,7 +115,7 @@ describe('SortFilterDialogComponent', () => {
     addFiterButton.click();
     fixture.detectChanges();
 
-    let formsElements = template.querySelectorAll('form');
+    const formsElements = template.querySelectorAll('form');
     expect(formsElements.length).toEqual(4);
   });
 
@@ -135,7 +130,7 @@ describe('SortFilterDialogComponent', () => {
     filterFormRemoveButton.click();
     fixture.detectChanges();
 
-    let formsElements = template.querySelectorAll('form');
+    const formsElements = template.querySelectorAll('form');
     expect(formsElements.length).toEqual(2);
   });
 });

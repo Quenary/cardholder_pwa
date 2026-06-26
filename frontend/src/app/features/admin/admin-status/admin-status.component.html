@@ -4,7 +4,7 @@
       matListItemIcon
       [ngTemplateOutlet]="statusIconTemplate"
       [ngTemplateOutletContext]="{
-        status: health()
+        status: health.value()
       }">
     </ng-container>
     <span matListItemTitle>
@@ -16,7 +16,7 @@
       matListItemIcon
       [ngTemplateOutlet]="statusIconTemplate"
       [ngTemplateOutletContext]="{
-        status: smtpStatus()
+        status: smtpStatus.value()
       }">
     </ng-container>
     <span matListItemTitle>
@@ -24,10 +24,18 @@
       <button
         class="mat-list-button"
         mat-button
-        [disabled]="!smtpStatus()"
+        [showProgress]="smtpLoading()"
+        [disabled]="!smtpStatus.value()"
         (click)="onSmtpTest()">
         <mat-icon>mail</mat-icon>
         {{ 'ADMIN.SMTP_TEST' | translate }}
+
+        <mat-progress-spinner
+          progressIndicator
+          mode="indeterminate"
+          diameter="20"
+          aria-label="Loading"
+          tabindex="" />
       </button>
     </span>
   </mat-list-item>

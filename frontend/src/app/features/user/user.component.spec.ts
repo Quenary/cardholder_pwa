@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UserComponent } from './user.component';
-import { ITestAppState, testAppState, TestTranslateModule } from 'src/app/test';
+import { ITestAppState, testAppState } from 'src/testing';
 import { provideRouter } from '@angular/router';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { UserActions } from 'src/app/entities/user/state/user.actions';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('UserComponent', () => {
   let component: UserComponent;
@@ -15,8 +16,12 @@ describe('UserComponent', () => {
   beforeEach(async () => {
     initialState = { ...testAppState };
     await TestBed.configureTestingModule({
-      providers: [provideMockStore({ initialState }), provideRouter([])],
-      imports: [UserComponent, TestTranslateModule],
+      providers: [
+        provideMockStore({ initialState }),
+        provideRouter([]),
+        provideTranslateService(),
+      ],
+      imports: [UserComponent],
     }).compileComponents();
 
     storeMock = TestBed.inject(MockStore);
@@ -32,15 +37,15 @@ describe('UserComponent', () => {
   it('should update username and email', () => {
     fixture = TestBed.createComponent(UserComponent);
     component = fixture.componentInstance;
-    const dispatchSpy = spyOn(storeMock, 'dispatch');
+    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
     const body = {
       username: 'user1',
       email: 'testemail1@example.com',
     };
-    component.form.patchValue(body);
-    component.onSubmit();
+    component['form'].patchValue(body);
+    component['onSubmit']();
 
     expect(dispatchSpy).toHaveBeenCalledWith(UserActions.update({ body }));
   });
@@ -48,49 +53,47 @@ describe('UserComponent', () => {
   it('should not update user on invalid form', () => {
     fixture = TestBed.createComponent(UserComponent);
     component = fixture.componentInstance;
-    const dispatchSpy = spyOn(storeMock, 'dispatch');
+    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
     // empty form
-    component.form.reset();
-    component.onSubmit();
+    component['form'].reset();
+    component['onSubmit']();
 
     // invalid username
-    component.form.patchValue({
+    component['form'].patchValue({
       username: '1',
       email: 'testemail1@example.com',
     });
-    component.onSubmit();
+    component['onSubmit']();
 
     // invalid email
-    component.form.patchValue({
+    component['form'].patchValue({
       username: 'user1',
       email: 'invalidemail',
     });
-    component.onSubmit();
+    component['onSubmit']();
 
-    expect(
-      dispatchSpy.calls
-        .all()
-        .some((call) => (call.args[0] as any).type == UserActions.update.type),
-    ).toBeFalse();
+    expect(dispatchSpy).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: UserActions.update.type }),
+    );
   });
 
   it('should update password if checked', () => {
     fixture = TestBed.createComponent(UserComponent);
     component = fixture.componentInstance;
-    const dispatchSpy = spyOn(storeMock, 'dispatch');
+    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
-    component.onChangePasswordCheck({ checked: true, source: null });
+    component['onChangePasswordCheck']({ checked: true, source: null });
     const body = {
       username: 'user1',
       email: 'testemail1@example.com',
       password: '12345678qQ',
       confirm_password: '12345678qQ',
     };
-    component.form.patchValue(body);
-    component.onSubmit();
+    component['form'].patchValue(body);
+    component['onSubmit']();
 
     expect(dispatchSpy).toHaveBeenCalledWith(UserActions.update({ body }));
   });
@@ -98,19 +101,19 @@ describe('UserComponent', () => {
   it('should not update password if unchecked', () => {
     fixture = TestBed.createComponent(UserComponent);
     component = fixture.componentInstance;
-    const dispatchSpy = spyOn(storeMock, 'dispatch');
+    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
-    component.onChangePasswordCheck({ checked: true, source: null });
+    component['onChangePasswordCheck']({ checked: true, source: null });
     const body = {
       username: 'user1',
       email: 'testemail1@example.com',
       password: '12345678qQ',
       confirm_password: '12345678qQ',
     };
-    component.form.patchValue(body);
-    component.onChangePasswordCheck({ checked: false, source: null });
-    component.onSubmit();
+    component['form'].patchValue(body);
+    component['onChangePasswordCheck']({ checked: false, source: null });
+    component['onSubmit']();
 
     expect(dispatchSpy).toHaveBeenCalledWith(
       UserActions.update({

@@ -1,0 +1,82 @@
+name: Prod Image
+
+on:
+  repository_dispatch:
+    types: [release-event]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    name: Build and push prod images
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-prod-image-${{ github.ref_name }}
+      cancel-in-progress: false
+    env:
+      IMAGE_NAME: cardholder_pwa
+
+    steps:
+      - name: Get Tags
+        id: get-tags
+        run: |
+          VERSION="${{ github.event.client_payload.version }}"
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          PREFIXED=v$VERSION
+
+          echo "full=$VERSION" >> $GITHUB_OUTPUT
+          echo "major=$MAJOR" >> $GITHUB_OUTPUT
+          echo "prefixed=$PREFIXED" >> $GITHUB_OUTPUT
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      
+      - name: Docker Metadata App
+        id: app-meta
+        uses: docker/metadata-action@v6
+        with:
+          images: |
+            docker.io/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
+            ghcr.io/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ steps.get-tags.outputs.full }}
+            type=raw,value=${{ steps.get-tags.outputs.major }}
+            type=raw,value=${{ steps.get-tags.outputs.prefixed }}
+            type=raw,value=latest
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: true
+          tags: ${{ steps.app-meta.outputs.tags }}
+          build-args: |
+            VERSION=${{ steps.get-tags.outputs.prefixed }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          labels: |
+            ${{ steps.app-meta.outputs.labels }}

@@ -1,17 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import text, select
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any
-from backend.db.session import get_async_session
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select, text
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from backend.config import Config
 from backend.db.models.settings_model import SettingModel
-from backend.schemas.version_schema import VersionSchema
+from backend.db.session import get_async_session
+from backend.enums.settings_enum import ESettingKey
+from backend.helpers.get_setting_typed_value import get_setting_typed_value
 from backend.schemas.public_settings_schema import (
     PublicSettingsItemSchema,
 )
-from backend.enums.settings_enum import ESettingKey
-from backend.helpers.get_setting_typed_value import get_setting_typed_value
-from backend.config import Config
-
+from backend.schemas.version_schema import VersionSchema
 
 router = APIRouter(tags=["public"], prefix="/public")
 
@@ -19,10 +20,12 @@ router = APIRouter(tags=["public"], prefix="/public")
 @router.get("/version", response_model=VersionSchema)
 def get_version():
     try:
-        with open("/app/version", "r") as file:
+        with open(
+            "/app/version",
+        ) as file:
             return {"image_version": file.readline()}
-    except FileNotFoundError:
-        raise HTTPException(404, "Version file not found")
+    except FileNotFoundError as e:
+        raise HTTPException(404, "Version file not found") from e
 
 
 @router.get("/health")
@@ -30,8 +33,8 @@ async def health(session: AsyncSession = Depends(get_async_session)):
     try:
         await session.execute(text("SELECT 1"))
         return "OK"
-    except Exception:
-        raise HTTPException(503, "db_error")
+    except Exception as e:
+        raise HTTPException(503, "db_error") from e
 
 
 @router.get(
@@ -44,19 +47,15 @@ async def settings(
 ):
     result_list: list[dict[str, Any]] = []
 
-    public_keys = [ESettingKey.ALLOW_REGISTRATION]
-    stmt = select(SettingModel).where(
-        SettingModel.key.in_(public_keys)
-    )
+    public_keys: list[str] = [ESettingKey.ALLOW_REGISTRATION]
+    stmt = select(SettingModel).where(SettingModel.key.in_(public_keys))
     result = await session.execute(stmt)
     settings = result.scalars()
     for s in settings:
         result_list.append(
             {
                 "key": s.key,
-                "value": get_setting_typed_value(
-                    s.value, s.value_type
-                ),
+                "value": get_setting_typed_value(s.value, s.value_type),
             }
         )
 

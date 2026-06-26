@@ -29,10 +29,10 @@ export class UserEffects {
       switchMap(() =>
         this.userApiService.read().pipe(
           map((info) => UserActions.readSuccess({ info })),
-          catchError((error) => of(UserActions.readError({ error })))
-        )
-      )
-    )
+          catchError((error) => of(UserActions.readError({ error }))),
+        ),
+      ),
+    ),
   );
 
   update$ = createEffect(() =>
@@ -41,10 +41,10 @@ export class UserEffects {
       switchMap((action) =>
         this.userApiService.update(action.body).pipe(
           map((info) => UserActions.updateSuccess({ info })),
-          catchError((error) => of(UserActions.updateError({ error })))
-        )
-      )
-    )
+          catchError((error) => of(UserActions.updateError({ error }))),
+        ),
+      ),
+    ),
   );
 
   updateSuccess$ = createEffect(
@@ -53,11 +53,11 @@ export class UserEffects {
         ofType(UserActions.updateSuccess),
         tap(() => {
           this.snackService.success(
-            this.translateService.instant('USER.SUCCESS.UPDATE')
+            this.translateService.instant('USER.SUCCESS.UPDATE'),
           );
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   saveUser$ = createEffect(
@@ -66,40 +66,40 @@ export class UserEffects {
         ofType(UserActions.readSuccess, UserActions.updateSuccess),
         tap((action) => {
           localStorage.setItemJson(ELocalStorageKey.USER, action.info);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   deleteAttempt$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.deleteAttempt),
-      switchMap((action) =>
+      switchMap(() =>
         this.matDialog
           .open(ConfirmDialogComponent, {
-            data: <IConfirmDialogData>{
+            data: {
               addCheckbox: true,
               title: 'GENERAL.DELETE_WARN',
               subtitle: 'USER.DELETE_WARN',
-            },
+            } as IConfirmDialogData,
             minHeight: '220px',
           })
           .afterClosed()
-          .pipe(switchMap((res) => (res ? of(UserActions.delete()) : EMPTY)))
-      )
-    )
+          .pipe(switchMap((res) => (res ? of(UserActions.delete()) : EMPTY))),
+      ),
+    ),
   );
 
   delete$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.delete),
-      switchMap((action) =>
+      switchMap(() =>
         this.userApiService.delete().pipe(
           map(() => UserActions.deleteSuccess()),
-          catchError((error) => of(UserActions.deleteError({ error })))
-        )
-      )
-    )
+          catchError((error) => of(UserActions.deleteError({ error }))),
+        ),
+      ),
+    ),
   );
 
   deleteSuccess$ = createEffect(
@@ -108,12 +108,12 @@ export class UserEffects {
         ofType(UserActions.deleteSuccess),
         tap(() => {
           this.snackService.success(
-            this.translateService.instant('USER.SUCCESS.DELETE')
+            this.translateService.instant('USER.SUCCESS.DELETE'),
           );
           this.store.dispatch(AuthActions.logoutSilent());
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   showErrors$ = createEffect(
@@ -122,12 +122,12 @@ export class UserEffects {
         ofType(
           UserActions.readError,
           UserActions.updateError,
-          UserActions.deleteError
+          UserActions.deleteError,
         ),
         tap((action) => {
           this.snackService.error(action.error);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 }

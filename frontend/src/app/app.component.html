@@ -8,41 +8,43 @@
       class="sidenav-list"
       aria-label="Main navigation"
       (click)="sidenavOpened.set(false)">
-      @for (item of links(); track item) {
-      <a
-        mat-list-item
-        [routerLink]="item.link"
-        routerLinkActive
-        #rla="routerLinkActive"
-        [activated]="rla.isActive"
-        (click)="item.onClick ? item.onClick() : null">
-        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-        <span>{{ item.name }}</span>
-      </a>
+      @for (item of links(); track item.link) {
+        <a
+          mat-list-item
+          [routerLink]="item.link"
+          routerLinkActive
+          #rla="routerLinkActive"
+          [activated]="rla.isActive"
+          (click)="item.onClick ? item.onClick() : null">
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span>{{ item.name }}</span>
+        </a>
       }
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content class="sidenav-container-content">
-    @if (isAuthorized()) { @defer {
-    <mat-toolbar class="mat-toolbar sidenav-container-content-toolbar">
-      <button
-        mat-icon-button
-        (click)="sidenavOpened.set(!sidenavOpened())">
-        <mat-icon>menu</mat-icon>
-      </button>
-      <span class="sidenav-container-content-toolbar-title">
-        {{ 'GENERAL.TITLE' | translate }}
-      </span>
-      @if (isOffline()) {
-      <section class="sidenav-container-content-toolbar-connection">
-        {{ 'GENERAL.CONNECTION' | translate }}
-        <mat-icon iconPositionEnd
-          ><mat-spinner [diameter]="24"></mat-spinner>
-        </mat-icon>
-      </section>
+    @if (isAuthorized()) {
+      @defer {
+        <mat-toolbar class="mat-toolbar sidenav-container-content-toolbar">
+          <button
+            mat-icon-button
+            (click)="sidenavOpened.set(!sidenavOpened())">
+            <mat-icon>menu</mat-icon>
+          </button>
+          <span class="sidenav-container-content-toolbar-title">
+            {{ 'GENERAL.TITLE' | translate }}
+          </span>
+          @if (isOffline()) {
+            <section class="sidenav-container-content-toolbar-connection">
+              {{ 'GENERAL.CONNECTION' | translate }}
+              <mat-icon iconPositionEnd
+                ><mat-spinner [diameter]="24"></mat-spinner>
+              </mat-icon>
+            </section>
+          }
+        </mat-toolbar>
       }
-    </mat-toolbar>
-    } }
+    }
     <section class="sidenav-container-content-outlet">
       <router-outlet></router-outlet>
     </section>

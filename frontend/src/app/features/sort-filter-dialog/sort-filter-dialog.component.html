@@ -11,7 +11,7 @@
       <mat-form-field>
         <mat-label>{{'SORT_FILTER.SORT_BY' | translate}}</mat-label>
         <mat-select formControlName="key">
-          @for (item of sortingOptions; track item) {
+          @for (item of sortingOptions; track item.key) {
             <mat-option [value]="item.key"
               >{{item.label | translate}}
             </mat-option>
@@ -22,7 +22,7 @@
         <mat-icon matPrefix>swap_vert</mat-icon>
         <mat-label>{{'SORT_FILTER.SORT_DIR' | translate}}</mat-label>
         <mat-select formControlName="direction">
-          @for (item of sortingOrders; track item) {
+          @for (item of sortingOrders; track item.value) {
             <mat-option [value]="item.value">
               <mat-icon matPrefix>{{item.icon}}</mat-icon>
               {{item.label | translate}}
@@ -45,7 +45,7 @@
           <mat-select
             formControlName="option"
             (selectionChange)="form.patchValue({criteria: null, value: null})">
-            @for (item of filterOptions; track item) {
+            @for (item of filterOptions; track item.key) {
               <mat-option [value]="item">
                 {{item.label | translate}}
               </mat-option>
@@ -105,7 +105,7 @@
                 <mat-form-field>
                   <mat-label>{{'SORT_FILTER.VALUE' | translate}}</mat-label>
                   <mat-select formControlName="value">
-                    @for (item of booleanOption; track item) {
+                    @for (item of booleanOption; track item.value) {
                       <mat-option [value]="item.value">
                         {{item.label}}
                       </mat-option>

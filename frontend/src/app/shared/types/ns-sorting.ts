@@ -1,4 +1,5 @@
-import { Premitive } from './premitive';
+/* eslint-disable @typescript-eslint/no-namespace, @typescript-eslint/no-explicit-any */
+import { PrimitiveStringType } from './premitive';
 
 /**
  * App sorting namespace
@@ -11,7 +12,7 @@ export namespace Sorting {
   /**
    * Model of sorting
    */
-  export interface Model<T extends unknown, K extends keyof T> {
+  export interface Model<T, K extends keyof T> {
     key: K;
     direction: Direction;
   }
@@ -29,10 +30,10 @@ export namespace Sorting {
    * @param type type of key
    * @returns
    */
-  export const sortBy = <T extends unknown, K extends keyof T>(
+  export const sortBy = <T extends object, K extends keyof T>(
     items: T[],
     model: Model<T, K>,
-    type: Premitive,
+    type: PrimitiveStringType,
   ): T[] => {
     try {
       let comperator: (a: any, b: any) => number;

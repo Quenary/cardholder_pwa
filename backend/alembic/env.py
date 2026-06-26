@@ -1,8 +1,10 @@
+import asyncio
+from logging.config import fileConfig
+
+from alembic import context
+
 from backend.db.models.base_model import BaseModel
 from backend.db.session import async_engine
-from logging.config import fileConfig
-import asyncio
-from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

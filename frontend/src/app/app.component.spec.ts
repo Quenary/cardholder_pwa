@@ -6,7 +6,8 @@ import {
 import { AppComponent } from './app.component';
 import { provideMockStore, MockStore } from '@ngrx/store/testing';
 import { provideRouter } from '@angular/router';
-import { TestTranslateModule, ITestAppState, testAppState } from './test';
+import { ITestAppState, testAppState } from '../testing';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
@@ -19,8 +20,12 @@ describe('AppComponent', () => {
     initialState = { ...testAppState };
 
     await TestBed.configureTestingModule({
-      providers: [provideMockStore({ initialState }), provideRouter([])],
-      imports: [AppComponent, TestTranslateModule],
+      providers: [
+        provideMockStore({ initialState }),
+        provideRouter([]),
+        provideTranslateService(),
+      ],
+      imports: [AppComponent],
     }).compileComponents();
 
     storeMock = TestBed.inject(MockStore);
@@ -44,7 +49,7 @@ describe('AppComponent', () => {
     component = fixture.componentInstance;
     fixture.autoDetectChanges();
     await fixture.whenStable();
-    expect(component.isAuthorized()).toBeFalsy();
+    expect(component['isAuthorized']()).toBeFalsy();
     const deferBlocks = await fixture.getDeferBlocks();
     expect(deferBlocks.length).toBe(0);
     const compiled = fixture.nativeElement as HTMLElement;

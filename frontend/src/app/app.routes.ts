@@ -35,7 +35,7 @@ export const routes: Routes = [
     title: titleTranslate('NAV.REGISTER'),
     loadComponent: () =>
       import('./features/register/register.component').then(
-        (c) => c.RegisterComponent
+        (c) => c.RegisterComponent,
       ),
   },
   {
@@ -45,16 +45,16 @@ export const routes: Routes = [
       {
         path: 'request',
         loadComponent: () =>
-          import(
-            './features/password-recovery-request/password-recovery-request.component'
-          ).then((c) => c.PasswordRecoveryRequestComponent),
+          import('./features/password-recovery-request/password-recovery-request.component').then(
+            (c) => c.PasswordRecoveryRequestComponent,
+          ),
       },
       {
         path: 'submit',
         loadComponent: () =>
-          import(
-            './features/password-recovery-submit/password-recovery-submit.component'
-          ).then((c) => c.PasswordRecoverySubmitComponent),
+          import('./features/password-recovery-submit/password-recovery-submit.component').then(
+            (c) => c.PasswordRecoverySubmitComponent,
+          ),
       },
     ],
   },

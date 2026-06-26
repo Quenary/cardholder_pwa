@@ -1,9 +1,12 @@
-from .base_model import BaseModel
-from sqlalchemy import Integer, String, Boolean, DateTime, ForeignKey, text
-from sqlalchemy.orm import relationship, mapped_column, Mapped
 from datetime import datetime
 from typing import TYPE_CHECKING
+
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from backend.helpers.now import now
+
+from .base_model import BaseModel
 
 if TYPE_CHECKING:
     from .user_model import UserModel

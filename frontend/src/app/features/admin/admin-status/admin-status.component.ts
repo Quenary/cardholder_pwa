@@ -1,11 +1,11 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, inject, signal, resource } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { map, retry, catchError, of } from 'rxjs';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { map, retry, catchError, of, finalize, firstValueFrom } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { AdminApiService } from 'src/app/entities/admin/admin-api.service';
 import { PublicApiService } from 'src/app/entities/public/public-api.service';
@@ -16,8 +16,9 @@ import { PublicApiService } from 'src/app/entities/public/public-api.service';
     MatListModule,
     MatButton,
     MatIcon,
-    TranslateModule,
+    TranslatePipe,
     NgTemplateOutlet,
+    MatProgressSpinner,
   ],
   templateUrl: './admin-status.component.html',
   styleUrl: './admin-status.component.scss',
@@ -28,38 +29,50 @@ export class AdminStatusComponent {
   private readonly snackService = inject(SnackService);
   private readonly publicApiService = inject(PublicApiService);
 
-  public readonly health = toSignal(
-    this.publicApiService.health().pipe(
-      map(() => true),
-      retry({ count: 1, delay: 1000 }),
-      catchError((error) => {
-        this.snackService.error(error);
-        return of(false);
-      }),
-    ),
-    { initialValue: true },
-  );
-  public readonly smtpStatus = toSignal(
-    this.adminApiService.smtpStatus().pipe(
-      retry({ count: 1, delay: 1000 }),
-      catchError((error) => {
-        this.snackService.error(error);
-        return of(false);
-      }),
-    ),
-    { initialValue: true },
-  );
+  protected readonly health = resource<boolean, unknown>({
+    loader: () =>
+      firstValueFrom(
+        this.publicApiService.health().pipe(
+          map(() => true),
+          catchError((error) => {
+            this.snackService.error(error);
+            return of(false);
+          }),
+        ),
+      ),
+  });
+  protected readonly smtpStatus = resource<boolean, unknown>({
+    loader: () =>
+      firstValueFrom(
+        this.adminApiService.smtpStatus().pipe(
+          retry({ count: 1, delay: 1000 }),
+          catchError((error) => {
+            this.snackService.error(error);
+            return of(false);
+          }),
+        ),
+      ),
+  });
+  protected readonly smtpLoading = signal<boolean>(false);
 
-  onSmtpTest(): void {
-    this.adminApiService.smtpTest().subscribe({
-      next: () => {
-        this.snackService.success(
-          this.translateService.instant('ADMIN.SMTP_TEST_SUCCESS'),
-        );
-      },
-      error: (error) => {
-        this.snackService.error(error);
-      },
-    });
+  protected onSmtpTest(): void {
+    this.smtpLoading.set(true);
+    this.adminApiService
+      .smtpTest()
+      .pipe(
+        finalize(() => {
+          this.smtpLoading.set(false);
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.snackService.success(
+            this.translateService.instant('ADMIN.SMTP_TEST_SUCCESS'),
+          );
+        },
+        error: (error) => {
+          this.snackService.error(error);
+        },
+      });
   }
 }

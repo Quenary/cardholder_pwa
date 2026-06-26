@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class EUserRole(str, Enum):
+class EUserRole(StrEnum):
     """Enum of user roles codes"""
 
     OWNER = "OWNER"

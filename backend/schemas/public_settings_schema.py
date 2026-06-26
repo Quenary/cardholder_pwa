@@ -1,7 +1,6 @@
-from typing import Union
 from pydantic import BaseModel
 
 
 class PublicSettingsItemSchema(BaseModel):
     key: str
-    value: Union[bool, int, float, str, None] = None
+    value: bool | int | float | str | None = None

@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { first } from 'rxjs';
 import { selectAppIsOnline } from 'src/app/state/app.selectors';
 
-export const isOnlineGuard: CanActivateFn = (route, state) => {
+export const isOnlineGuard: CanActivateFn = () => {
   const store = inject(Store);
   return store.select(selectAppIsOnline).pipe(first());
 };

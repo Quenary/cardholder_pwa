@@ -1,4 +1,7 @@
-<router-outlet></router-outlet>
+<router-outlet
+  (activate)="showParent.set(false)"
+  (deactivate)="showParent.set(true)">
+</router-outlet>
 
 @if (showParent()) {
   <section class="cards-header">
@@ -48,7 +51,7 @@
         <div class="cards-list-item animated-placeholder"> </div>
       }
     } @else {
-      @for (card of cards(); track card) {
+      @for (card of cards(); track card.id) {
         <div
           class="cards-list-item"
           matRipple

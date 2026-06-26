@@ -24,7 +24,7 @@ export const cardsReducer = createReducer(
     CardsActions.read,
     CardsActions.update,
     CardsActions.delete,
-    (state, payload) => ({
+    (state) => ({
       ...state,
       isLoading: true,
     }),
@@ -48,7 +48,7 @@ export const cardsReducer = createReducer(
       isLoading: false,
     }),
   ),
-  on(CardsActions.deleteSuccess, (state, payload) => ({
+  on(CardsActions.deleteSuccess, (state) => ({
     ...state,
     active: null,
     isLoading: false,
@@ -73,7 +73,7 @@ export const cardsReducer = createReducer(
       },
     };
   }),
-  on(CardsActions.exitCard, (state, payload) => ({
+  on(CardsActions.exitCard, (state) => ({
     ...state,
     active: null,
   })),
@@ -83,7 +83,7 @@ export const cardsReducer = createReducer(
     CardsActions.readError,
     CardsActions.updateError,
     CardsActions.deleteError,
-    (state, payload) => ({
+    (state) => ({
       ...state,
       isLoading: false,
     }),

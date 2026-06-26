@@ -11,7 +11,7 @@ export type TypeToString<T> = T extends string
         ? 'boolean'
         : T extends Date
           ? 'date'
-          : T extends any[]
+          : T extends unknown[]
             ? 'array'
             : T extends object
               ? 'object'

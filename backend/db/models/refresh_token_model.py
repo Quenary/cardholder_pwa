@@ -1,9 +1,12 @@
-from .base_model import BaseModel
-from sqlalchemy import Integer, String, Boolean, DateTime, ForeignKey, text
-from sqlalchemy.orm import relationship, mapped_column, Mapped
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from backend.helpers.now import now
+
+from .base_model import BaseModel
 
 if TYPE_CHECKING:
     from .user_model import UserModel
@@ -25,7 +28,9 @@ class RefreshTokenModel(BaseModel):
     revoked: Mapped[bool] = mapped_column(
         Boolean, server_default=text("FALSE"), default=False, nullable=False
     )
-    user_agent: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    ip_address: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    user_agent: Mapped[str | None] = mapped_column(String, nullable=True)
+    ip_address: Mapped[str | None] = mapped_column(String, nullable=True)
 
-    user: Mapped["UserModel"] = relationship("UserModel", back_populates="refresh_tokens")
+    user: Mapped["UserModel"] = relationship(
+        "UserModel", back_populates="refresh_tokens"
+    )

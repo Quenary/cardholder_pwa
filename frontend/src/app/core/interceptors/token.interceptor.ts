@@ -35,9 +35,9 @@ const isRefreshable = (req: HttpRequest<unknown>, error: unknown): boolean => {
   );
 };
 
-const cloneWithToken = <T extends unknown = unknown>(
+const cloneWithToken = <T = unknown>(
   req: HttpRequest<T>,
-  token: string
+  token: string,
 ): HttpRequest<T> => {
   return req.clone({
     setHeaders: {
@@ -46,7 +46,7 @@ const cloneWithToken = <T extends unknown = unknown>(
   });
 };
 
-let isRefreshing: boolean = false;
+let isRefreshing = false;
 
 export const getTokenInterceptor: HttpInterceptorFn = (req, next) => {
   if (ignore(req)) {
@@ -69,7 +69,7 @@ export const getTokenInterceptor: HttpInterceptorFn = (req, next) => {
               store.dispatch(
                 AuthActions.refreshToken({
                   refreshToken: tokens.refresh_token,
-                })
+                }),
               );
               store
                 .select(selectAuthTokenResponse)
@@ -91,12 +91,12 @@ export const getTokenInterceptor: HttpInterceptorFn = (req, next) => {
                   return throwError(() => error);
                 }
                 return next(cloneWithToken(req, newTokens.access_token));
-              })
+              }),
             );
           }
           return throwError(() => error);
-        })
+        }),
       );
-    })
+    }),
   );
 };

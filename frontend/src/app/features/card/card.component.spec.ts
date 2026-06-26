@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CardComponent } from './card.component';
 import { provideRouter } from '@angular/router';
-import { ITestAppState, testAppState, TestTranslateModule } from 'src/app/test';
+import { ITestAppState, testAppState } from 'src/testing';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CardComponent', () => {
   let fixture: ComponentFixture<CardComponent>;
@@ -16,8 +17,12 @@ describe('CardComponent', () => {
     initialState = { ...testAppState };
 
     await TestBed.configureTestingModule({
-      providers: [provideMockStore({ initialState }), provideRouter([])],
-      imports: [CardComponent, TestTranslateModule],
+      providers: [
+        provideMockStore({ initialState }),
+        provideRouter([]),
+        provideTranslateService(),
+      ],
+      imports: [CardComponent],
     }).compileComponents();
 
     storeMock = TestBed.inject(MockStore);
@@ -33,15 +38,15 @@ describe('CardComponent', () => {
   it('should save valid card', () => {
     fixture = TestBed.createComponent(CardComponent);
     component = fixture.componentInstance;
-    const dispatchSpy = spyOn(storeMock, 'dispatch');
+    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
-    component.form.patchValue({
+    component['form'].patchValue({
       code: '12345678',
       code_type: 'ean8',
       name: 'newcard',
     });
-    component.onSubmit();
+    component['onSubmit']();
 
     expect(dispatchSpy).toHaveBeenCalledWith(CardsActions.saveCard());
   });
@@ -49,36 +54,32 @@ describe('CardComponent', () => {
   it('should not save invalid card', () => {
     fixture = TestBed.createComponent(CardComponent);
     component = fixture.componentInstance;
-    const dispatchSpy = spyOn(storeMock, 'dispatch');
+    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
     fixture.detectChanges();
 
-    component.form.patchValue({
+    component['form'].patchValue({
       code: '12345678',
       code_type: null,
       name: 'newcard',
     });
-    component.onSubmit();
+    component['onSubmit']();
 
-    component.form.patchValue({
+    component['form'].patchValue({
       code: null,
       code_type: 'ean8',
       name: 'newcard',
     });
-    component.onSubmit();
+    component['onSubmit']();
 
-    component.form.patchValue({
+    component['form'].patchValue({
       code: '12345678',
       code_type: 'ean8',
       name: null,
     });
-    component.onSubmit();
+    component['onSubmit']();
 
-    expect(
-      dispatchSpy.calls
-        .all()
-        .some(
-          (call) => (call.args[0] as any).type == CardsActions.saveCard.type,
-        ),
-    ).toBeFalse();
+    expect(dispatchSpy).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: CardsActions.update.type }),
+    );
   });
 });

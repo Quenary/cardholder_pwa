@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   MatList,
   MatListItem,
   MatListItemIcon,
   MatListItemTitle,
 } from '@angular/material/list';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MatIcon } from '@angular/material/icon';
 import { CodeExamplesComponent } from '../code-examples/code-examples.component';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -18,7 +18,7 @@ import { selectAppVersion } from 'src/app/state/app.selectors';
   imports: [
     MatList,
     MatListItem,
-    TranslateModule,
+    TranslatePipe,
     MatIcon,
     MatListItemTitle,
     MatListItemIcon,
@@ -28,10 +28,9 @@ import { selectAppVersion } from 'src/app/state/app.selectors';
   ],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutComponent {
   private readonly store = inject(Store);
 
-  public readonly version = this.store.selectSignal(selectAppVersion);
+  protected readonly version = this.store.selectSignal(selectAppVersion);
 }

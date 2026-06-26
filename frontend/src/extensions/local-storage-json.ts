@@ -1,27 +1,26 @@
+import {
+  storageGetItemJson,
+  storageSetItemJson,
+} from '../app/shared/functions/storage.function';
+
 declare global {
   interface Storage {
+    /**
+     * Get from storage (deserialized)
+     * @param key key
+     */
     getItemJson<T = unknown>(key: string): T | null;
+    /**
+     * Save to storage (serialize)
+     * @param key key
+     * @param value value
+     */
     setItemJson<T = unknown>(key: string, value: T): void;
   }
 }
 
-Storage.prototype.getItemJson = function (key) {
-  const value = localStorage.getItem(key);
-  if (value) {
-    try {
-      return JSON.parse(value);
-    } catch (e) {
-      console.error(e);
-      console.warn(`Invalid key '${key}' removed from storage`);
-      localStorage.removeItem(key);
-      return null;
-    }
-  }
-  return null;
+export const storageJson = () => {
+  Storage.prototype.getItemJson = (key) => storageGetItemJson(key, this);
+  Storage.prototype.setItemJson = (key, value) =>
+    storageSetItemJson(key, value, this);
 };
-
-Storage.prototype.setItemJson = function (key, value) {
-  this.setItem(key, JSON.stringify(value));
-};
-
-export {};

@@ -12,12 +12,14 @@ import {
   createSnackServiceMock,
   ITestAppState,
   testAppState,
-  TestTranslateModule,
-} from 'src/app/test';
+} from 'src/testing';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { provideRouter } from '@angular/router';
 import { provideMockStore } from '@ngrx/store/testing';
 import { MediaDevicesService } from 'src/app/core/services/media-devices.service';
+import { Mocked } from 'vitest';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 const testMediaDevices: MediaDeviceInfo[] = [
   {
@@ -57,7 +59,7 @@ describe('CardScannerComponent', () => {
   let matDialogRefMock: ReturnType<typeof createMatDialogRefMock>;
   let matBottomSheetMock: ReturnType<typeof createMatBottomSheetMock>;
   let snackServiceMock: ReturnType<typeof createSnackServiceMock>;
-  let mediaDevicesServiceMock: jasmine.SpyObj<MediaDevicesService>;
+  let mediaDevicesServiceMock: Partial<Mocked<MediaDevicesService>>;
   let initialState: ITestAppState;
 
   beforeEach(async () => {
@@ -65,10 +67,10 @@ describe('CardScannerComponent', () => {
     matDialogRefMock = createMatDialogRefMock();
     matBottomSheetMock = createMatBottomSheetMock();
     snackServiceMock = createSnackServiceMock();
-    mediaDevicesServiceMock = jasmine.createSpyObj<MediaDevicesService>(
-      'MediaDevicesService',
-      ['getUserMedia', 'enumerateDevices'],
-    );
+    mediaDevicesServiceMock = {
+      getUserMedia: vi.fn(),
+      enumerateDevices: vi.fn(),
+    };
 
     await TestBed.configureTestingModule({
       providers: [
@@ -78,14 +80,18 @@ describe('CardScannerComponent', () => {
         { provide: MatBottomSheet, useValue: matBottomSheetMock },
         { provide: SnackService, useValue: snackServiceMock },
         { provide: MediaDevicesService, useValue: mediaDevicesServiceMock },
+        provideTranslateService(),
+        provideZonelessChangeDetection(),
       ],
-      imports: [CardScannerComponent, TestTranslateModule],
+      imports: [CardScannerComponent],
     }).compileComponents();
   });
 
   it('should create', () => {
-    mediaDevicesServiceMock.getUserMedia.and.resolveTo();
-    mediaDevicesServiceMock.enumerateDevices.and.resolveTo(testMediaDevices);
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(null);
+    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+      testMediaDevices,
+    );
     fixture = TestBed.createComponent(CardScannerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -93,8 +99,8 @@ describe('CardScannerComponent', () => {
   });
 
   it('should show an error on denied permission', async () => {
-    mediaDevicesServiceMock.getUserMedia.and.rejectWith();
-    mediaDevicesServiceMock.enumerateDevices.and.rejectWith();
+    mediaDevicesServiceMock.getUserMedia.mockRejectedValue(null);
+    mediaDevicesServiceMock.enumerateDevices.mockRejectedValue(null);
     fixture = TestBed.createComponent(CardScannerComponent);
     component = fixture.componentInstance;
     fixture.autoDetectChanges();
@@ -105,24 +111,42 @@ describe('CardScannerComponent', () => {
   });
 
   it('should select first environment camera as default', async () => {
-    mediaDevicesServiceMock.getUserMedia.and.resolveTo(new MediaStream());
-    mediaDevicesServiceMock.enumerateDevices.and.resolveTo(testMediaDevices);
+    if (typeof globalThis.MediaStream === 'undefined') {
+      globalThis.MediaStream = class {} as typeof MediaStream;
+    }
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
+      new globalThis.MediaStream(),
+    );
+    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+      testMediaDevices,
+    );
     fixture = TestBed.createComponent(CardScannerComponent);
     component = fixture.componentInstance;
-    fixture.autoDetectChanges();
+
+    fixture.detectChanges();
     await fixture.whenStable();
-    expect(component.selectedDevice()).toEqual(testMediaDevices[2]);
+    await fixture.whenRenderingDone();
+    TestBed.tick();
+
+    expect(component['selectedDevice']()).toEqual(testMediaDevices[2]);
   });
 
   it('should display scanner if permission granted', async () => {
-    mediaDevicesServiceMock.getUserMedia.and.resolveTo();
-    mediaDevicesServiceMock.enumerateDevices.and.resolveTo(testMediaDevices);
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(null);
+    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+      testMediaDevices,
+    );
     fixture = TestBed.createComponent(CardScannerComponent);
     component = fixture.componentInstance;
-    fixture.autoDetectChanges();
+
+    fixture.detectChanges();
     await fixture.whenStable();
+    await fixture.whenRenderingDone();
+    TestBed.tick();
+
     const deferBlocks = await fixture.getDeferBlocks();
     expect(deferBlocks.length).toEqual(1);
+
     await deferBlocks[0].render(DeferBlockState.Complete);
     expect(
       fixture.nativeElement.querySelector('app-card-scanner-zxing'),

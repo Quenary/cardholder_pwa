@@ -3,7 +3,6 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { Store } from '@ngrx/store';
-import { TranslateModule } from '@ngx-translate/core';
 import { IUserCreate, IUserUpdate } from 'src/app/entities/user/user-interface';
 import {
   selectUserHasChanges,
@@ -29,20 +28,20 @@ import { ERegexp } from 'src/app/app.consts';
 import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
 import { passwordMatchValidator } from 'src/app/shared/validators/passwords-match.validator';
 import { MatCheckbox, MatCheckboxChange } from '@angular/material/checkbox';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-user',
   imports: [
     MatIcon,
     MatButton,
-    TranslateModule,
+    TranslatePipe,
     MatProgressSpinner,
     MatInput,
     MatIcon,
     MatFormField,
     MatLabel,
     ReactiveFormsModule,
-    TranslateModule,
     MatSuffix,
     MatCheckbox,
   ],
@@ -53,17 +52,13 @@ export class UserComponent implements OnInit {
   private readonly store = inject(Store);
   private readonly destroyRef = inject(DestroyRef);
 
-  private get value(): IUserUpdate {
-    return this.form.value as IUserUpdate;
-  }
+  protected readonly isOwner = this.store.selectSignal(selectUserIsOwner);
+  protected readonly isLoading = this.store.selectSignal(selectUserIsLoading);
+  protected readonly hasChanges = this.store.selectSignal(selectUserHasChanges);
+  protected readonly hidePassword = signal(true);
+  protected readonly hideConfirmPassword = signal(true);
 
-  public readonly isOwner = this.store.selectSignal(selectUserIsOwner);
-  public readonly isLoading = this.store.selectSignal(selectUserIsLoading);
-  public readonly hasChanges = this.store.selectSignal(selectUserHasChanges);
-  public readonly hidePassword = signal(true);
-  public readonly hideConfirmPassword = signal(true);
-
-  public readonly form = new FormGroup<
+  protected readonly form = new FormGroup<
     TInterfaceToForm<IUserCreate & IUserUpdate>
   >(
     {
@@ -86,20 +81,8 @@ export class UserComponent implements OnInit {
     passwordMatchValidator(),
   );
 
-  onChangePasswordCheck($event: MatCheckboxChange) {
-    this.form.patchValue({
-      password: null,
-      confirm_password: null,
-    });
-    const password = this.form.controls.password;
-    const confirm_password = this.form.controls.confirm_password;
-    if ($event.checked) {
-      password.enable();
-      confirm_password.enable();
-    } else {
-      password.disable();
-      confirm_password.disable();
-    }
+  private get value(): IUserUpdate {
+    return this.form.value as IUserUpdate;
   }
 
   ngOnInit(): void {
@@ -117,7 +100,23 @@ export class UserComponent implements OnInit {
       });
   }
 
-  onSubmit(): void {
+  protected onChangePasswordCheck($event: MatCheckboxChange) {
+    this.form.patchValue({
+      password: null,
+      confirm_password: null,
+    });
+    const password = this.form.controls.password;
+    const confirm_password = this.form.controls.confirm_password;
+    if ($event.checked) {
+      password.enable();
+      confirm_password.enable();
+    } else {
+      password.disable();
+      confirm_password.disable();
+    }
+  }
+
+  protected onSubmit(): void {
     if (this.form.invalid) {
       return;
     }
@@ -125,7 +124,7 @@ export class UserComponent implements OnInit {
     this.store.dispatch(UserActions.update({ body: this.value }));
   }
 
-  onDelete(): void {
+  protected onDelete(): void {
     this.store.dispatch(UserActions.deleteAttempt());
   }
 }

@@ -1,24 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
 from backend.core.auth_core import (
-    create_access_token,
-    create_refresh_token,
     authenticate_user,
     build_token_response,
+    create_access_token,
+    create_refresh_token,
     is_user,
 )
+from backend.db.models.refresh_token_model import RefreshTokenModel
 from backend.db.session import get_async_session
+from backend.helpers.delay_to_minimum import delay_to_minimum
+from backend.helpers.now import now
 from backend.schemas.auth_schema import (
-    TokenResponseSchema,
     RefreshRequestSchema,
     RevokeRequestSchema,
+    TokenResponseSchema,
 )
-from backend.db.models.refresh_token_model import RefreshTokenModel
-from fastapi.security import OAuth2PasswordRequestForm
-from backend.helpers.now import now
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
-from backend.helpers.delay_to_minimum import delay_to_minimum
 
 router = APIRouter(tags=["auth"])
 
@@ -30,27 +31,21 @@ async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     session: AsyncSession = Depends(get_async_session),
 ):
-    user = await authenticate_user(
-        session, form_data.username, form_data.password
-    )
+    user = await authenticate_user(session, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token, access_exp = create_access_token(
-        {"sub": user.username}
-    )
+    access_token, access_exp = create_access_token({"sub": user.username})
     refresh_token = await create_refresh_token(
         user.id,
         session,
         request.headers.get("user-agent"),
         request.client.host if request.client else None,
     )
-    return build_token_response(
-        access_token, access_exp, refresh_token
-    )
+    return build_token_response(access_token, access_exp, refresh_token)
 
 
 @router.post("/token/refresh", response_model=TokenResponseSchema)
@@ -63,7 +58,7 @@ async def refresh_token(
         select(RefreshTokenModel)
         .where(
             RefreshTokenModel.token == form.refresh_token,
-            RefreshTokenModel.revoked == False,
+            RefreshTokenModel.revoked.is_(False),
             RefreshTokenModel.expires_at > now(),
         )
         .options(selectinload(RefreshTokenModel.user))
@@ -72,17 +67,13 @@ async def refresh_token(
     result = await session.execute(stmt)
     db_token = result.scalar_one_or_none()
     if not db_token:
-        raise HTTPException(
-            status_code=401, detail="Invalid or expired refresh token"
-        )
+        raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
 
     db_token.revoked = True
     await session.commit()
 
     user = db_token.user
-    access_token, access_exp = create_access_token(
-        {"sub": user.username}
-    )
+    access_token, access_exp = create_access_token({"sub": user.username})
     new_refresh = await create_refresh_token(
         user.id,
         session,
@@ -102,7 +93,7 @@ async def logout(
         select(RefreshTokenModel)
         .where(
             RefreshTokenModel.token == form.refresh_token,
-            RefreshTokenModel.revoked == False,
+            RefreshTokenModel.revoked.is_(False),
         )
         .limit(1)
     )

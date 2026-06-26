@@ -4,17 +4,14 @@ import {
   CardCodeViewerDialogComponent,
   ICardCodeViewerData,
 } from './card-code-viewer.component';
-import {
-  createMatDialogMock,
-  createMatDialogRefMock,
-  TestTranslateModule,
-} from 'src/app/test';
+import { createMatDialogMock, createMatDialogRefMock } from 'src/testing';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
   MatDialogRef,
 } from '@angular/material/dialog';
 import { ELocalStorageKey } from 'src/app/app.consts';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CardCodeViewerComponent', () => {
   let fixture: ComponentFixture<CardCodeViewerComponent>;
@@ -24,6 +21,8 @@ describe('CardCodeViewerComponent', () => {
 
   beforeEach(async () => {
     matDialogMock = createMatDialogMock();
+
+    vi.spyOn(console, 'error').mockImplementation(() => 1);
 
     await TestBed.configureTestingModule({
       providers: [{ provide: MatDialog, useValue: matDialogMock }],
@@ -40,13 +39,12 @@ describe('CardCodeViewerComponent', () => {
   it('should draw code', () => {
     fixture = TestBed.createComponent(CardCodeViewerComponent);
     component = fixture.componentInstance;
-    component.card = {
+    component.card.set({
       code: '0123456789012',
       code_type: 'ean13',
-    };
+    });
     const canvasElement: HTMLCanvasElement =
       fixture.nativeElement.querySelector('.canvas');
-    spyOn(console, 'error');
     fixture.detectChanges();
 
     expect(canvasElement).toBeTruthy();
@@ -56,13 +54,12 @@ describe('CardCodeViewerComponent', () => {
   it('should not draw code', () => {
     fixture = TestBed.createComponent(CardCodeViewerComponent);
     component = fixture.componentInstance;
-    component.card = {
+    component.card.set({
       code: 'badvalue',
       code_type: 'ean13',
-    };
+    });
     const canvasElement: HTMLCanvasElement =
       fixture.nativeElement.querySelector('.canvas');
-    spyOn(console, 'error');
     fixture.detectChanges();
 
     expect(canvasElement).toBeTruthy();
@@ -72,10 +69,10 @@ describe('CardCodeViewerComponent', () => {
   it('should open dialog', () => {
     fixture = TestBed.createComponent(CardCodeViewerComponent);
     component = fixture.componentInstance;
-    component.card = {
+    component.card.set({
       code: '0123456789012',
       code_type: 'ean13',
-    };
+    });
     const canvasElement: HTMLCanvasElement =
       fixture.nativeElement.querySelector('.canvas');
     fixture.detectChanges();
@@ -102,12 +99,12 @@ describe('CardCodeViewerDialogComponent', () => {
         code_type: 'ean13',
       },
       scale: 3,
-      color: 'black',
+      color: '#000000',
     };
 
     await TestBed.configureTestingModule({
-      imports: [TestTranslateModule],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: matDialogRefMock },
         { provide: MAT_DIALOG_DATA, useValue: matDialogDataMock },
       ],
@@ -122,24 +119,24 @@ describe('CardCodeViewerDialogComponent', () => {
   });
 
   it('should preserve color inversion in local storage', () => {
-    const lsGetSpy = spyOn(localStorage, 'getItemJson').and.callFake(
-      () => true as any,
-    );
-    const lsSetSpy = spyOn(localStorage, 'setItemJson').and.callFake(() => {});
+    const lsGetSpy = vi
+      .spyOn(Storage.prototype, 'getItemJson')
+      .mockReturnValue(true);
+    const lsSetSpy = vi.spyOn(Storage.prototype, 'setItemJson');
     fixture = TestBed.createComponent(CardCodeViewerDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
 
     expect(lsGetSpy).toHaveBeenCalledTimes(1);
-    expect(component.invert()).toBeTrue();
+    expect(component['invert']()).toBe(true);
 
-    component.toggleInvert();
+    component['toggleInvert']();
 
     expect(lsSetSpy).toHaveBeenCalledTimes(1);
     expect(lsSetSpy).toHaveBeenCalledWith(
       ELocalStorageKey.CODE_COLOR_INVERSION,
       false,
     );
-    expect(component.invert()).toBeFalse();
+    expect(component['invert']()).toBe(false);
   });
 });

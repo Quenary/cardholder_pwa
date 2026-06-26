@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { first, map, tap } from 'rxjs';
 import { selectAuthTokenResponse } from 'src/app/entities/auth/state/auth.selectors';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = () => {
   const store = inject(Store);
   const router = inject(Router);
   return store.select(selectAuthTokenResponse).pipe(
@@ -14,6 +14,6 @@ export const authGuard: CanActivateFn = (route, state) => {
       if (!res) {
         router.navigate(['/auth']);
       }
-    })
+    }),
   );
 };

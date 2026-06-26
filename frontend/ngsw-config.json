@@ -4,9 +4,7 @@
   "dataGroups": [
     {
       "name": "api",
-      "urls": [
-        "/api/**"
-      ],
+      "urls": ["/api/**"],
       "version": 1,
       "cacheConfig": {
         "maxAge": "90d",
@@ -36,9 +34,7 @@
       "installMode": "prefetch",
       "updateMode": "prefetch",
       "resources": {
-        "files": [
-          "/i18n/*.json"
-        ]
+        "files": ["/i18n/*.json"]
       }
     },
     {
@@ -56,9 +52,7 @@
       "installMode": "lazy",
       "updateMode": "lazy",
       "resources": {
-        "files": [
-          "/**/CHANGELOG.md"
-        ]
+        "files": ["/**/CHANGELOG.md"]
       }
     }
   ]

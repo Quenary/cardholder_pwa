@@ -17,9 +17,9 @@ export class SnackService {
    */
   error(
     error: HttpErrorResponse | Error | string | unknown,
-    action: string = this.translateService.instant('GENERAL.CLOSE')
+    action: string = this.translateService.instant('GENERAL.CLOSE'),
   ): void {
-    let message: string = '';
+    let message: string;
     if (error instanceof HttpErrorResponse) {
       message = this.translateService.instant('GENERAL.REQUEST_ERROR');
       message += `: ${error.status} ${error.statusText}`;
@@ -52,7 +52,7 @@ export class SnackService {
    */
   success(
     message: string,
-    action: string = this.translateService.instant('GENERAL.CLOSE')
+    action: string = this.translateService.instant('GENERAL.CLOSE'),
   ): void {
     this.matSnackBar.open(message, action, {
       duration: 4000,

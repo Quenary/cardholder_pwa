@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { ICardBase } from 'src/app/entities/cards/cards-interface';
 import { CardCodeViewerComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
 
@@ -7,10 +7,9 @@ import { CardCodeViewerComponent } from 'src/app/shared/components/card-code-vie
   imports: [CardCodeViewerComponent],
   templateUrl: './code-examples.component.html',
   styleUrl: './code-examples.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodeExamplesComponent {
-  public readonly barcodeExamples: Partial<ICardBase>[] = [
+  protected readonly barcodeExamples: Partial<ICardBase>[] = [
     { code: '01234567', code_type: 'azteccode', name: 'azteccode (AZTEC)' },
     {
       code: 'ABC1234567890',

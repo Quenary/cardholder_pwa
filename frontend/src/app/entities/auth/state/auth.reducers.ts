@@ -23,10 +23,10 @@ export const authReducer = createReducer(
     AuthActions.token,
     AuthActions.refreshToken,
     AuthActions.logout,
-    (state, payload) => ({
+    (state) => ({
       ...state,
       isLoading: true,
-    })
+    }),
   ),
   on(
     AuthActions.tokenSuccess,
@@ -35,21 +35,21 @@ export const authReducer = createReducer(
       ...state,
       tokenResponse: payload.tokenResponse,
       isLoading: false,
-    })
+    }),
   ),
   on(
     AuthActions.logoutSuccess,
     AuthActions.tokenError,
     AuthActions.refreshTokenError,
     AuthActions.logoutError,
-    (state, payload) => ({
+    (state) => ({
       ...state,
       tokenResponse: null,
       isLoading: false,
-    })
+    }),
   ),
-  on(AuthActions.logoutSilent, (state, payload) => ({
+  on(AuthActions.logoutSilent, () => ({
     ...initialState,
     init: true,
-  }))
+  })),
 );

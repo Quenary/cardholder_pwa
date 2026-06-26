@@ -10,7 +10,7 @@
       &-checkbox {
         display: inline-flex;
         width: 100%;
-        flex-basis: 100%
+        flex-basis: 100%;
       }
       &-password-hints {
         @include mx.form-password-hints;

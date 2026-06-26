@@ -17,7 +17,7 @@
     </mat-list-item>
     <mat-list-item>
       <span matListItemTitle>{{ 'ADMIN.USERS.ROLE' | translate }}</span>
-      <span matListItemLine>{{ rolesTranslates[user.role_code] }}</span>
+      <span matListItemLine>{{ rolesTranslations[user.role_code] }}</span>
     </mat-list-item>
     <mat-list-item>
       <span matListItemTitle>{{ 'ADMIN.USERS.CREATED_AT' | translate }}</span>
@@ -60,7 +60,7 @@
     }
   }
   @if (
-    user.role_code == EUserRole.MEMBER || (user.role_code == EUserRole.ADMIN && isOwner())
+    user.role_code === EUserRole.MEMBER || (user.role_code === EUserRole.ADMIN && isOwner())
   ) {
     <button
       class="warn-color"

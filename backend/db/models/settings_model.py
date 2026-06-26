@@ -1,8 +1,11 @@
-from .base_model import BaseModel
-from sqlalchemy import String, DateTime, text
-from sqlalchemy.orm import mapped_column, Mapped
 from datetime import datetime
+
+from sqlalchemy import DateTime, String, text
+from sqlalchemy.orm import Mapped, mapped_column
+
 from backend.helpers.now import now
+
+from .base_model import BaseModel
 
 
 class SettingModel(BaseModel):

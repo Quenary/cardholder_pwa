@@ -1,24 +1,13 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  ActivatedRouteSnapshot,
-  CanActivateFn,
-  GuardResult,
-  RouterStateSnapshot,
-} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { isOnlineGuard } from './is-online.guard';
-import { Store } from '@ngrx/store';
-import { of, Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { ITestAppState, testAppState } from 'src/app/test';
+import { ITestAppState, testAppState } from 'src/testing';
 
 describe('isOnlineGuard', () => {
-  const dummyRoute = {} as ActivatedRouteSnapshot;
-  const dummyState = {} as RouterStateSnapshot;
   let storeMock: MockStore;
   let initialState: ITestAppState;
-
-  const executeGuard: CanActivateFn = (...guardParameters) =>
-    TestBed.runInInjectionContext(() => isOnlineGuard(...guardParameters));
 
   beforeEach(() => {
     initialState = { ...testAppState };
@@ -29,34 +18,30 @@ describe('isOnlineGuard', () => {
     storeMock = TestBed.inject(MockStore);
   });
 
-  it('should be created', () => {
-    expect(executeGuard).toBeTruthy();
+  function runGuard() {
+    return TestBed.runInInjectionContext(
+      () =>
+        isOnlineGuard(
+          {} as ActivatedRouteSnapshot,
+          {} as RouterStateSnapshot,
+        ) as Observable<boolean>,
+    );
+  }
+
+  it('should allow online', async () => {
+    const result = await firstValueFrom(runGuard());
+
+    expect(result).toBe(true);
   });
 
-  it('should allow online', (done) => {
-    const result$ = executeGuard(
-      dummyRoute,
-      dummyState,
-    ) as Observable<GuardResult>;
-    result$.subscribe((canActivate) => {
-      expect(canActivate).toBeTrue();
-      done();
-    });
-  });
-
-  it('should reject not online', (done) => {
+  it('should reject not online', async () => {
     storeMock.setState({
       app: {
         isOnline: false,
       },
     });
-    const result$ = executeGuard(
-      dummyRoute,
-      dummyState,
-    ) as Observable<GuardResult>;
-    result$.subscribe((canActivate) => {
-      expect(canActivate).toBeFalse();
-      done();
-    });
+    const result = await firstValueFrom(runGuard());
+
+    expect(result).toBe(false);
   });
 });

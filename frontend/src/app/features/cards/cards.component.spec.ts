@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CardsComponent } from './cards.component';
-import { ITestAppState, testAppState, TestTranslateModule } from 'src/app/test';
+import { ITestAppState, testAppState } from 'src/testing';
 import { provideRouter } from '@angular/router';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { ICard } from 'src/app/entities/cards/cards-interface';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CardsComponent', () => {
   let component: CardsComponent;
@@ -16,8 +17,12 @@ describe('CardsComponent', () => {
     initialState = { ...testAppState };
 
     await TestBed.configureTestingModule({
-      providers: [provideMockStore({ initialState }), provideRouter([])],
-      imports: [CardsComponent, TestTranslateModule],
+      providers: [
+        provideMockStore({ initialState }),
+        provideRouter([]),
+        provideTranslateService(),
+      ],
+      imports: [CardsComponent],
     }).compileComponents();
 
     storeMock = TestBed.inject(MockStore);
@@ -61,11 +66,11 @@ describe('CardsComponent', () => {
     fixture = TestBed.createComponent(CardsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    component.searchControl.setValue('tes');
-    expect(component.cards()).toEqual([list[1]]);
-    component.searchControl.setValue('rep');
-    expect(component.cards()).toEqual([list[0]]);
-    component.searchControl.setValue('qwerty');
-    expect(component.cards()).toEqual([]);
+    component['searchControl'].setValue('tes');
+    expect(component['cards']()).toEqual([list[1]]);
+    component['searchControl'].setValue('rep');
+    expect(component['cards']()).toEqual([list[0]]);
+    component['searchControl'].setValue('qwerty');
+    expect(component['cards']()).toEqual([]);
   });
 });

@@ -1,14 +1,17 @@
-from typing import Optional, Self
+from datetime import datetime
+from typing import Self
+
 from pydantic import (
     BaseModel,
+    ConfigDict,
     EmailStr,
     field_validator,
     model_validator,
-    ConfigDict,
 )
-from .validators import password_validator
+
 from backend.enums.user_role_enum import EUserRole
-from datetime import datetime
+
+from .validators import password_validator
 
 
 class UserCreateSchema(BaseModel):
@@ -36,8 +39,8 @@ class UserUpdateSchema(BaseModel):
 
     username: str
     email: EmailStr
-    password: Optional[str] = None
-    confirm_password: Optional[str] = None
+    password: str | None = None
+    confirm_password: str | None = None
 
     @field_validator("password", "confirm_password")
     @classmethod

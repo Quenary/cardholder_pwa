@@ -5,7 +5,7 @@ import {
   IVersion,
 } from '../entities/public/public-interface';
 
-export const baseActionPrefix: string = '[CARDHOLDER]';
+export const baseActionPrefix = '[CARDHOLDER]';
 export interface IAppState {
   /**
    * Connection state
@@ -31,7 +31,7 @@ export const appReducer = createReducer(
     ...state,
     settings: payload.settings,
   })),
-  on(AppActions.getPublicSettingsError, (state, payload) => ({
+  on(AppActions.getPublicSettingsError, (state) => ({
     ...state,
     settings: [],
   })),
@@ -39,16 +39,12 @@ export const appReducer = createReducer(
     ...state,
     version: payload.version,
   })),
-  on(AppActions.getVersionError, (state, payload) => ({
+  on(AppActions.getVersionError, (state) => ({
     ...state,
     version: null,
   })),
-  on(AppActions.networkOnline, (state, payload) => ({
+  on(AppActions.setNetworkStatus, (state, { isOnline }) => ({
     ...state,
-    isOnline: true,
-  })),
-  on(AppActions.networkOffline, (state, payload) => ({
-    ...state,
-    isOnline: false,
+    isOnline,
   })),
 );

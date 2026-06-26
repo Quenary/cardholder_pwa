@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -15,7 +10,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInput, MatFormField, MatLabel } from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { Router, RouterLink } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 import { SnackService } from 'src/app/core/services/snack.service';
 import { PasswordRecoveryApiService } from 'src/app/entities/password-recovery/password-recovery-api.service';
@@ -32,12 +27,11 @@ import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
     MatFormField,
     MatLabel,
     ReactiveFormsModule,
-    TranslateModule,
+    TranslatePipe,
     MatProgressSpinner,
   ],
   templateUrl: './password-recovery-request.component.html',
   styleUrl: './password-recovery-request.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PasswordRecoveryRequestComponent {
   private readonly passwordRecoveryApiService = inject(
@@ -47,17 +41,17 @@ export class PasswordRecoveryRequestComponent {
   private readonly router = inject(Router);
   private readonly snackService = inject(SnackService);
 
-  public readonly isLoading = signal(false);
-  public readonly form = new FormGroup<TInterfaceToForm<IPasswordRecoveryCode>>(
-    {
-      email: new FormControl<string>(null, [
-        Validators.required,
-        Validators.email,
-      ]),
-    },
-  );
+  protected readonly isLoading = signal(false);
+  protected readonly form = new FormGroup<
+    TInterfaceToForm<IPasswordRecoveryCode>
+  >({
+    email: new FormControl<string>(null, [
+      Validators.required,
+      Validators.email,
+    ]),
+  });
 
-  onSubmit(): void {
+  protected onSubmit(): void {
     if (this.form.invalid) {
       return;
     }

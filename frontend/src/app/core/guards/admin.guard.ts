@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { first } from 'rxjs';
 import { selectUserIsAdmin } from 'src/app/entities/user/state/user.selectors';
 
-export const adminGuard: CanActivateFn = (route, state) => {
+export const adminGuard: CanActivateFn = () => {
   const store = inject(Store);
   return store.select(selectUserIsAdmin).pipe(first());
 };

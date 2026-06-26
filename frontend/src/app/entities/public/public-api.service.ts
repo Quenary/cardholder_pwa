@@ -13,7 +13,7 @@ export class PublicApiService extends BaseApiService<'public'> {
     return this.httpClient.get<IVersion>(`${this.basePath}/version`);
   }
 
-  health(): Observable<any> {
+  health(): Observable<unknown> {
     return this.httpClient.get(`${this.basePath}/health`);
   }
 

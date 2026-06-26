@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -21,7 +15,7 @@ import {
 } from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { finalize, first } from 'rxjs';
 import { ERegexp } from 'src/app/app.consts';
 import { SnackService } from 'src/app/core/services/snack.service';
@@ -40,13 +34,12 @@ import { passwordMatchValidator } from 'src/app/shared/validators/passwords-matc
     MatFormField,
     MatLabel,
     ReactiveFormsModule,
-    TranslateModule,
+    TranslatePipe,
     MatProgressSpinner,
     MatSuffix,
   ],
   templateUrl: './password-recovery-submit.component.html',
   styleUrl: './password-recovery-submit.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PasswordRecoverySubmitComponent implements OnInit {
   private readonly passwordRecoveryApiService = inject(
@@ -57,11 +50,10 @@ export class PasswordRecoverySubmitComponent implements OnInit {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly snackService = inject(SnackService);
 
-  public readonly isLoading = signal(false);
-  public readonly hidePassword = signal(true);
-  public readonly hideConfirmPassword = signal(true);
-
-  public readonly form = new FormGroup<
+  protected readonly isLoading = signal(false);
+  protected readonly hidePassword = signal(true);
+  protected readonly hideConfirmPassword = signal(true);
+  protected readonly form = new FormGroup<
     TInterfaceToForm<IPasswordRecoverySubmit>
   >(
     {
@@ -88,7 +80,7 @@ export class PasswordRecoverySubmitComponent implements OnInit {
     });
   }
 
-  onSubmit(): void {
+  protected onSubmit(): void {
     if (this.form.invalid) {
       return;
     }
