@@ -65,7 +65,7 @@
       "DESCRIPTION": "Description",
       "COLOR": "Color",
       "LOGO": "Logo",
-      "LOGO_HINT": "PNG, JPEG, WebP or GIF. The image is resized and re-encoded.",
+      "LOGO_HINT": "PNG, JPEG, WebP, GIF or SVG. The image is resized and re-encoded.",
       "LOGO_SAVE_FIRST": "Save the card first to add a logo.",
       "LOGO_UPLOAD": "Choose an image",
       "LOGO_REMOVE": "Remove",

@@ -22,6 +22,7 @@ class Config:
     LOGO_DIR: ClassVar[str]
     LOGO_MAX_UPLOAD_BYTES: ClassVar[int]
     LOGO_MAX_DIMENSION: ClassVar[int]
+    LOGO_SVG_TIMEOUT_SEC: ClassVar[float]
     DB_CLEANUP_INTERVAL_MIN: ClassVar[float]
     SMTP_DISABLED: ClassVar[bool]
     SMTP_ENCRYPTION: ClassVar[SMTP_ENCRYPTION_TYPE]
@@ -65,7 +66,10 @@ class Config:
             cls.LOGO_MAX_UPLOAD_BYTES = int(
                 os.getenv("LOGO_MAX_UPLOAD_BYTES") or 2 * 1024 * 1024
             )
-            cls.LOGO_MAX_DIMENSION = int(os.getenv("LOGO_MAX_DIMENSION") or 512)
+            cls.LOGO_MAX_DIMENSION = int(os.getenv("LOGO_MAX_DIMENSION") or 1024)
+            # Render time is unrelated to file size, so SVG rasterising runs in
+            # a child process that is killed past this many seconds.
+            cls.LOGO_SVG_TIMEOUT_SEC = float(os.getenv("LOGO_SVG_TIMEOUT_SEC") or 10)
 
             cls.SMTP_DISABLED = os.getenv("SMTP_DISABLED", "false").lower() == "true"
 

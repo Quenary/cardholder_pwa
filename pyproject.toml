@@ -10,6 +10,7 @@ dependencies = [
     "asyncmy>=0.2.11",
     "asyncpg>=0.31.0",
     "bcrypt>=5.0.0",
+    "cairosvg>=2.8.2",
     "dotenv>=0.9.9",
     "fastapi>=0.138.0",
     "pillow>=11.3.0",

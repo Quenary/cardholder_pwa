@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.concurrency import run_in_threadpool
 
 from backend.config import Config
 from backend.core.auth_core import is_user
@@ -193,7 +194,9 @@ async def upload_card_logo(
     card = await _get_own_card(card_id, session, user)
     raw = await _read_capped(file)
     try:
-        file_name = save_logo(raw)
+        # Decoding and re-encoding are CPU-bound: kept off the event loop so a
+        # slow image cannot stall every other request being served.
+        file_name = await run_in_threadpool(save_logo, raw)
     except LogoError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
