@@ -57,12 +57,6 @@
           matRipple
           [routerLink]="['/cards', card.id]">
           <section class="cards-list-item-header">
-            @if (card | cardLogo | async; as logo) {
-              <img
-                class="cards-list-item-header-logo"
-                [src]="logo"
-                alt="" />
-            }
             <span class="cards-list-item-header-text">
               {{ card.name }}
             </span>
@@ -85,7 +79,28 @@
               }
             </section>
           </section>
-          @if (card | isValidCard) {
+          @if (card.has_logo) {
+            <!--
+              The logo replaces the code preview: the card is recognisable at a
+              glance and the codes are no longer all laid out on one screen.
+              The click is deliberately left to bubble up so the routerLink
+              opens the card, while still marking it as used.
+            -->
+            <div
+              class="cards-list-item-logo"
+              role="button"
+              tabindex="0"
+              [attr.aria-label]="card.name"
+              (click)="$event.stopPropagation(); openCard(card)"
+              (keydown.enter)="openCard(card)"
+              (keydown.space)="$event.preventDefault(); openCard(card)">
+              @if (card | cardLogo | async; as logo) {
+                <img
+                  [src]="logo"
+                  [alt]="card.name" />
+              }
+            </div>
+          } @else if (card | isValidCard) {
             @defer {
               <app-card-code-viewer
                 class="cards-list-item-preview"

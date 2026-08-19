@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
 import {
@@ -72,6 +72,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 export class CardsComponent {
   private readonly store = inject(Store);
   private readonly matDialog = inject(MatDialog);
+  private readonly router = inject(Router);
 
   protected readonly showParent = signal<boolean>(true);
   protected readonly cardsPlaceholder: number[] = Array(6).fill(Math.random());
@@ -154,6 +155,16 @@ export class CardsComponent {
         },
       }),
     );
+  }
+
+  /**
+   * Opens a card from its logo. Navigation is done here rather than left to the
+   * surrounding routerLink so that keyboard users get the same behaviour as a
+   * mouse click, and so the card is marked as used either way.
+   */
+  protected openCard(card: ICard): void {
+    this.updateUsedDate(card);
+    this.router.navigate(['/cards', card.id]);
   }
 
   protected updateUsedDate(card: ICard): void {
