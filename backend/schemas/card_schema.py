@@ -1,7 +1,7 @@
 import re
 from datetime import UTC, datetime
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 
 
 class CardBaseSchema(BaseModel):
@@ -63,4 +63,15 @@ class CardSchema(CardBaseSchema):
     used_at: datetime | None
     created_at: datetime
     updated_at: datetime
+    # Read from the model but never sent to clients: the file name is an
+    # internal detail, the client only needs to know whether a logo exists
+    # and can then fetch /cards/{id}/logo.
+    logo_file: str | None = Field(default=None, exclude=True)
     model_config = ConfigDict(from_attributes=True)
+
+    # mypy does not support decorators stacked on @property; this is the
+    # workaround documented by pydantic for computed fields.
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def has_logo(self) -> bool:
+        return bool(self.logo_file)

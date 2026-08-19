@@ -57,6 +57,12 @@
           matRipple
           [routerLink]="['/cards', card.id]">
           <section class="cards-list-item-header">
+            @if (card | cardLogo | async; as logo) {
+              <img
+                class="cards-list-item-header-logo"
+                [src]="logo"
+                alt="" />
+            }
             <span class="cards-list-item-header-text">
               {{ card.name }}
             </span>

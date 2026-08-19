@@ -38,6 +38,25 @@
         font-size: 20px;
         padding: 16px 16px 8px 16px;
 
+        &-logo {
+          // Brand logos are mostly wide wordmarks, so the height is fixed and
+          // the width follows; a square box would squash them into an
+          // unreadable smudge. The cap keeps the card name readable.
+          height: 22px;
+          max-width: 64px;
+          width: auto;
+          object-fit: contain;
+          // Almost every brand logo is drawn for a white background, so it is
+          // placed on a light chip rather than straight onto the surface,
+          // where dark wordmarks would vanish in the dark theme.
+          background-color: #fff;
+          border-radius: 4px;
+          padding: 2px 4px;
+          margin-right: 8px;
+          flex: 0 0 auto;
+          align-self: center;
+        }
+
         &-text {
           text-overflow: ellipsis;
           white-space: nowrap;

@@ -88,6 +88,33 @@ export const cardsReducer = createReducer(
       isLoading: false,
     }),
   ),
+  on(CardsActions.setLogo, CardsActions.removeLogo, (state) => ({
+    ...state,
+    isLoading: true,
+  })),
+  on(CardsActions.setLogoError, CardsActions.removeLogoError, (state) => ({
+    ...state,
+    isLoading: false,
+  })),
+  // Only the list is refreshed here: rewriting `active.info` would emit a new
+  // card to the edit screen, which resets the form and would silently discard
+  // whatever the user is typing while the logo uploads.
+  on(
+    CardsActions.setLogoSuccess,
+    CardsActions.removeLogoSuccess,
+    (state, payload) => {
+      const list = [...state.list];
+      const index = list.findIndex((i) => i.id == payload.info.id);
+      if (index >= 0) {
+        list[index] = { ...list[index], ...payload.info };
+      }
+      return {
+        ...state,
+        list,
+        isLoading: false,
+      };
+    },
+  ),
   on(CardsActions.patchListItemSuccess, (state, payload) => {
     const list = [...state.list];
     const index = list.findIndex((i) => i.id == payload.card.id);

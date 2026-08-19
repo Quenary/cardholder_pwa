@@ -19,6 +19,9 @@ class Config:
     REFRESH_TOKEN_LIFETIME_MIN: ClassVar[float]
     PASSWORD_RECOVERY_CODE_LIFETIME_MIN: ClassVar[float]
     DB_URL: ClassVar[str]
+    LOGO_DIR: ClassVar[str]
+    LOGO_MAX_UPLOAD_BYTES: ClassVar[int]
+    LOGO_MAX_DIMENSION: ClassVar[int]
     DB_CLEANUP_INTERVAL_MIN: ClassVar[float]
     SMTP_DISABLED: ClassVar[bool]
     SMTP_ENCRYPTION: ClassVar[SMTP_ENCRYPTION_TYPE]
@@ -55,6 +58,14 @@ class Config:
             cls.DB_CLEANUP_INTERVAL_MIN = float(
                 os.getenv("DB_CLEANUP_INTERVAL_MIN") or 360
             )
+            # Logos are stored next to the database so a single volume holds
+            # all persistent state.
+            cls.LOGO_DIR = os.getenv("LOGO_DIR") or "/cardholder_pwa/logos"
+            # Upload cap applied before decoding, to avoid decompression bombs.
+            cls.LOGO_MAX_UPLOAD_BYTES = int(
+                os.getenv("LOGO_MAX_UPLOAD_BYTES") or 2 * 1024 * 1024
+            )
+            cls.LOGO_MAX_DIMENSION = int(os.getenv("LOGO_MAX_DIMENSION") or 512)
 
             cls.SMTP_DISABLED = os.getenv("SMTP_DISABLED", "false").lower() == "true"
 

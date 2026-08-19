@@ -28,6 +28,13 @@ export const CardsActions = createActionGroup({
     'set form': props<{ form: ICardBase }>(),
     'save card': emptyProps(),
     'exit card': emptyProps(),
+    // LOGO (sub-resource, saved immediately and independently of the form)
+    'set logo': props<{ id: number; file: File }>(),
+    'set logo success': props<{ info: ICard }>(),
+    'set logo error': props<{ error: HttpErrorResponse }>(),
+    'remove logo': props<{ id: number }>(),
+    'remove logo success': props<{ info: ICard }>(),
+    'remove logo error': props<{ error: HttpErrorResponse }>(),
     patchListItem: props<{ id: number; body: Partial<ICardBase> }>(),
     patchListItemSuccess: props<{ card: ICard }>(),
     patchListItemError: props<{ error: HttpErrorResponse }>(),

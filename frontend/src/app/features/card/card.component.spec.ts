@@ -5,6 +5,11 @@ import { ITestAppState, testAppState } from 'src/testing';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
 import { provideTranslateService } from '@ngx-translate/core';
+import { provideMockActions } from '@ngrx/effects/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { Subject } from 'rxjs';
+import { Action } from '@ngrx/store';
 
 describe('CardComponent', () => {
   let fixture: ComponentFixture<CardComponent>;
@@ -12,15 +17,21 @@ describe('CardComponent', () => {
 
   let storeMock: MockStore;
   let initialState: ITestAppState;
+  // The component listens to the action stream to refresh the logo preview.
+  let actions$: Subject<Action>;
 
   beforeEach(async () => {
     initialState = { ...testAppState };
+    actions$ = new Subject<Action>();
 
     await TestBed.configureTestingModule({
       providers: [
         provideMockStore({ initialState }),
         provideRouter([]),
         provideTranslateService(),
+        provideMockActions(() => actions$),
+        provideHttpClient(),
+        provideHttpClientTesting(),
       ],
       imports: [CardComponent],
     }).compileComponents();
