@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
 import {
@@ -24,7 +24,10 @@ import {
 } from 'src/app/entities/cards/state/cards.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatFabButton } from '@angular/material/button';
-import { CardCodeViewerComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
+import {
+  CardCodeViewerComponent,
+  CardCodeViewerDialogComponent,
+} from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
 import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
 import { CardLogoPipe } from 'src/app/shared/pipes/card-logo.pipe';
 import { AsyncPipe } from '@angular/common';
@@ -72,7 +75,6 @@ import { MatBadgeModule } from '@angular/material/badge';
 export class CardsComponent {
   private readonly store = inject(Store);
   private readonly matDialog = inject(MatDialog);
-  private readonly router = inject(Router);
 
   protected readonly showParent = signal<boolean>(true);
   protected readonly cardsPlaceholder: number[] = Array(6).fill(Math.random());
@@ -158,13 +160,26 @@ export class CardsComponent {
   }
 
   /**
-   * Opens a card from its logo. Navigation is done here rather than left to the
-   * surrounding routerLink so that keyboard users get the same behaviour as a
-   * mouse click, and so the card is marked as used either way.
+   * Shows the code full size, which is what tapping a card is for: the point of
+   * opening it is to have the code scanned at a till.
+   *
+   * A card showing its logo has no code preview to tap, so the logo takes over
+   * that role and opens the very same dialog the preview would have opened.
+   * Navigating to the card screen is left to the surrounding routerLink, which
+   * still fires when the header or the name is tapped.
    */
-  protected openCard(card: ICard): void {
+  protected showCode(card: ICard): void {
     this.updateUsedDate(card);
-    this.router.navigate(['/cards', card.id]);
+    this.matDialog.open(CardCodeViewerDialogComponent, {
+      width: 'calc(100% - 50px)',
+      height: 'calc(100% - 50px)',
+      // `color` is left out on purpose: the dialog component defaults it to the
+      // current theme colour, same as the preview does.
+      data: {
+        card,
+        scale: 6,
+      },
+    });
   }
 
   protected updateUsedDate(card: ICard): void {

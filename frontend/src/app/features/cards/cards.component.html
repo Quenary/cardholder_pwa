@@ -83,17 +83,19 @@
             <!--
               The logo replaces the code preview: the card is recognisable at a
               glance and the codes are no longer all laid out on one screen.
-              The click is deliberately left to bubble up so the routerLink
-              opens the card, while still marking it as used.
+              Tapping it opens the code full size, exactly as tapping the
+              preview did, because that is what the card is opened for.
+              Propagation is stopped so the surrounding routerLink does not
+              also navigate to the card screen.
             -->
             <div
               class="cards-list-item-logo"
               role="button"
               tabindex="0"
               [attr.aria-label]="card.name"
-              (click)="$event.stopPropagation(); openCard(card)"
-              (keydown.enter)="openCard(card)"
-              (keydown.space)="$event.preventDefault(); openCard(card)">
+              (click)="$event.stopPropagation(); showCode(card)"
+              (keydown.enter)="$event.stopPropagation(); showCode(card)"
+              (keydown.space)="$event.preventDefault(); $event.stopPropagation(); showCode(card)">
               @if (card | cardLogo | async; as logo) {
                 <img
                   [src]="logo"
