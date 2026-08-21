@@ -26,6 +26,28 @@ from backend.schemas.password_recovery_schema import (
 router = APIRouter(tags=["password recovery"], prefix="/recovery")
 
 
+def build_reset_url(request: Request, code: str) -> str | None:
+    """Build the link sent in the password reset email.
+
+    Config.PUBLIC_URL is used when set, because the incoming request's Host
+    header is client-supplied and not to be trusted for a security-sensitive
+    URL: anyone able to reach the app directly (bypassing the reverse proxy,
+    e.g. over the LAN) can set it to any value, which would otherwise let them
+    point reset links at a domain of their choosing.
+
+    Falling back to the Host header keeps this working out of the box for
+    deployments that have not set PUBLIC_URL, same as before this existed.
+    """
+    if Config.PUBLIC_URL:
+        return f"{Config.PUBLIC_URL.rstrip('/')}/password-recovery/submit?code={code}"
+
+    host = request.headers.get("host", "")
+    scheme = request.scope["scheme"]
+    if host and scheme:
+        return f"{scheme}://{host}/password-recovery/submit?code={code}"
+    return None
+
+
 @router.post("/code", description="Request password recovery code")
 @delay_to_minimum(1)
 async def code(
@@ -57,11 +79,7 @@ async def code(
             minutes=Config.PASSWORD_RECOVERY_CODE_LIFETIME_MIN
         )
 
-        reset_url = None
-        host = request.headers.get("host", "")
-        scheme = request.scope["scheme"]
-        if host and scheme:
-            reset_url = f"{scheme}://{host}/password-recovery/submit?code={code}"
+        reset_url = build_reset_url(request, code)
 
         await asyncio.to_thread(
             EmailSender.send_password_reset_email,

@@ -36,6 +36,11 @@ class Config:
     SMTP_USERNAME: ClassVar[str]
     SMTP_PASSWORD: ClassVar[str]
     SMTP_TIMEOUT: ClassVar[int]
+    # Base URL used to build links sent by email (password reset). When set,
+    # it is trusted instead of the incoming request's Host header, which an
+    # attacker able to reach the app directly (bypassing the reverse proxy)
+    # could otherwise spoof to point reset links at a domain they control.
+    PUBLIC_URL: ClassVar[str]
 
     @classmethod
     def load(cls) -> None:
@@ -110,6 +115,7 @@ class Config:
             cls.SMTP_USERNAME = os.getenv("SMTP_USERNAME", "")
             cls.SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
             cls.SMTP_TIMEOUT = int(os.getenv("SMTP_TIMEOUT", 10))
+            cls.PUBLIC_URL = os.getenv("PUBLIC_URL", "").rstrip("/")
             cls._loaded = True
 
 
