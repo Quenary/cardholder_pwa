@@ -165,6 +165,30 @@ export class CardsEffects {
     { dispatch: false },
   );
 
+  setLogo$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CardsActions.setLogo),
+      switchMap((action) =>
+        this.cardsApiService.uploadLogo(action.id, action.file).pipe(
+          map((info) => CardsActions.setLogoSuccess({ info })),
+          catchError((error) => of(CardsActions.setLogoError({ error }))),
+        ),
+      ),
+    ),
+  );
+
+  removeLogo$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(CardsActions.removeLogo),
+      switchMap((action) =>
+        this.cardsApiService.deleteLogo(action.id).pipe(
+          map((info) => CardsActions.removeLogoSuccess({ info })),
+          catchError((error) => of(CardsActions.removeLogoError({ error }))),
+        ),
+      ),
+    ),
+  );
+
   patchListItem$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CardsActions.patchListItem),
@@ -187,6 +211,8 @@ export class CardsEffects {
           CardsActions.updateError,
           CardsActions.deleteError,
           CardsActions.patchListItemError,
+          CardsActions.setLogoError,
+          CardsActions.removeLogoError,
         ),
         tap((action) => {
           this.snackService.error(action.error);

@@ -5,6 +5,10 @@ import { provideRouter } from '@angular/router';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { ICard } from 'src/app/entities/cards/cards-interface';
 import { provideTranslateService } from '@ngx-translate/core';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
+import { CardCodeViewerDialogComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
 
 describe('CardsComponent', () => {
   let component: CardsComponent;
@@ -72,5 +76,41 @@ describe('CardsComponent', () => {
     expect(component['cards']()).toEqual([list[0]]);
     component['searchControl'].setValue('qwerty');
     expect(component['cards']()).toEqual([]);
+  });
+  it('should show the code full size rather than open the card screen', () => {
+    // A card showing a logo has no code preview to tap, so the logo takes that
+    // role. Navigating to the edit screen instead would put the code two taps
+    // away, which is the wrong thing at a till.
+    const card: ICard = {
+      id: 7,
+      name: 'shop',
+      code: '12345678',
+      code_type: 'ean8',
+      description: null,
+      color: null,
+      used_at: null,
+      updated_at: null,
+      created_at: null,
+      has_logo: true,
+    };
+    fixture = TestBed.createComponent(CardsComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    const matDialog = TestBed.inject(MatDialog);
+    const openSpy = vi.spyOn(matDialog, 'open').mockReturnValue({} as never);
+    const navigateSpy = vi.spyOn(TestBed.inject(Router), 'navigate');
+    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
+
+    component['showCode'](card);
+
+    expect(openSpy).toHaveBeenCalledWith(
+      CardCodeViewerDialogComponent,
+      expect.objectContaining({ data: expect.objectContaining({ card }) }),
+    );
+    expect(navigateSpy).not.toHaveBeenCalled();
+    expect(dispatchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ type: CardsActions.patchListItem.type }),
+    );
   });
 });

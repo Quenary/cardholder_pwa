@@ -76,6 +76,57 @@
     </textarea>
   </mat-form-field>
 
+  <section class="card-form-logo">
+    <div class="card-form-logo-preview">
+      @if (logoUrl(); as logo) {
+        <img
+          [src]="logo"
+          alt="" />
+      } @else {
+        <mat-icon>image</mat-icon>
+      }
+    </div>
+    <div class="card-form-logo-text">
+      <span class="card-form-logo-title">
+        {{ 'CARDS.CARD.LOGO' | translate }}
+      </span>
+      <span class="card-form-logo-hint">
+        @if (card()) {
+          {{ 'CARDS.CARD.LOGO_HINT' | translate }}
+        } @else {
+          {{ 'CARDS.CARD.LOGO_SAVE_FIRST' | translate }}
+        }
+      </span>
+      <div class="card-form-logo-buttons">
+        <button
+          mat-button
+          type="button"
+          [disabled]="!card() || isLoading()"
+          (click)="logoInput.click()">
+          <mat-icon>upload</mat-icon>
+          {{ 'CARDS.CARD.LOGO_UPLOAD' | translate }}
+        </button>
+        @if (logoUrl()) {
+          <button
+            class="warn-color"
+            mat-button
+            type="button"
+            [disabled]="isLoading()"
+            (click)="onRemoveLogo()">
+            <mat-icon>delete</mat-icon>
+            {{ 'CARDS.CARD.LOGO_REMOVE' | translate }}
+          </button>
+        }
+      </div>
+    </div>
+    <input
+      #logoInput
+      hidden
+      type="file"
+      accept="image/png,image/jpeg,image/webp,image/gif,image/bmp,image/svg+xml"
+      (change)="onLogoSelected($event)" />
+  </section>
+
   <mat-form-field class="card-form-field">
     <mat-label>{{ 'CARDS.CARD.COLOR' | translate }}</mat-label>
     <input

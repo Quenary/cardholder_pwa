@@ -24,8 +24,13 @@ import {
 } from 'src/app/entities/cards/state/cards.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatFabButton } from '@angular/material/button';
-import { CardCodeViewerComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
+import {
+  CardCodeViewerComponent,
+  CardCodeViewerDialogComponent,
+} from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
 import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
+import { CardLogoPipe } from 'src/app/shared/pipes/card-logo.pipe';
+import { AsyncPipe } from '@angular/common';
 import { GetOnColorPipe } from 'src/app/shared/pipes/get-on-color.pipe';
 import { IsOldCodeType } from 'src/app/shared/pipes/is-old-code-type.pipe';
 import { MatDialog } from '@angular/material/dialog';
@@ -61,6 +66,8 @@ import { MatBadgeModule } from '@angular/material/badge';
     GetOnColorPipe,
     IsOldCodeType,
     MatBadgeModule,
+    CardLogoPipe,
+    AsyncPipe,
   ],
   templateUrl: './cards.component.html',
   styleUrl: './cards.component.scss',
@@ -150,6 +157,29 @@ export class CardsComponent {
         },
       }),
     );
+  }
+
+  /**
+   * Shows the code full size, which is what tapping a card is for: the point of
+   * opening it is to have the code scanned at a till.
+   *
+   * A card showing its logo has no code preview to tap, so the logo takes over
+   * that role and opens the very same dialog the preview would have opened.
+   * Navigating to the card screen is left to the surrounding routerLink, which
+   * still fires when the header or the name is tapped.
+   */
+  protected showCode(card: ICard): void {
+    this.updateUsedDate(card);
+    this.matDialog.open(CardCodeViewerDialogComponent, {
+      width: 'calc(100% - 50px)',
+      height: 'calc(100% - 50px)',
+      // `color` is left out on purpose: the dialog component defaults it to the
+      // current theme colour, same as the preview does.
+      data: {
+        card,
+        scale: 6,
+      },
+    });
   }
 
   protected updateUsedDate(card: ICard): void {

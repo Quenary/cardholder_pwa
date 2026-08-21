@@ -32,6 +32,58 @@
     }
   }
 
+  &-logo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+
+    &-preview {
+      // Wider than tall, for the same reason as in the list: most logos are
+      // wordmarks rather than square icons.
+      width: 112px;
+      height: 64px;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      // Same reasoning as the list: a light chip so logos drawn for white
+      // backgrounds stay readable in the dark theme.
+      background-color: #fff;
+      overflow: hidden;
+      padding: 6px;
+
+      img {
+        width: 100%;
+        height: 100%;
+        // Logos are all shapes and sizes: never crop or stretch them.
+        object-fit: contain;
+      }
+      mat-icon {
+        color: rgba(0, 0, 0, 0.38);
+      }
+    }
+
+    &-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    &-hint {
+      font-size: 12px;
+      color: var(--mat-sys-outline);
+    }
+
+    &-buttons {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+  }
+
   &-buttons {
     @include mx.flex-container-buttons;
   }

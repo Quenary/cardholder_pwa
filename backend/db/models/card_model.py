@@ -22,6 +22,9 @@ class CardModel(BaseModel):
     name: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[Text | None] = mapped_column(Text, nullable=True)
     color: Mapped[str | None] = mapped_column(String, nullable=True)
+    # File name only (never a path): the image lives in Config.LOGO_DIR.
+    # Keeping it out of the database keeps dumps small and restores simple.
+    logo_file: Mapped[str | None] = mapped_column(String, nullable=True)
     is_favorite: Mapped[bool] = mapped_column(
         Boolean, server_default=text("FALSE"), default=False, nullable=False
     )

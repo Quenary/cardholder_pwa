@@ -13,6 +13,8 @@ export interface ICard extends ICardBase {
   id: number;
   created_at: string;
   updated_at: string;
+  /** Server-side flag; the image itself is fetched from /cards/{id}/logo */
+  has_logo?: boolean;
 }
 export const ECardFieldType: { [K in keyof ICard]: TypeToString<ICard[K]> } = {
   id: 'number',
@@ -25,4 +27,5 @@ export const ECardFieldType: { [K in keyof ICard]: TypeToString<ICard[K]> } = {
   used_at: 'date',
   created_at: 'date',
   updated_at: 'date',
+  has_logo: 'boolean',
 };

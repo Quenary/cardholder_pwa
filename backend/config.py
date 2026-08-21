@@ -19,15 +19,28 @@ class Config:
     REFRESH_TOKEN_LIFETIME_MIN: ClassVar[float]
     PASSWORD_RECOVERY_CODE_LIFETIME_MIN: ClassVar[float]
     DB_URL: ClassVar[str]
+    LOGO_DIR: ClassVar[str]
+    LOGO_MAX_UPLOAD_BYTES: ClassVar[int]
+    LOGO_MAX_DIMENSION: ClassVar[int]
+    LOGO_SVG_TIMEOUT_SEC: ClassVar[float]
     DB_CLEANUP_INTERVAL_MIN: ClassVar[float]
     SMTP_DISABLED: ClassVar[bool]
     SMTP_ENCRYPTION: ClassVar[SMTP_ENCRYPTION_TYPE]
     SMTP_SERVER: ClassVar[str]
     SMTP_PORT: ClassVar[int]
     SMTP_FROM_EMAIL: ClassVar[str]
+    # Display name shown next to the address in the recipient's inbox (e.g.
+    # "Cardholder - Famille Bonnier"). Optional: falls back to the bare
+    # address when unset, same as before this variable existed.
+    SMTP_FROM_NAME: ClassVar[str]
     SMTP_USERNAME: ClassVar[str]
     SMTP_PASSWORD: ClassVar[str]
     SMTP_TIMEOUT: ClassVar[int]
+    # Base URL used to build links sent by email (password reset). When set,
+    # it is trusted instead of the incoming request's Host header, which an
+    # attacker able to reach the app directly (bypassing the reverse proxy)
+    # could otherwise spoof to point reset links at a domain they control.
+    PUBLIC_URL: ClassVar[str]
 
     @classmethod
     def load(cls) -> None:
@@ -55,6 +68,17 @@ class Config:
             cls.DB_CLEANUP_INTERVAL_MIN = float(
                 os.getenv("DB_CLEANUP_INTERVAL_MIN") or 360
             )
+            # Logos are stored next to the database so a single volume holds
+            # all persistent state.
+            cls.LOGO_DIR = os.getenv("LOGO_DIR") or "/cardholder_pwa/logos"
+            # Upload cap applied before decoding, to avoid decompression bombs.
+            cls.LOGO_MAX_UPLOAD_BYTES = int(
+                os.getenv("LOGO_MAX_UPLOAD_BYTES") or 2 * 1024 * 1024
+            )
+            cls.LOGO_MAX_DIMENSION = int(os.getenv("LOGO_MAX_DIMENSION") or 1024)
+            # Render time is unrelated to file size, so SVG rasterising runs in
+            # a child process that is killed past this many seconds.
+            cls.LOGO_SVG_TIMEOUT_SEC = float(os.getenv("LOGO_SVG_TIMEOUT_SEC") or 10)
 
             cls.SMTP_DISABLED = os.getenv("SMTP_DISABLED", "false").lower() == "true"
 
@@ -87,9 +111,11 @@ class Config:
             cls.SMTP_SERVER = os.getenv("SMTP_SERVER", "")
             cls.SMTP_PORT = int(os.getenv("SMTP_PORT", defaultPort))
             cls.SMTP_FROM_EMAIL = os.getenv("SMTP_FROM_EMAIL", "")
+            cls.SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "")
             cls.SMTP_USERNAME = os.getenv("SMTP_USERNAME", "")
             cls.SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
             cls.SMTP_TIMEOUT = int(os.getenv("SMTP_TIMEOUT", 10))
+            cls.PUBLIC_URL = os.getenv("PUBLIC_URL", "").rstrip("/")
             cls._loaded = True
 
 
