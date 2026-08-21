@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v1.9.0 (2026-08-21)
+
+### Features
+
+- Optional per-card logos, with SVG support by @thomasbonr
+  ([`f0c3cee`](https://github.com/Quenary/cardholder_pwa/commit/f0c3ceede6a878b4b7a6757fa32e95de609b3e37))
+
+
 ## v1.8.2 (2026-06-26)
 
 ### Bug Fixes
