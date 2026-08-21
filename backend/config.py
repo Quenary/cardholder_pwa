@@ -29,6 +29,10 @@ class Config:
     SMTP_SERVER: ClassVar[str]
     SMTP_PORT: ClassVar[int]
     SMTP_FROM_EMAIL: ClassVar[str]
+    # Display name shown next to the address in the recipient's inbox (e.g.
+    # "Cardholder - Famille Bonnier"). Optional: falls back to the bare
+    # address when unset, same as before this variable existed.
+    SMTP_FROM_NAME: ClassVar[str]
     SMTP_USERNAME: ClassVar[str]
     SMTP_PASSWORD: ClassVar[str]
     SMTP_TIMEOUT: ClassVar[int]
@@ -102,6 +106,7 @@ class Config:
             cls.SMTP_SERVER = os.getenv("SMTP_SERVER", "")
             cls.SMTP_PORT = int(os.getenv("SMTP_PORT", defaultPort))
             cls.SMTP_FROM_EMAIL = os.getenv("SMTP_FROM_EMAIL", "")
+            cls.SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "")
             cls.SMTP_USERNAME = os.getenv("SMTP_USERNAME", "")
             cls.SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
             cls.SMTP_TIMEOUT = int(os.getenv("SMTP_TIMEOUT", 10))
