@@ -158,7 +158,7 @@ export class CardComponent implements OnInit, OnDestroy {
         next: (action) => {
           this.loadedLogoCardId = action.info.id;
           if (action.info.has_logo) {
-            this.fetchLogo(action.info.id);
+            this.fetchLogo(action.info.id, action.info.updated_at);
           } else {
             this.setLogoPreview(null);
           }
@@ -194,7 +194,9 @@ export class CardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private syncLogo(info: { id?: number; has_logo?: boolean } | null): void {
+  private syncLogo(
+    info: { id?: number; has_logo?: boolean; updated_at?: string } | null,
+  ): void {
     if (!info?.id) {
       this.loadedLogoCardId = null;
       this.setLogoPreview(null);
@@ -205,15 +207,15 @@ export class CardComponent implements OnInit, OnDestroy {
     }
     this.loadedLogoCardId = info.id;
     if (info.has_logo) {
-      this.fetchLogo(info.id);
+      this.fetchLogo(info.id, info.updated_at);
     } else {
       this.setLogoPreview(null);
     }
   }
 
-  private fetchLogo(id: number): void {
+  private fetchLogo(id: number, updatedAt?: string): void {
     this.cardsApiService
-      .getLogoBlob(id)
+      .getLogoBlob(id, updatedAt ?? '')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (blob) => this.setLogoPreview(blob),

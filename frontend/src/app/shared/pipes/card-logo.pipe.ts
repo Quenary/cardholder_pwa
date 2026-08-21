@@ -11,27 +11,26 @@ import { ICard } from 'src/app/entities/cards/cards-interface';
  * browser directly; it is fetched through `HttpClient` (which carries the
  * token) and turned into an object URL.
  *
- * Results are cached per card *and* per `updated_at`, so scrolling a long list
- * issues one request per card, while replacing a logo still refreshes it. The
- * object URLs are revoked when the pipe is destroyed to avoid leaking blobs.
+ * Each use of the pipe gets its own instance, so this holds the last result
+ * only: that is the whole lifetime it can actually serve. It keeps a row from
+ * refetching on every change detection, and a new request is issued when the
+ * card or its `updated_at` changes. The object URL is revoked when it is
+ * replaced and when the pipe is destroyed, so blobs are not leaked.
  */
 @Pipe({
   name: 'cardLogo',
   pure: true,
 })
 export class CardLogoPipe implements PipeTransform {
-  private readonly cardsApiService = inject(CardApiService);
+  private readonly cardApiService = inject(CardApiService);
   private readonly domSanitizer = inject(DomSanitizer);
 
-  private readonly cache = new Map<string, Observable<SafeUrl | null>>();
-  private readonly objectUrls: string[] = [];
+  private lastKey: string | null = null;
+  private last$: Observable<SafeUrl | null> = of(null);
+  private objectUrl: string | null = null;
 
   constructor() {
-    inject(DestroyRef).onDestroy(() => {
-      this.objectUrls.forEach((url) => URL.revokeObjectURL(url));
-      this.objectUrls.length = 0;
-      this.cache.clear();
-    });
+    inject(DestroyRef).onDestroy(() => this.revoke());
   }
 
   transform(card: ICard | null | undefined): Observable<SafeUrl | null> {
@@ -39,23 +38,31 @@ export class CardLogoPipe implements PipeTransform {
       return of(null);
     }
 
-    const key = `${card.id}:${card.updated_at ?? ''}`;
-    let logo$ = this.cache.get(key);
-
-    if (!logo$) {
-      logo$ = this.cardsApiService.getLogoBlob(card.id).pipe(
-        map((blob) => {
-          const objectUrl = URL.createObjectURL(blob);
-          this.objectUrls.push(objectUrl);
-          return this.domSanitizer.bypassSecurityTrustUrl(objectUrl);
-        }),
-        // A missing logo must never break the list: fall back to no image.
-        catchError(() => of(null)),
-        shareReplay({ bufferSize: 1, refCount: false }),
-      );
-      this.cache.set(key, logo$);
+    const updatedAt = card.updated_at ?? '';
+    const key = `${card.id}:${updatedAt}`;
+    if (key === this.lastKey) {
+      return this.last$;
     }
 
-    return logo$;
+    this.lastKey = key;
+    this.last$ = this.cardApiService.getLogoBlob(card.id, updatedAt).pipe(
+      map((blob) => {
+        this.revoke();
+        this.objectUrl = URL.createObjectURL(blob);
+        return this.domSanitizer.bypassSecurityTrustUrl(this.objectUrl);
+      }),
+      // A missing logo must never break the list: fall back to no image.
+      catchError(() => of(null)),
+      shareReplay({ bufferSize: 1, refCount: false }),
+    );
+
+    return this.last$;
+  }
+
+  private revoke(): void {
+    if (this.objectUrl) {
+      URL.revokeObjectURL(this.objectUrl);
+      this.objectUrl = null;
+    }
   }
 }

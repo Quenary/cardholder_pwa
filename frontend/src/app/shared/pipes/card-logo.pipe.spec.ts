@@ -53,27 +53,29 @@ describe('CardLogoPipe', () => {
   it('should fetch the logo only once for the same card', async () => {
     const first = firstValueFrom(pipe.transform(card()));
     httpMock
-      .expectOne('/api/cards/1/logo')
+      .expectOne('/api/cards/1/logo?updatedAt=2026-01-01')
       .flush(new Blob(['x'], { type: 'image/webp' }));
     await expect(first).resolves.toBeTruthy();
 
     // Same card again: served from the cache, no second request.
     await expect(firstValueFrom(pipe.transform(card()))).resolves.toBeTruthy();
-    httpMock.expectNone('/api/cards/1/logo');
+    httpMock.expectNone(() => true);
   });
 
   it('should fetch again once the card has been updated', async () => {
     const first = firstValueFrom(pipe.transform(card()));
     httpMock
-      .expectOne('/api/cards/1/logo')
+      .expectOne('/api/cards/1/logo?updatedAt=2026-01-01')
       .flush(new Blob(['x'], { type: 'image/webp' }));
     await first;
 
     const second = firstValueFrom(
       pipe.transform(card({ updated_at: '2026-02-02' })),
     );
+    // The changed updated_at is what makes this a different URL, so a replaced
+    // logo is not served from the browser or service worker cache.
     httpMock
-      .expectOne('/api/cards/1/logo')
+      .expectOne('/api/cards/1/logo?updatedAt=2026-02-02')
       .flush(new Blob(['y'], { type: 'image/webp' }));
     await expect(second).resolves.toBeTruthy();
   });
@@ -82,10 +84,12 @@ describe('CardLogoPipe', () => {
     const result = firstValueFrom(pipe.transform(card()));
     // A blob-typed request cannot be flushed with a text body, so the failure
     // is simulated with an error response instead.
-    httpMock.expectOne('/api/cards/1/logo').error(new ProgressEvent('error'), {
-      status: 404,
-      statusText: 'Not Found',
-    });
+    httpMock
+      .expectOne('/api/cards/1/logo?updatedAt=2026-01-01')
+      .error(new ProgressEvent('error'), {
+        status: 404,
+        statusText: 'Not Found',
+      });
     await expect(result).resolves.toBeNull();
   });
 });

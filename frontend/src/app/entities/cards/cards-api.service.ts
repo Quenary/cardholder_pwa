@@ -41,9 +41,13 @@ export class CardApiService extends BaseApiService<'cards'> {
    * URL: the endpoint is authenticated and a plain `<img src>` would not carry
    * the bearer token added by the interceptor.
    */
-  getLogoBlob(cardId: number): Observable<Blob> {
+  getLogoBlob(cardId: number, updatedAt: string): Observable<Blob> {
     return this.httpClient.get(`${this.basePath}/${cardId}/logo`, {
       responseType: 'blob',
+      // The logo URL is stable across replacements, so `updatedAt` is what
+      // makes a replaced image a different URL for the browser and the
+      // service worker.
+      params: { updatedAt },
     });
   }
 

@@ -5,8 +5,9 @@ Design notes
 Uploads are the classic attack surface of a web application, so the uploaded
 bytes are never trusted and never served back as-is:
 
-* the file is size-capped **before** being decoded, to rule out decompression
-  bombs;
+* the file is size-capped before being decoded, and the decoded pixel count is
+  capped too. The byte cap alone is not enough: a 2 MiB PNG can hold tens of
+  megapixels, and converting that to RGBA would allocate hundreds of MB;
 * SVG is accepted, because that is how brands publish their logos, but it is
   rasterised on the way in and never stored: an SVG is XML that can carry
   scripts, so keeping one would break the guarantee below;
@@ -32,6 +33,7 @@ import uuid
 from io import BytesIO
 
 from PIL import Image, UnidentifiedImageError
+from PIL.Image import DecompressionBombError
 
 from backend.config import Config
 
@@ -40,6 +42,11 @@ from backend.config import Config
 ALLOWED_INPUT_FORMATS = {"PNG", "JPEG", "WEBP", "GIF", "BMP"}
 
 _OUTPUT_SUFFIX = ".webp"
+
+# Upper bound on the decoded image, independent of the file size. Well above
+# any real logo, far below what would exhaust memory: at 4 bytes per pixel in
+# RGBA, 40 megapixels is about 160 MB.
+MAX_IMAGE_PIXELS = 40_000_000
 
 
 class LogoError(ValueError):
@@ -134,14 +141,23 @@ def save_logo(raw: bytes) -> str:
     if _looks_like_svg(raw):
         raw = _rasterise_svg(raw)
 
+    # Applied around decoding only, and restored afterwards, so the cap cannot
+    # leak into other Pillow users in the same process.
+    previous_limit = Image.MAX_IMAGE_PIXELS
+    Image.MAX_IMAGE_PIXELS = MAX_IMAGE_PIXELS
     try:
-        source = Image.open(BytesIO(raw))
+        # formats= makes Pillow refuse anything outside the allow-list at open
+        # time, instead of decoding first and checking the format afterwards.
+        source = Image.open(BytesIO(raw), formats=sorted(ALLOWED_INPUT_FORMATS))
         source.load()
+    except DecompressionBombError as exc:
+        # Not an OSError, so it would escape the handler below and surface as a
+        # 500 rather than a rejected upload.
+        raise LogoError("Image has too many pixels") from exc
     except (UnidentifiedImageError, OSError) as exc:
         raise LogoError("File is not a readable image") from exc
-
-    if source.format not in ALLOWED_INPUT_FORMATS:
-        raise LogoError(f"Unsupported image format: {source.format}")
+    finally:
+        Image.MAX_IMAGE_PIXELS = previous_limit
 
     # Flatten to RGBA: keeps transparency for logos, drops animation frames
     # and any exotic mode that would complicate encoding.

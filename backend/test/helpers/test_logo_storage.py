@@ -13,6 +13,7 @@ import pytest
 from PIL import Image
 
 from backend.config import Config
+from backend.helpers import logo_storage
 from backend.helpers.logo_storage import (
     LogoError,
     delete_logo,
@@ -108,6 +109,44 @@ def test_rejects_unusable_uploads(payload: bytes) -> None:
 def test_rejects_uploads_over_the_size_limit() -> None:
     with pytest.raises(LogoError):
         save_logo(b"x" * (Config.LOGO_MAX_UPLOAD_BYTES + 1))
+
+
+def test_rejects_a_decompression_bomb(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A small file can still decode to a huge image.
+
+    The byte cap says nothing about the decoded size, and Pillow raises
+    DecompressionBombError, which is not an OSError: unhandled it would come
+    back as a 500 rather than a rejected upload.
+    """
+    monkeypatch.setattr(logo_storage, "MAX_IMAGE_PIXELS", 4096, raising=False)
+
+    # Comfortably over the patched limit, but a tiny file: a single-colour PNG
+    # compresses to almost nothing.
+    payload = _png(4000, 4000)
+    assert len(payload) < Config.LOGO_MAX_UPLOAD_BYTES
+
+    with pytest.raises(LogoError, match="too many pixels"):
+        save_logo(payload)
+
+
+def test_pixel_limit_is_restored_after_use(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The cap is global to Pillow, so it must not leak out of save_logo."""
+    monkeypatch.setattr(logo_storage, "MAX_IMAGE_PIXELS", 4096, raising=False)
+    before = Image.MAX_IMAGE_PIXELS
+
+    with pytest.raises(LogoError):
+        save_logo(_png(4000, 4000))
+
+    assert Image.MAX_IMAGE_PIXELS == before
+
+
+def test_refuses_a_format_outside_the_allow_list() -> None:
+    """`formats=` makes Pillow refuse at open time rather than after decoding."""
+    buffer = BytesIO()
+    Image.new("RGB", (10, 10), (1, 2, 3)).save(buffer, format="PPM")
+
+    with pytest.raises(LogoError):
+        save_logo(buffer.getvalue())
 
 
 def test_renders_svg_and_stores_it_as_webp() -> None:

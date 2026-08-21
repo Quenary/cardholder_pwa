@@ -3,6 +3,17 @@
   "index": "/index.html",
   "dataGroups": [
     {
+      "name": "card-logos",
+      "urls": ["/api/cards/*/logo"],
+      "version": 1,
+      "cacheConfig": {
+        "maxAge": "90d",
+        "maxSize": 200,
+        "timeout": "3s",
+        "strategy": "performance"
+      }
+    },
+    {
       "name": "api",
       "urls": ["/api/**"],
       "version": 1,

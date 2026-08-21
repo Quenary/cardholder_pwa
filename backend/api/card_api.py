@@ -224,7 +224,11 @@ async def get_card_logo(
         path,
         media_type="image/webp",
         headers={
-            "Cache-Control": "private, max-age=86400",
+            # The URL of a logo does not change when the image behind it does,
+            # so a max-age would keep serving the previous picture after a
+            # replacement. no-cache still allows a revalidated 304 via the
+            # ETag FileResponse already sends.
+            "Cache-Control": "private, no-cache",
             "X-Content-Type-Options": "nosniff",
         },
     )
