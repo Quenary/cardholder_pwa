@@ -168,6 +168,57 @@ describe('CardScannerComponent', () => {
     expect(component['selectedDevice']()).toEqual(testMediaDevices[2]);
   });
 
+  it('should hand over to the other scanner when nothing is read', async () => {
+    vi.useFakeTimers();
+    if (typeof globalThis.MediaStream === 'undefined') {
+      globalThis.MediaStream = class {} as typeof MediaStream;
+    }
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
+      new globalThis.MediaStream(),
+    );
+    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+      testMediaDevices,
+    );
+    fixture = TestBed.createComponent(CardScannerComponent);
+    component = fixture.componentInstance;
+
+    fixture.detectChanges();
+    await vi.advanceTimersByTimeAsync(0);
+    TestBed.tick();
+
+    const first = component['selectedScanner']();
+    await vi.advanceTimersByTimeAsync(6000);
+
+    expect(component['selectedScanner']().code).not.toEqual(first.code);
+    vi.useRealTimers();
+  });
+
+  it('should leave a manual scanner choice alone', async () => {
+    vi.useFakeTimers();
+    if (typeof globalThis.MediaStream === 'undefined') {
+      globalThis.MediaStream = class {} as typeof MediaStream;
+    }
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
+      new globalThis.MediaStream(),
+    );
+    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+      testMediaDevices,
+    );
+    fixture = TestBed.createComponent(CardScannerComponent);
+    component = fixture.componentInstance;
+
+    fixture.detectChanges();
+    await vi.advanceTimersByTimeAsync(0);
+    TestBed.tick();
+
+    const chosen = component['scanners'][0];
+    component['onSelectScanner'](chosen);
+    await vi.advanceTimersByTimeAsync(6000);
+
+    expect(component['selectedScanner']()).toEqual(chosen);
+    vi.useRealTimers();
+  });
+
   it('should display scanner if permission granted', async () => {
     mediaDevicesServiceMock.getUserMedia.mockResolvedValue(null);
     mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(

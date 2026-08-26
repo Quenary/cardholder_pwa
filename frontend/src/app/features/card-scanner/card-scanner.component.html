@@ -38,7 +38,7 @@
     </button>
     <mat-button-toggle-group
       [value]="selectedScanner()"
-      (valueChange)="selectedScanner.set($event)">
+      (valueChange)="onSelectScanner($event)">
       @for (s of scanners; track s.code) {
         <mat-button-toggle [value]="s">{{s.name}}</mat-button-toggle>
       }

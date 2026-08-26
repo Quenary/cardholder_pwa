@@ -84,7 +84,8 @@
             "TITLE": "Général",
             "0": "Un code 2D est par exemple un QR code ou un DataMatrix",
             "1": "Un code 1D est par exemple un code-barres classique",
-            "2": "Le scan de fichier utilise également le scanner actif"
+            "2": "Le scan de fichier utilise également le scanner actif",
+            "3": "Si rien n'est lu au bout de quelques secondes, l'autre scanner prend le relais"
           },
           "ZXING": {
             "TITLE": "Zxing",

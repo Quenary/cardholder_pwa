@@ -84,7 +84,8 @@
             "TITLE": "General",
             "0": "A 2D code is, for example, a QR or DataMatrix",
             "1": "A 1D code is, for example, a regular barcode",
-            "2": "File scanning also uses the active scanner"
+            "2": "File scanning also uses the active scanner",
+            "3": "If nothing is read after a few seconds, the other scanner is tried"
           },
           "ZXING": {
             "TITLE": "Zxing",

@@ -73,6 +73,13 @@ export class CardScannerDeviceSheetComponent {
   }
 }
 
+/**
+ * How long a scanner keeps the camera before the other one is tried.
+ * Long enough to frame a code and hold still, short enough that a user
+ * does not give up first.
+ */
+const SCANNER_FALLBACK_MS = 5000;
+
 @Component({
   selector: 'app-card-scanner',
   imports: [
@@ -117,6 +124,11 @@ export class CardScannerComponent implements OnDestroy {
    * Selected scanner
    */
   protected readonly selectedScanner = signal<IScanner>(this.scanners[0]);
+  /**
+   * Time left on the camera before handing over to the other scanner,
+   * see scheduleScannerFallback.
+   */
+  private fallbackTimer: ReturnType<typeof setTimeout> = null;
   /**
    * Selected media device
    */
@@ -165,12 +177,49 @@ export class CardScannerComponent implements OnDestroy {
       if (devices.length && !device) {
         const device = this.getDefaultDevice(devices);
         this.selectedDevice.set(device);
+        this.scheduleScannerFallback();
       }
     });
   }
 
   ngOnDestroy(): void {
+    this.cancelScannerFallback();
     this.matBottomSheet.dismiss();
+  }
+
+  /**
+   * Hands the camera over to the other scanner if the current one has read
+   * nothing after a while.
+   *
+   * Zxing reads 2D codes and Quagga2 reads more 1D formats, which is not
+   * something a user can be expected to know from the code in front of them.
+   * Trying the other one is what they end up doing by hand anyway.
+   *
+   * Only fires once, and never after a manual choice: past that point the
+   * selection belongs to the user.
+   */
+  private scheduleScannerFallback(): void {
+    this.cancelScannerFallback();
+    this.fallbackTimer = setTimeout(() => {
+      this.fallbackTimer = null;
+      const current = this.selectedScanner();
+      const other = this.scanners.find((s) => s.code !== current.code);
+      if (other) {
+        this.selectedScanner.set(other);
+      }
+    }, SCANNER_FALLBACK_MS);
+  }
+
+  private cancelScannerFallback(): void {
+    if (this.fallbackTimer) {
+      clearTimeout(this.fallbackTimer);
+      this.fallbackTimer = null;
+    }
+  }
+
+  protected onSelectScanner(scanner: IScanner): void {
+    this.cancelScannerFallback();
+    this.selectedScanner.set(scanner);
   }
 
   /**
@@ -182,6 +231,7 @@ export class CardScannerComponent implements OnDestroy {
     if (!res) {
       return;
     }
+    this.cancelScannerFallback();
     this.close({
       text: res.code,
       format: res.type,
