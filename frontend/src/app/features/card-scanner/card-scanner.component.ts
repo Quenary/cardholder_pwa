@@ -7,7 +7,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import { catchError, from, map, of, switchMap } from 'rxjs';
+import { catchError, from, map, of, switchMap, tap } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   MatDialog,
@@ -128,11 +128,22 @@ export class CardScannerComponent implements OnDestroy {
   >('scanner', { read: CardScannerBaseComponent });
 
   /**
+   * Device id the platform granted for the rear camera request, when it
+   * reports one. Used as the default camera, see getDefaultDevice.
+   */
+  private readonly grantedDeviceId = signal<string>(null);
+
+  /**
    * Media device list.
    * That is also initiates permission dialog.
    */
   private readonly devices = toSignal(
-    from(this.mediaDevicesService.getUserMedia({ video: true })).pipe(
+    from(
+      this.mediaDevicesService.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+      }),
+    ).pipe(
+      tap((stream) => this.readGrantedDevice(stream)),
       switchMap(() => from(this.mediaDevicesService.enumerateDevices())),
       map((res) =>
         (res || []).filter((d) => !d.kind || d.kind.includes('video')),
@@ -152,7 +163,7 @@ export class CardScannerComponent implements OnDestroy {
       const devices = this.devices();
       const device = this.selectedDevice();
       if (devices.length && !device) {
-        const device = this.getDefaultDeviceByLabel(devices);
+        const device = this.getDefaultDevice(devices);
         this.selectedDevice.set(device);
       }
     });
@@ -226,12 +237,40 @@ export class CardScannerComponent implements OnDestroy {
     this.matDialog.open(CardScannerHelpDialogComponent);
   }
 
-  private getDefaultDeviceByLabel(devices: MediaDeviceInfo[]): MediaDeviceInfo {
+  /**
+   * Keeps the camera the platform actually granted, then releases the stream:
+   * it was only opened to raise the permission dialog and to read that id.
+   */
+  private readGrantedDevice(stream: MediaStream): void {
+    const track = stream?.getVideoTracks?.()?.[0];
+    this.grantedDeviceId.set(track?.getSettings?.()?.deviceId || null);
+    stream?.getTracks?.().forEach((t) => t.stop());
+  }
+
+  /**
+   * Default camera.
+   *
+   * Matching on the label alone is not enough on Android: phones expose
+   * several rear cameras (wide, ultra wide, telephoto, depth) and they all
+   * carry "back" in their label, so the first match is often the ultra wide
+   * one, which cannot focus close enough to read a barcode.
+   *
+   * The rear camera request above lets the platform pick the main one, so
+   * prefer the device it granted and keep the label match as a fallback for
+   * browsers that report no device id.
+   */
+  private getDefaultDevice(devices: MediaDeviceInfo[]): MediaDeviceInfo {
     if (!devices?.length) {
       return null;
     }
+    const grantedId = this.grantedDeviceId();
+    const granted = grantedId
+      ? devices.find((d) => d.deviceId === grantedId)
+      : undefined;
     return (
-      devices.find((d) => /back|rear|environment/i.test(d.label)) || devices[0]
+      granted ??
+      devices.find((d) => /back|rear|environment/i.test(d.label)) ??
+      devices[0]
     );
   }
 }
