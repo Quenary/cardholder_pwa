@@ -12,6 +12,7 @@ import {
   MatFormField,
   MatLabel,
   MatSuffix,
+  MatError,
 } from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -23,6 +24,7 @@ import { PasswordRecoveryApiService } from 'src/app/entities/password-recovery/p
 import { IPasswordRecoverySubmit } from 'src/app/entities/password-recovery/password-recovery-interface';
 import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
 import { passwordMatchValidator } from 'src/app/shared/validators/passwords-match.validator';
+import { PasswordsMatchErrorStateMatcher } from 'src/app/shared/validators/passwords-match.error-state-matcher';
 
 @Component({
   selector: 'app-password-recovery-submit',
@@ -37,11 +39,14 @@ import { passwordMatchValidator } from 'src/app/shared/validators/passwords-matc
     TranslatePipe,
     MatProgressSpinner,
     MatSuffix,
+    MatError,
   ],
   templateUrl: './password-recovery-submit.component.html',
   styleUrl: './password-recovery-submit.component.scss',
 })
 export class PasswordRecoverySubmitComponent implements OnInit {
+  protected readonly passwordsMatchErrorStateMatcher =
+    new PasswordsMatchErrorStateMatcher();
   private readonly passwordRecoveryApiService = inject(
     PasswordRecoveryApiService,
   );

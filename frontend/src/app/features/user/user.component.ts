@@ -23,10 +23,12 @@ import {
   MatFormField,
   MatLabel,
   MatSuffix,
+  MatError,
 } from '@angular/material/input';
 import { ERegexp } from 'src/app/app.consts';
 import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
 import { passwordMatchValidator } from 'src/app/shared/validators/passwords-match.validator';
+import { PasswordsMatchErrorStateMatcher } from 'src/app/shared/validators/passwords-match.error-state-matcher';
 import { MatCheckbox, MatCheckboxChange } from '@angular/material/checkbox';
 import { TranslatePipe } from '@ngx-translate/core';
 
@@ -43,12 +45,15 @@ import { TranslatePipe } from '@ngx-translate/core';
     MatLabel,
     ReactiveFormsModule,
     MatSuffix,
+    MatError,
     MatCheckbox,
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss',
 })
 export class UserComponent implements OnInit {
+  protected readonly passwordsMatchErrorStateMatcher =
+    new PasswordsMatchErrorStateMatcher();
   private readonly store = inject(Store);
   private readonly destroyRef = inject(DestroyRef);
 

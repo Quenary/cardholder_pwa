@@ -61,12 +61,16 @@
         id="confirm-password"
         name="confirm-password"
         autocomplete="new-password"
-        formControlName="confirm_password" />
+        formControlName="confirm_password"
+        [errorStateMatcher]="passwordsMatchErrorStateMatcher" />
       <mat-icon
         matSuffix
         (click)="hideConfirmPassword.set(!hideConfirmPassword())">
         {{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}
       </mat-icon>
+      @if (form.hasError('passwordMatchValidator')) {
+        <mat-error>{{ 'USER.PASSWORDS_MISMATCH' | translate }}</mat-error>
+      }
     </mat-form-field>
     @if (changePasswordCheckbox.checked) {
       <ul class="user-component-form-password-hints">

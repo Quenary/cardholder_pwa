@@ -114,6 +114,7 @@
     "CHANGE_PASSWORD": "Changer le mot de passe",
     "PASSWORD": "Mot de passe",
     "CONFIRM_PASSWORD": "Confirmer le mot de passe",
+    "PASSWORDS_MISMATCH": "Les mots de passe ne correspondent pas",
     "PASSWORD_HINTS": [
       "Au moins 8 caractères",
       "Lettres majuscules et minuscules",
