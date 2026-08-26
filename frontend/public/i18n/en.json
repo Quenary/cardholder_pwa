@@ -112,6 +112,7 @@
     "USERNAME": "Username",
     "EMAIL": "E-mail",
     "CHANGE_PASSWORD": "Change password",
+    "CURRENT_PASSWORD": "Current password",
     "PASSWORD": "Password",
     "CONFIRM_PASSWORD": "Confirm password",
     "PASSWORDS_MISMATCH": "Passwords do not match",

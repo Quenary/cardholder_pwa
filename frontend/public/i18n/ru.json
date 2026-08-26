@@ -112,6 +112,7 @@
     "USERNAME": "Имя пользователя",
     "EMAIL": "E-mail",
     "CHANGE_PASSWORD": "Изменить пароль",
+    "CURRENT_PASSWORD": "Текущий пароль",
     "PASSWORD": "Пароль",
     "CONFIRM_PASSWORD": "Повторить пароль",
     "PASSWORDS_MISMATCH": "Пароли не совпадают",
