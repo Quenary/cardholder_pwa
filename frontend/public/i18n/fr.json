@@ -11,7 +11,7 @@
     "REQUEST_ERROR": "Erreur de requête",
     "UNSAVED_WARN": "Les données non enregistrées seront perdues",
     "CONFIRM": "Confirmer",
-    "DELETE_WARN": "Confirmer la suppresion",
+    "DELETE_WARN": "Confirmer la suppression",
     "DELETE": "Supprimer"
   },
   "UPDATE": {
@@ -22,7 +22,7 @@
   "NAV": {
     "AUTH": "Connexion",
     "REGISTER": "Inscription",
-    "PASSWORD_RECOVERY": "Récuperation de mot de passe",
+    "PASSWORD_RECOVERY": "Récupération du mot de passe",
     "CARD": "Cartes",
     "USER": "Utilisateur",
     "ADMIN": "Panneau d'administration",
@@ -35,25 +35,25 @@
     "PASSWORD": "Mot de passe",
     "SIGNIN": "Se connecter",
     "SIGNUP": "Vous n'avez pas de compte ?",
-    "PASSWORD_RECOVERY": "Récuperation de mot de passe",
+    "PASSWORD_RECOVERY": "Récupération du mot de passe",
     "REGISTRATION_DISABLED": "L'inscription est désactivée dans les paramètres de l'application",
     "SMTP_DISABLED": "Le SMTP est désactivé dans les variables d'environnement"
   },
   "REGISTER": {
     "NEW_ACCOUNT": "Nouveau compte",
     "SIGNUP": "S'inscrire",
-    "SIGNIN": "Vous avez déjà un compte?",
+    "SIGNIN": "Vous avez déjà un compte ?",
     "SUCCESS": "Compte créé !"
   },
   "PASSWORD_RECOVERY": {
-    "TITLE": "Récuperation de mot de passe",
+    "TITLE": "Récupération du mot de passe",
     "EMAIL": "E-mail",
     "CODE": "Code",
     "PASSWORD": "Mot de passe",
     "CONFIRM_PASSWORD": "Confirmer le mot de passe",
     "HAVE_CODE": "Vous avez le code ?",
-    "SENT": "Si l'utilisateur existe, des instructions vous seront envoyé par e-mail.",
-    "SUCCESS": "Récuperation de mot de passe complète"
+    "SENT": "Si l'utilisateur existe, des instructions vous seront envoyées par e-mail.",
+    "SUCCESS": "Récupération du mot de passe terminée"
   },
   "CARDS": {
     "SEARCH": "Rechercher",
@@ -76,13 +76,13 @@
       "CODE_FORMAT_WARN": "L'application utilise désormais des noms différents pour les types de codes. Enregistrez la carte avec le nouveau type de code.",
       "SCAN": {
         "PERMISSION_ERROR": "L'accès au périphérique vidéo est refusé ou la fonctionnalité n'est pas prise en charge.",
-        "SELECT_SOURCE": "Sélectionnez la source",
+        "SELECT_SOURCE": "Sélectionner la source",
         "FROM_FILE": "Ajouter depuis un fichier",
         "SCANNER": "Scanner",
         "SCANNERS": {
           "GENERAL": {
             "TITLE": "Général",
-            "0": "Un code 2D est par exemple un QR code ou DataMatrix",
+            "0": "Un code 2D est par exemple un QR code ou un DataMatrix",
             "1": "Un code 1D est par exemple un code-barres classique",
             "2": "Le scan de fichier utilise également le scanner actif"
           },
@@ -117,12 +117,12 @@
     "PASSWORD_HINTS": [
       "Au moins 8 caractères",
       "Lettres majuscules et minuscules",
-      "Nombres"
+      "Chiffres"
     ],
     "DELETE_WARN": "Voulez-vous supprimer définitivement l'utilisateur et toutes les données associées ?",
     "SUCCESS": {
       "UPDATE": "Données utilisateur mises à jour",
-      "DELETE": "Données utilisateur supprimé"
+      "DELETE": "Utilisateur supprimé"
     }
   },
   "ADMIN": {
@@ -144,7 +144,7 @@
       "ID": "ID",
       "USERNAME": "Nom d'utilisateur",
       "EMAIL": "E-mail",
-      "ROLE": "Role",
+      "ROLE": "Rôle",
       "CREATED_AT": "Date de création",
       "UPDATED_AT": "Date de mise à jour",
       "ROLES": {
@@ -164,7 +164,7 @@
     "HOMEPAGE": "Page d'accueil",
     "IMAGE_VERSION": "Version de l'image Docker",
     "EXAMPLES": "Exemples de codes pris en charge",
-    "CHANGELOG": "journal des modifications"
+    "CHANGELOG": "Journal des modifications"
   },
   "SORT_FILTER": {
     "TITLE": "Tri et filtrage",
