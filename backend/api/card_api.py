@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy import select
@@ -23,6 +25,7 @@ from backend.schemas.card_schema import (
 )
 
 router = APIRouter(tags=["card"])
+logger = logging.getLogger(__name__)
 
 
 @router.get("/cards", response_model=list[CardSchema])
@@ -198,6 +201,10 @@ async def upload_card_logo(
         # slow image cannot stall every other request being served.
         file_name = await run_in_threadpool(save_logo, raw)
     except LogoError as exc:
+        # Without this, a rejected upload is only the access-log 422 line,
+        # which is indistinguishable from FastAPI refusing the multipart
+        # before the handler (the iOS-PWA empty-filename case).
+        logger.warning("Rejected logo for card %s: %s", card_id, exc)
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     previous = card.logo_file

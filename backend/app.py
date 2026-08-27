@@ -2,7 +2,9 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exception_handlers import request_validation_exception_handler
+from fastapi.exceptions import RequestValidationError
 
 from backend.api import (
     admin_router,
@@ -39,6 +41,25 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(root_path=Config.API_PATH, lifespan=lifespan)
+
+
+@app.exception_handler(RequestValidationError)
+async def log_request_validation_error(request: Request, exc: RequestValidationError):
+    # FastAPI 422s never reach the route, so they used to show up as a bare
+    # access-log line. Log loc/type/msg only: `input` can be the whole body.
+    logger = logging.getLogger("backend.validation")
+    logger.info(
+        "422 %s %s: %s",
+        request.method,
+        request.url.path,
+        [
+            {k: err[k] for k in ("type", "loc", "msg") if k in err}
+            for err in exc.errors()
+        ],
+    )
+    return await request_validation_exception_handler(request, exc)
+
+
 app.include_router(auth_router)
 app.include_router(user_router)
 app.include_router(card_router)
