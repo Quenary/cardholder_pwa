@@ -72,6 +72,7 @@ export class CardScannerZxingComponent extends CardScannerBaseComponent {
           observer.add(() => {
             controls.stop();
           });
+          this.notifyStarted();
         })
         .catch((e) => {
           observer.error(e);
