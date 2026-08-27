@@ -3,7 +3,7 @@ networks:
     driver: bridge
 services:
   app:
-    image: quenary/cardholder_pwa:latest
+    image: ghcr.io/quenary/cardholder_pwa:1
     restart: unless-stopped
     volumes:
       - $HOME/.cardholder_pwa:/cardholder_pwa

@@ -20,7 +20,8 @@
 ### Основные особенности
 
 - PWA — можно установить прямо из браузера и использовать даже офлайн (для просмотра)
-- Поддержка нескольких пользователей
+- Несколько пользователей с ролями владельца, администратора и участника
+- Восстановление пароля по email (если настроен SMTP)
 - Простое развертывание
 - Открытый исходный код
 
@@ -53,12 +54,12 @@
 
 ```bash
 # загрузка образа
-docker pull quenary/cardholder_pwa:latest
+docker pull ghcr.io/quenary/cardholder_pwa:1
 
 # запуск контейнера
 docker run -d -p 80:80 \
 -v $HOME/.cardholder_pwa:/cardholder_pwa \
-quenary/cardholder_pwa:latest
+ghcr.io/quenary/cardholder_pwa:1
 ```
 
 - Через `docker-compose`
@@ -81,3 +82,10 @@ docker-compose -f <имя_файла> up -d
 - **Администратор** может:
     - Менять некоторые настройки приложения через интерфейс
     - Удалять аккаунты участников
+
+### Участие в разработке и безопасность
+
+Эти документы только на английском:
+
+- [Contributing](/docs/CONTRIBUTING.md)
+- [Security](/docs/SECURITY.md)

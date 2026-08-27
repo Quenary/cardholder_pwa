@@ -19,7 +19,8 @@ It's powered by free providers and can be suspended, which will lead to a long i
 ### Main features:
 
 - PWA - you can install it on device from browser and use even offline (read-only)
-- Multi-user support
+- Multi-user support with owner, admin, and member roles
+- Password recovery by email (when SMTP is configured)
 - Easy to self-host
 - Open-source
 
@@ -52,12 +53,12 @@ It's powered by free providers and can be suspended, which will lead to a long i
 
 ```bash
 # pull image
-docker pull quenary/cardholder_pwa:latest
+docker pull ghcr.io/quenary/cardholder_pwa:1
 
 # run container
 docker run -d -p 80:80 \
 -v $HOME/.cardholder_pwa:/cardholder_pwa \
-quenary/cardholder_pwa:latest
+ghcr.io/quenary/cardholder_pwa:1
 ```
 
 - Using `docker-compose`
@@ -80,3 +81,11 @@ docker-compose -f <filename> up -d
 - The **admin** can:
   - Change some app settings from the UI
   - Delete members accounts
+
+### Contributing
+
+See [docs/CONTRIBUTING.md](/docs/CONTRIBUTING.md).
+
+### Security
+
+See [docs/SECURITY.md](/docs/SECURITY.md).
