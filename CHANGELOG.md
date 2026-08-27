@@ -1,6 +1,36 @@
 # CHANGELOG
 
 
+## v1.10.0 (2026-08-27)
+
+### Bug Fixes
+
+- **backend**: Require the current password to change credentials
+  ([#52](https://github.com/Quenary/cardholder_pwa/pull/52),
+  [`59a6dee`](https://github.com/Quenary/cardholder_pwa/commit/59a6deeea2e6145c019c75d35a1a8121a8cffc16))
+
+- **ci**: Pin GitPython to unblock semantic-release
+  ([`f84d030`](https://github.com/Quenary/cardholder_pwa/commit/f84d0300db4331b17fd9609019ccc30e41dcc782))
+
+- **frontend**: Default to the rear camera the platform grants
+  ([#51](https://github.com/Quenary/cardholder_pwa/pull/51),
+  [`1352db7`](https://github.com/Quenary/cardholder_pwa/commit/1352db747717195b99d1bbbf1f7623827f3d9dcb))
+
+- **frontend**: Show an error when the password confirmation does not match
+  ([#50](https://github.com/Quenary/cardholder_pwa/pull/50),
+  [`c2112b6`](https://github.com/Quenary/cardholder_pwa/commit/c2112b6b47f76fccfea95e8a972c2e4f673de8f4))
+
+- **i18n**: Spelling and agreement in the french translation
+  ([#54](https://github.com/Quenary/cardholder_pwa/pull/54),
+  [`8d50835`](https://github.com/Quenary/cardholder_pwa/commit/8d50835ddfd4d4000b297dd339013a3587b67663))
+
+### Features
+
+- **frontend**: Try the other scanner when the first reads nothing
+  ([#53](https://github.com/Quenary/cardholder_pwa/pull/53),
+  [`e7ab897`](https://github.com/Quenary/cardholder_pwa/commit/e7ab897d849ab9fdc38c110c561b44b77f35c384))
+
+
 ## v1.9.0 (2026-08-21)
 
 ### Features
