@@ -16,11 +16,13 @@ import {
 import { ERegexp } from 'src/app/app.consts';
 import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
 import { passwordMatchValidator } from 'src/app/shared/validators/passwords-match.validator';
+import { PasswordsMatchErrorStateMatcher } from 'src/app/shared/validators/passwords-match.error-state-matcher';
 import {
   MatInput,
   MatFormField,
   MatLabel,
   MatSuffix,
+  MatError,
 } from '@angular/material/input';
 import { SnackService } from 'src/app/core/services/snack.service';
 
@@ -38,11 +40,14 @@ import { SnackService } from 'src/app/core/services/snack.service';
     MatLabel,
     ReactiveFormsModule,
     MatSuffix,
+    MatError,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
 export class RegisterComponent {
+  protected readonly passwordsMatchErrorStateMatcher =
+    new PasswordsMatchErrorStateMatcher();
   private readonly userApiService = inject(UserApiService);
   private readonly router = inject(Router);
   private readonly translateService = inject(TranslateService);

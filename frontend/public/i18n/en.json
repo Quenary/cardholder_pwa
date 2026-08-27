@@ -114,6 +114,7 @@
     "CHANGE_PASSWORD": "Change password",
     "PASSWORD": "Password",
     "CONFIRM_PASSWORD": "Confirm password",
+    "PASSWORDS_MISMATCH": "Passwords do not match",
     "PASSWORD_HINTS": [
       "At least 8 characters",
       "Upper and lower case letters",
