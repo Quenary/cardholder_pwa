@@ -90,6 +90,7 @@ export class CardScannerQuagga2Component extends CardScannerBaseComponent {
       })
         .then(() => {
           Quagga2.start();
+          this.notifyStarted();
           const onDetected: QuaggaJSResultCallbackFunction = (data) => {
             if (data?.codeResult) {
               observer.next(this.prepareResult(data.codeResult));

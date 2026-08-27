@@ -73,6 +73,13 @@ export class CardScannerDeviceSheetComponent {
   }
 }
 
+/**
+ * How long a scanner keeps the camera before the other one is tried.
+ * Long enough to frame a code and hold still, short enough that a user
+ * does not give up first.
+ */
+const SCANNER_FALLBACK_MS = 5000;
+
 @Component({
   selector: 'app-card-scanner',
   imports: [
@@ -117,6 +124,13 @@ export class CardScannerComponent implements OnDestroy {
    * Selected scanner
    */
   protected readonly selectedScanner = signal<IScanner>(this.scanners[0]);
+  /**
+   * Time left on the camera before handing over to the other scanner,
+   * see scheduleScannerFallback.
+   */
+  private fallbackTimer: ReturnType<typeof setTimeout> = null;
+  /** Set once the switch has happened, or once the user has had their say. */
+  private fallbackDone = false;
   /**
    * Selected media device
    */
@@ -170,7 +184,89 @@ export class CardScannerComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearFallbackTimer();
     this.matBottomSheet.dismiss();
+  }
+
+  /**
+   * The active scanner reports its camera is up: only from here does the
+   * countdown mean anything. Starting it at device selection would have
+   * spent most of it on the deferred chunk and on getUserMedia.
+   */
+  protected onScannerStarted(): void {
+    this.scheduleScannerFallback();
+  }
+
+  /**
+   * Hands the camera over to the other scanner if the current one has read
+   * nothing after a while.
+   *
+   * Zxing reads 2D codes and Quagga2 reads more 1D formats, which is not
+   * something a user can be expected to know from the code in front of them.
+   * Trying the other one is what they end up doing by hand anyway.
+   *
+   * Held back whenever the user is not actually pointing the camera at a
+   * code, and dropped for good once the choice becomes theirs.
+   */
+  private scheduleScannerFallback(): void {
+    this.clearFallbackTimer();
+    if (this.fallbackDone) {
+      return;
+    }
+    this.fallbackTimer = setTimeout(() => {
+      this.fallbackTimer = null;
+      this.fallbackDone = true;
+      const current = this.selectedScanner();
+      const other = this.scanners.find((s) => s.code !== current.code);
+      if (other) {
+        this.selectedScanner.set(other);
+      }
+    }, SCANNER_FALLBACK_MS);
+  }
+
+  private clearFallbackTimer(): void {
+    if (this.fallbackTimer) {
+      clearTimeout(this.fallbackTimer);
+      this.fallbackTimer = null;
+    }
+  }
+
+  /**
+   * Holds the countdown while the user is away from the live camera: the
+   * file picker, the help dialog, the camera sheet. It restarts when the
+   * scanner reports it is running again.
+   */
+  private suspendScannerFallback(): void {
+    this.clearFallbackTimer();
+  }
+
+  /**
+   * Drops the automatic switch for the rest of the dialog.
+   */
+  private cancelScannerFallback(): void {
+    this.clearFallbackTimer();
+    this.fallbackDone = true;
+  }
+
+  /**
+   * Any click on the toggle group, even one that does not change the value:
+   * clicking the active scanner is how a user says "stay on this one", and
+   * mat-button-toggle-group emits nothing in that case.
+   */
+  protected onScannerToggleClick(): void {
+    this.cancelScannerFallback();
+  }
+
+  /**
+   * The toggle group also emits when it syncs itself with [value] on init,
+   * which is not a choice anyone made - only an actual change is.
+   */
+  protected onSelectScanner(scanner: IScanner): void {
+    if (!scanner || scanner.code === this.selectedScanner().code) {
+      return;
+    }
+    this.cancelScannerFallback();
+    this.selectedScanner.set(scanner);
   }
 
   /**
@@ -182,6 +278,7 @@ export class CardScannerComponent implements OnDestroy {
     if (!res) {
       return;
     }
+    this.cancelScannerFallback();
     this.close({
       text: res.code,
       format: res.type,
@@ -204,13 +301,24 @@ export class CardScannerComponent implements OnDestroy {
         next: (res) => {
           if (res) {
             this.onResult(res);
+          } else {
+            this.scheduleScannerFallback();
           }
         },
         error: (error) => {
           this.snackService.error(error);
+          this.scheduleScannerFallback();
         },
       });
     }
+  }
+
+  /**
+   * The system file picker is about to take over. No event tells us it was
+   * dismissed, so the countdown only comes back on a finished file scan.
+   */
+  protected onPickFile(): void {
+    this.suspendScannerFallback();
   }
 
   protected close($event?: ICardScannerResult) {
@@ -218,6 +326,7 @@ export class CardScannerComponent implements OnDestroy {
   }
 
   protected onClickSelectDevice(): void {
+    this.suspendScannerFallback();
     const devices = this.devices();
     this.matBottomSheet
       .open(CardScannerDeviceSheetComponent, {
@@ -230,11 +339,16 @@ export class CardScannerComponent implements OnDestroy {
         if (data?.device) {
           this.selectedDevice.set(data.device);
         }
+        this.scheduleScannerFallback();
       });
   }
 
   protected openScannersHelp() {
-    this.matDialog.open(CardScannerHelpDialogComponent);
+    this.suspendScannerFallback();
+    this.matDialog
+      .open(CardScannerHelpDialogComponent)
+      .afterClosed()
+      .subscribe(() => this.scheduleScannerFallback());
   }
 
   /**
