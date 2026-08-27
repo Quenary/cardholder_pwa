@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ICard, ICardBase } from './cards-interface';
 import { Observable } from 'rxjs';
 import { BaseApiService } from '../base/base-api.service';
+import { filenameFor } from 'src/app/shared/functions/filename-for.function';
 
 @Injectable({
   providedIn: 'root',
@@ -53,7 +54,12 @@ export class CardApiService extends BaseApiService<'cards'> {
 
   uploadLogo(cardId: number, file: File): Observable<ICard> {
     const form = new FormData();
-    form.append('file', file);
+    // iOS WKWebView (installed PWA) often hands us a File with an empty name.
+    // FormData then omits `filename=` from Content-Disposition, Starlette
+    // treats the part as a regular form field, and FastAPI's
+    // `UploadFile = File(...)` rejects the request with 422 before the
+    // handler runs — which is why the server log is only the access line.
+    form.append('file', file, filenameFor(file));
     return this.httpClient.post<ICard>(`${this.basePath}/${cardId}/logo`, form);
   }
 
