@@ -15,6 +15,8 @@ export interface IUserCreate {
 export interface IUserUpdate {
   username: string;
   email: string;
+  /** Required by the api when the password or the email changes. */
+  current_password?: string;
   password?: string;
   confirm_password?: string;
 }

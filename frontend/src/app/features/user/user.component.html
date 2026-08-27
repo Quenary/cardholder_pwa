@@ -26,6 +26,25 @@
         autocomplete="username"
         formControlName="username" />
     </mat-form-field>
+    @if (needsCurrentPassword()) {
+      <mat-form-field class="user-component-form-field">
+        <mat-label aria-required="true">{{
+          'USER.CURRENT_PASSWORD' | translate
+        }}</mat-label>
+        <input
+          matInput
+          [type]="hideCurrentPassword() ? 'password' : 'text'"
+          id="current-password"
+          name="current-password"
+          autocomplete="current-password"
+          formControlName="current_password" />
+        <mat-icon
+          matSuffix
+          (click)="hideCurrentPassword.set(!hideCurrentPassword())">
+          {{ hideCurrentPassword() ? 'visibility_off' : 'visibility' }}
+        </mat-icon>
+      </mat-form-field>
+    }
     <mat-checkbox
       #changePasswordCheckbox
       class="user-component-form-checkbox"

@@ -35,10 +35,15 @@ class UserCreateSchema(BaseModel):
 
 
 class UserUpdateSchema(BaseModel):
-    """User update schema. Passwords optional"""
+    """User update schema. Passwords optional.
+
+    current_password is required by the endpoint when the password or the
+    email address changes, since both are enough to take the account over.
+    """
 
     username: str
     email: EmailStr
+    current_password: str | None = None
     password: str | None = None
     confirm_password: str | None = None
 

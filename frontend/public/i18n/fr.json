@@ -112,6 +112,7 @@
     "USERNAME": "Nom d'utilisateur",
     "EMAIL": "E-mail",
     "CHANGE_PASSWORD": "Changer le mot de passe",
+    "CURRENT_PASSWORD": "Mot de passe actuel",
     "PASSWORD": "Mot de passe",
     "CONFIRM_PASSWORD": "Confirmer le mot de passe",
     "PASSWORDS_MISMATCH": "Les mots de passe ne correspondent pas",
