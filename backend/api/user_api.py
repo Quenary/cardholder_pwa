@@ -73,7 +73,7 @@ async def update_user(
         if not data.current_password or not verify_password(
             data.current_password, current_user.hashed_password
         ):
-            raise HTTPException(401, detail="Current password is incorrect")
+            raise HTTPException(400, detail="Current password is incorrect")
 
     if data.username != current_user.username:
         current_user.username = data.username

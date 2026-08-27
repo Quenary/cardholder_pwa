@@ -227,7 +227,7 @@ async def test_user_should_not_change_password_without_current_one() -> None:
         with pytest.raises(HTTPException) as exc_info:
             await update_user(user, session_mock, current_user)
 
-    assert exc_info.value.status_code == 401
+    assert exc_info.value.status_code == 400
     assert verify_password(CURRENT_PASSWORD, current_user.hashed_password)
 
 
@@ -255,7 +255,7 @@ async def test_user_should_not_change_password_with_a_wrong_current_one() -> Non
         with pytest.raises(HTTPException) as exc_info:
             await update_user(user, session_mock, current_user)
 
-    assert exc_info.value.status_code == 401
+    assert exc_info.value.status_code == 400
 
 
 @pytest.mark.asyncio
@@ -279,5 +279,5 @@ async def test_user_should_not_change_email_without_current_password() -> None:
         with pytest.raises(HTTPException) as exc_info:
             await update_user(user, session_mock, current_user)
 
-    assert exc_info.value.status_code == 401
+    assert exc_info.value.status_code == 400
     assert current_user.email == "user_email@example.com"
