@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v1.10.1 (2026-08-27)
+
+### Bug Fixes
+
+- Explicitly send a filename so iOS PWA logo uploads are not rejected
+  ([#56](https://github.com/Quenary/cardholder_pwa/pull/56),
+  [`5f12169`](https://github.com/Quenary/cardholder_pwa/commit/5f121692b79e45d4c7e7b972c13ccd372f2c359a))
+
+
 ## v1.10.0 (2026-08-27)
 
 ### Bug Fixes
