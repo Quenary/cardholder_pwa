@@ -44,6 +44,13 @@ const testMediaDevices: MediaDeviceInfo[] = [
     toJSON: null,
   },
   {
+    deviceId: 'backcamera2',
+    groupId: null,
+    kind: 'videoinput',
+    label: 'Back camera',
+    toJSON: null,
+  },
+  {
     deviceId: 'somespeaker',
     groupId: null,
     kind: 'audiooutput',
@@ -51,6 +58,18 @@ const testMediaDevices: MediaDeviceInfo[] = [
     toJSON: null,
   },
 ];
+
+/** Stream stub exposing the camera the platform granted. */
+const grantedStream = (deviceId: string) => {
+  const track = {
+    getSettings: () => ({ deviceId }),
+    stop: vi.fn(),
+  } as unknown as MediaStreamTrack;
+  return {
+    getVideoTracks: () => [track],
+    getTracks: () => [track],
+  } as unknown as MediaStream;
+};
 
 describe('CardScannerComponent', () => {
   let component: CardScannerComponent;
@@ -110,7 +129,25 @@ describe('CardScannerComponent', () => {
     expect(snackServiceMock.error).toHaveBeenCalledTimes(1);
   });
 
-  it('should select first environment camera as default', async () => {
+  it('should default to the camera granted by the platform', async () => {
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
+      grantedStream('backcamera2'),
+    );
+    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+      testMediaDevices,
+    );
+    fixture = TestBed.createComponent(CardScannerComponent);
+    component = fixture.componentInstance;
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+    await fixture.whenRenderingDone();
+    TestBed.tick();
+
+    expect(component['selectedDevice']()).toEqual(testMediaDevices[3]);
+  });
+
+  it('should fall back to the label when no device id is reported', async () => {
     if (typeof globalThis.MediaStream === 'undefined') {
       globalThis.MediaStream = class {} as typeof MediaStream;
     }
