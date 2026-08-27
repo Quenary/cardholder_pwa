@@ -6,6 +6,7 @@
           <app-card-scanner-zxing
             #scanner
             [deviceId]="device.deviceId"
+            (OnStart)="onScannerStarted()"
             (OnSuccess)="onResult($event)">
           </app-card-scanner-zxing>
         } @placeholder {
@@ -17,6 +18,7 @@
           <app-card-scanner-quagga2
             #scanner
             [deviceId]="device.deviceId"
+            (OnStart)="onScannerStarted()"
             (OnSuccess)="onResult($event)">
           </app-card-scanner-quagga2>
         } @placeholder {
@@ -38,7 +40,8 @@
     </button>
     <mat-button-toggle-group
       [value]="selectedScanner()"
-      (valueChange)="selectedScanner.set($event)">
+      (click)="onScannerToggleClick()"
+      (valueChange)="onSelectScanner($event)">
       @for (s of scanners; track s.code) {
         <mat-button-toggle [value]="s">{{s.name}}</mat-button-toggle>
       }
@@ -57,7 +60,7 @@
   <button
     mat-button
     class="accent-color"
-    (click)="fileInput.click()">
+    (click)="onPickFile(); fileInput.click()">
     <mat-icon>image</mat-icon>
     {{ 'CARDS.CARD.SCAN.FROM_FILE' | translate }}
     <input

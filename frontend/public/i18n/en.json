@@ -84,7 +84,8 @@
             "TITLE": "General",
             "0": "A 2D code is, for example, a QR or DataMatrix",
             "1": "A 1D code is, for example, a regular barcode",
-            "2": "File scanning also uses the active scanner"
+            "2": "File scanning also uses the active scanner",
+            "3": "If nothing is read after a few seconds, the other scanner is tried"
           },
           "ZXING": {
             "TITLE": "Zxing",
@@ -112,8 +113,10 @@
     "USERNAME": "Username",
     "EMAIL": "E-mail",
     "CHANGE_PASSWORD": "Change password",
+    "CURRENT_PASSWORD": "Current password",
     "PASSWORD": "Password",
     "CONFIRM_PASSWORD": "Confirm password",
+    "PASSWORDS_MISMATCH": "Passwords do not match",
     "PASSWORD_HINTS": [
       "At least 8 characters",
       "Upper and lower case letters",

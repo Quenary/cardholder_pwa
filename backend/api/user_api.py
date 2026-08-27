@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.auth_core import (
@@ -7,8 +7,10 @@ from backend.core.auth_core import (
     get_password_hash,
     is_creds_taken,
     is_user,
+    verify_password,
 )
 from backend.core.user_core import delete_user as _delete_user
+from backend.db.models.refresh_token_model import RefreshTokenModel
 from backend.db.models.user_model import UserModel
 from backend.db.session import get_async_session
 from backend.enums.user_role_enum import EUserRole
@@ -66,14 +68,32 @@ async def update_user(
     )
     if creds_taken:
         raise HTTPException(400, detail="Username or email is already taken")
+    email_changed = data.email != current_user.email
+    if data.password or email_changed:
+        if not data.current_password or not verify_password(
+            data.current_password, current_user.hashed_password
+        ):
+            raise HTTPException(400, detail="Current password is incorrect")
+
     if data.username != current_user.username:
         current_user.username = data.username
-    if data.email != current_user.email:
+    if email_changed:
         current_user.email = data.email
     if data.password:
         current_user.hashed_password = get_password_hash(data.password)
     await session.commit()
     await session.refresh(current_user)
+
+    if data.password:
+        # Same as after a recovery: a new password ends the old sessions,
+        # so a stolen refresh token does not outlive the change.
+        await session.execute(
+            update(RefreshTokenModel)
+            .where(RefreshTokenModel.user_id == current_user.id)
+            .values(revoked=True)
+        )
+        await session.commit()
+
     return current_user
 
 
