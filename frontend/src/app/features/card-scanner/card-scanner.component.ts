@@ -31,6 +31,7 @@ import {
 import { SnackService } from 'src/app/core/services/snack.service';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MediaDevicesService } from 'src/app/core/services/media-devices.service';
+import { HapticsService } from 'src/app/core/services/haptics.service';
 import { BarcodeDecodingService } from './decoders/barcode-decoding.service';
 import { IBarcodeDecoder, IScannerResult } from './decoders/barcode-decoder';
 
@@ -118,6 +119,7 @@ export class CardScannerComponent implements OnDestroy {
   private readonly translateService = inject(TranslateService);
   private readonly mediaDevicesService = inject(MediaDevicesService);
   private readonly decodingService = inject(BarcodeDecodingService);
+  private readonly hapticsService = inject(HapticsService);
   private readonly pendingTasks = inject(PendingTasks);
 
   private readonly videoRef = viewChild<unknown, ElementRef<HTMLVideoElement>>(
@@ -445,6 +447,10 @@ export class CardScannerComponent implements OnDestroy {
 
   private onResult(result: IScannerResult): void {
     this.stopLoop();
+    // The eyes are on the card, not on the screen, so the confirmation has
+    // to be felt. Without it the dialog simply vanishes and it takes a
+    // moment to work out whether that was the scan or a misplaced tap.
+    this.hapticsService.confirm();
     this.close({
       text: result.code,
       format: result.type,
