@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   effect,
   ElementRef,
   inject,
@@ -34,10 +35,19 @@ import { MediaDevicesService } from 'src/app/core/services/media-devices.service
 import { HapticsService } from 'src/app/core/services/haptics.service';
 import { BarcodeDecodingService } from './decoders/barcode-decoding.service';
 import { IBarcodeDecoder, IScannerResult } from './decoders/barcode-decoder';
+import { describeCameras, ICameraOption } from './camera-label';
 
 export interface ICardScannerResult {
   text: string;
   format: string;
+}
+
+/** Why no camera is running, when none is. */
+export enum ECameraError {
+  /** Permission was refused, and is given back in the browser's settings. */
+  DENIED = 'denied',
+  /** No camera at all, or one already held by something else. */
+  UNAVAILABLE = 'unavailable',
 }
 
 @Component({
@@ -45,10 +55,10 @@ export interface ICardScannerResult {
   imports: [MatListItem, MatListItemTitle, MatActionList],
   template: `
     <mat-action-list>
-      @for (device of devices; track device.deviceId) {
-      <mat-list-item (click)="onSelectDevice(device)">
+      @for (camera of cameras; track camera.device.deviceId) {
+      <mat-list-item (click)="onSelectDevice(camera)">
         <span matListItemTitle>
-          {{ device.label }}
+          {{ camera.label }}
         </span>
       </mat-list-item>
       }
@@ -59,10 +69,10 @@ export class CardScannerDeviceSheetComponent {
   private readonly matBottomSheetRef = inject(MatBottomSheetRef);
   private readonly data = inject(MAT_BOTTOM_SHEET_DATA);
 
-  protected readonly devices: MediaDeviceInfo[] = this.data.devices ?? [];
+  protected readonly cameras: ICameraOption[] = this.data.cameras ?? [];
 
-  protected onSelectDevice(device: MediaDeviceInfo): void {
-    this.matBottomSheetRef.dismiss({ device });
+  protected onSelectDevice(camera: ICameraOption): void {
+    this.matBottomSheetRef.dismiss({ device: camera.device });
   }
 }
 
@@ -127,11 +137,25 @@ export class CardScannerComponent implements OnDestroy {
     { read: ElementRef },
   );
 
+  protected readonly ECameraError = ECameraError;
+
   /** Cameras offered in the picker. Only populated once permission is given. */
-  protected readonly devices = signal<MediaDeviceInfo[]>([]);
+  protected readonly cameras = signal<ICameraOption[]>([]);
   protected readonly selectedDevice = signal<MediaDeviceInfo>(null);
+  /** Name of the running camera, as shown on the picker button. */
+  protected readonly selectedLabel = computed(
+    () =>
+      this.cameras().find(
+        (camera) => camera.device.deviceId === this.selectedDevice()?.deviceId,
+      )?.label ?? null,
+  );
   /** The camera is open but not yet showing frames. */
   protected readonly isStarting = signal<boolean>(true);
+  /**
+   * Why there is no camera, when there is none. The dialog stays useful
+   * either way: a photo of the card still works.
+   */
+  protected readonly cameraError = signal<ECameraError>(null);
   /** A picked photo is being decoded, which holds the live camera. */
   protected readonly isDecodingFile = signal<boolean>(false);
   /** The running camera reports a lamp it will let us switch on. */
@@ -181,11 +205,16 @@ export class CardScannerComponent implements OnDestroy {
     this.matDialogRef.close($event);
   }
 
+  /** Asks for the camera again, after the browser prompt was dismissed. */
+  protected onRetry(): void {
+    void this.whileUnstable(() => this.start());
+  }
+
   protected onClickSelectDevice(): void {
     this.matBottomSheet
       .open(CardScannerDeviceSheetComponent, {
         data: {
-          devices: this.devices(),
+          cameras: this.cameras(),
         },
       })
       .afterDismissed()
@@ -295,15 +324,27 @@ export class CardScannerComponent implements OnDestroy {
         return;
       }
       this.stream.set(stream);
+      this.cameraError.set(null);
       this.readTorchCapability();
       this.startLoop();
-    } catch {
+    } catch (error) {
       if (token === this.openToken) {
-        this.snackService.error(
-          this.translateService.instant('CARDS.CARD.SCAN.PERMISSION_ERROR'),
-        );
+        this.isStarting.set(false);
+        this.cameraError.set(this.describeCameraError(error));
       }
     }
+  }
+
+  /**
+   * Tells apart the reasons a camera does not open, because what to do about
+   * them differs: a refusal is undone in the browser's own settings, while a
+   * camera that is missing or already in use is not.
+   */
+  private describeCameraError(error: unknown): ECameraError {
+    const name = (error as { name?: string })?.name;
+    return name === 'NotAllowedError' || name === 'SecurityError'
+      ? ECameraError.DENIED
+      : ECameraError.UNAVAILABLE;
   }
 
   /**
@@ -318,7 +359,13 @@ export class CardScannerComponent implements OnDestroy {
     const cameras = (devices || []).filter(
       (device) => !device.kind || device.kind.includes('video'),
     );
-    this.devices.set(cameras);
+    this.cameras.set(
+      describeCameras(cameras, {
+        back: this.translateService.instant('CARDS.CARD.SCAN.CAMERA_BACK'),
+        front: this.translateService.instant('CARDS.CARD.SCAN.CAMERA_FRONT'),
+        camera: this.translateService.instant('CARDS.CARD.SCAN.CAMERA'),
+      }),
+    );
     this.selectedDevice.set(this.resolveGrantedDevice(cameras));
   }
 

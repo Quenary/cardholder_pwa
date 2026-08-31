@@ -75,11 +75,18 @@
       "UPDATED_AT": "Date de modification",
       "CODE_FORMAT_WARN": "L'application utilise désormais des noms différents pour les types de codes. Enregistrez la carte avec le nouveau type de code.",
       "SCAN": {
-        "PERMISSION_ERROR": "L'accès au périphérique vidéo est refusé ou la fonctionnalité n'est pas prise en charge.",
         "SELECT_SOURCE": "Sélectionner la source",
         "FROM_FILE": "Ajouter depuis un fichier",
         "FILE_NO_CODE": "Aucun code n'a été trouvé dans cette image.",
-        "TORCH": "Éclairage"
+        "TORCH": "Éclairage",
+        "DENIED_TITLE": "L'accès à la caméra est bloqué",
+        "DENIED_HINT": "Autorisez la caméra pour ce site dans les réglages du navigateur, puis réessayez. Vous pouvez aussi ajouter la carte depuis une photo.",
+        "UNAVAILABLE_TITLE": "Aucune caméra disponible",
+        "UNAVAILABLE_HINT": "Aucune caméra n'a été trouvée, ou une autre application l'utilise. Vous pouvez ajouter la carte depuis une photo.",
+        "RETRY": "Réessayer",
+        "CAMERA": "Caméra",
+        "CAMERA_BACK": "Caméra arrière",
+        "CAMERA_FRONT": "Caméra avant"
       },
       "SUCCESS": {
         "SAVE": "Carte enregistrée",

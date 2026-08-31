@@ -1,22 +1,48 @@
 <mat-dialog-content class="mat-dialog-content">
-  <video
-    #video
-    class="mat-dialog-content-video"
-    playsinline
-    autoplay
-    [muted]="true"
-    (playing)="onVideoPlaying()"></video>
-  @if (!isStarting()) {
-    <div
-      class="mat-dialog-content-viewfinder"
-      aria-hidden="true">
-      <div class="mat-dialog-content-viewfinder-frame"></div>
-    </div>
-  }
-  @if (isStarting() || isDecodingFile()) {
-    <div class="mat-dialog-content-overlay">
-      <mat-spinner [diameter]="50"></mat-spinner>
-    </div>
+  @if (cameraError(); as error) {
+    <section class="mat-dialog-content-error">
+      <mat-icon class="mat-dialog-content-error-icon">videocam_off</mat-icon>
+      <span class="mat-dialog-content-error-title">
+        @if (error === ECameraError.DENIED) {
+          {{ 'CARDS.CARD.SCAN.DENIED_TITLE' | translate }}
+        } @else {
+          {{ 'CARDS.CARD.SCAN.UNAVAILABLE_TITLE' | translate }}
+        }
+      </span>
+      <span class="mat-dialog-content-error-hint">
+        @if (error === ECameraError.DENIED) {
+          {{ 'CARDS.CARD.SCAN.DENIED_HINT' | translate }}
+        } @else {
+          {{ 'CARDS.CARD.SCAN.UNAVAILABLE_HINT' | translate }}
+        }
+      </span>
+      <button
+        mat-button
+        (click)="onRetry()">
+        <mat-icon>refresh</mat-icon>
+        {{ 'CARDS.CARD.SCAN.RETRY' | translate }}
+      </button>
+    </section>
+  } @else {
+    <video
+      #video
+      class="mat-dialog-content-video"
+      playsinline
+      autoplay
+      [muted]="true"
+      (playing)="onVideoPlaying()"></video>
+    @if (!isStarting()) {
+      <div
+        class="mat-dialog-content-viewfinder"
+        aria-hidden="true">
+        <div class="mat-dialog-content-viewfinder-frame"></div>
+      </div>
+    }
+    @if (isStarting() || isDecodingFile()) {
+      <div class="mat-dialog-content-overlay">
+        <mat-spinner [diameter]="50"></mat-spinner>
+      </div>
+    }
   }
 </mat-dialog-content>
 <mat-dialog-actions class="mat-dialog-actions">
@@ -32,17 +58,14 @@
       >
     </button>
   }
-  <button
-    mat-button
-    [disabled]="!devices().length"
-    (click)="onClickSelectDevice()">
-    <mat-icon>videocam_outlined</mat-icon>
-    @if (selectedDevice(); as device) {
-      {{ device.label ?? device.deviceId }}
-    } @else {
-      {{ 'CARDS.CARD.SCAN.SELECT_SOURCE' | translate }}
-    }
-  </button>
+  @if (cameras().length) {
+    <button
+      mat-button
+      (click)="onClickSelectDevice()">
+      <mat-icon>videocam_outlined</mat-icon>
+      {{ selectedLabel() ?? ('CARDS.CARD.SCAN.SELECT_SOURCE' | translate) }}
+    </button>
+  }
   <button
     mat-button
     class="accent-color"

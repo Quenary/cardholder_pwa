@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CardScannerComponent } from './card-scanner.component';
+import { CardScannerComponent, ECameraError } from './card-scanner.component';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import {
@@ -152,17 +152,61 @@ describe('CardScannerComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should show an error on denied permission', async () => {
-    mediaDevicesServiceMock.getUserMedia.mockRejectedValue(null);
+  /** Brings the component up against a camera that refuses to open. */
+  const createWithError = async (name: string) => {
+    mediaDevicesServiceMock.getUserMedia.mockRejectedValue({ name });
     mediaDevicesServiceMock.enumerateDevices.mockResolvedValue([]);
     fixture = TestBed.createComponent(CardScannerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
     await fixture.whenStable();
     TestBed.tick();
+    fixture.detectChanges();
+  };
 
-    expect(mediaDevicesServiceMock.getUserMedia).toHaveBeenCalledTimes(1);
-    expect(snackServiceMock.error).toHaveBeenCalledTimes(1);
+  it('should tell a refusal apart from a missing camera', async () => {
+    await createWithError('NotAllowedError');
+    expect(component['cameraError']()).toEqual(ECameraError.DENIED);
+
+    await createWithError('NotFoundError');
+    expect(component['cameraError']()).toEqual(ECameraError.UNAVAILABLE);
+  });
+
+  it('should stop waiting and explain when no camera opens', async () => {
+    await createWithError('NotAllowedError');
+
+    // The spinner used to run for as long as the dialog stayed open.
+    expect(component['isStarting']()).toEqual(false);
+    expect(
+      fixture.nativeElement.querySelector('.mat-dialog-content-error'),
+    ).toBeTruthy();
+  });
+
+  it('should still offer the photo route when no camera opens', async () => {
+    await createWithError('NotAllowedError');
+
+    const fromFile = [
+      ...fixture.nativeElement.querySelectorAll('mat-dialog-actions button'),
+    ].find((button: HTMLButtonElement) =>
+      button.classList.contains('accent-color'),
+    ) as HTMLButtonElement;
+    expect(fromFile).toBeTruthy();
+    expect(fromFile.disabled).toEqual(false);
+  });
+
+  it('should ask for the camera again on retry', async () => {
+    await createWithError('NotAllowedError');
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
+      createStream('backcamera2').stream,
+    );
+    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+      testMediaDevices,
+    );
+
+    component['onRetry']();
+    await fixture.whenStable();
+
+    expect(component['cameraError']()).toBeNull();
   });
 
   it('should let the platform pick the camera on the first open', async () => {
@@ -189,11 +233,15 @@ describe('CardScannerComponent', () => {
   it('should offer only the cameras in the picker', async () => {
     await create('backcamera2');
 
-    expect(component['devices']().map((device) => device.deviceId)).toEqual([
-      'frontcamera1',
-      'backcamera1',
-      'backcamera2',
-    ]);
+    expect(
+      component['cameras']().map((camera) => camera.device.deviceId),
+    ).toEqual(['frontcamera1', 'backcamera1', 'backcamera2']);
+  });
+
+  it('should name the running camera on the picker button', async () => {
+    await create('backcamera2');
+
+    expect(component['selectedLabel']()).toEqual('Back camera');
   });
 
   it('should keep the stream when the picker returns the running camera', async () => {
