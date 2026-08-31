@@ -8,7 +8,8 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
 import { exhaustMap, filter, from, interval, Subscription, take } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
@@ -99,6 +100,8 @@ const VIDEO_CONSTRAINTS: MediaTrackConstraints = {
   selector: 'app-card-scanner',
   imports: [
     MatButton,
+    MatIconButton,
+    MatTooltip,
     TranslatePipe,
     MatIcon,
     MatDialogActions,
@@ -129,6 +132,9 @@ export class CardScannerComponent implements OnDestroy {
   protected readonly isStarting = signal<boolean>(true);
   /** A picked photo is being decoded, which holds the live camera. */
   protected readonly isDecodingFile = signal<boolean>(false);
+  /** The running camera reports a lamp it will let us switch on. */
+  protected readonly hasTorch = signal<boolean>(false);
+  protected readonly isTorchOn = signal<boolean>(false);
 
   private readonly stream = signal<MediaStream>(null);
 
@@ -287,6 +293,7 @@ export class CardScannerComponent implements OnDestroy {
         return;
       }
       this.stream.set(stream);
+      this.readTorchCapability();
       this.startLoop();
     } catch {
       if (token === this.openToken) {
@@ -444,10 +451,52 @@ export class CardScannerComponent implements OnDestroy {
     });
   }
 
+  /**
+   * Switches the camera lamp.
+   *
+   * A card is often read where the light is poor: a wallet at a till, a
+   * drawer, a bag. Without this the only way through is to carry the card
+   * to a window or to light it from another phone.
+   */
+  protected async toggleTorch(): Promise<void> {
+    const track = this.getVideoTrack();
+    if (!track) {
+      return;
+    }
+    const next = !this.isTorchOn();
+    try {
+      await track.applyConstraints({
+        advanced: [{ torch: next } as MediaTrackConstraintSet],
+      });
+      this.isTorchOn.set(next);
+    } catch {
+      // Some drivers advertise the lamp and then refuse the constraint.
+      // Hiding the button is more honest than a control that does nothing.
+      this.hasTorch.set(false);
+      this.isTorchOn.set(false);
+    }
+  }
+
+  /**
+   * Asks the camera now running whether it has a lamp.
+   *
+   * Cameras differ on this, front ones almost never having one, so it is
+   * read again on every open rather than once for the device.
+   */
+  private readTorchCapability(): void {
+    const capabilities = this.getVideoTrack()?.getCapabilities?.() as
+      | { torch?: boolean }
+      | undefined;
+    this.hasTorch.set(!!capabilities?.torch);
+    this.isTorchOn.set(false);
+  }
+
+  private getVideoTrack(): MediaStreamTrack | null {
+    return this.stream()?.getVideoTracks?.()?.[0] ?? null;
+  }
+
   private getStreamDeviceId(): string | null {
-    return (
-      this.stream()?.getVideoTracks?.()?.[0]?.getSettings?.()?.deviceId || null
-    );
+    return this.getVideoTrack()?.getSettings?.()?.deviceId || null;
   }
 
   private releaseStream(): void {

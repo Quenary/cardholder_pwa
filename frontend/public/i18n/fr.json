@@ -78,7 +78,8 @@
         "PERMISSION_ERROR": "L'accès au périphérique vidéo est refusé ou la fonctionnalité n'est pas prise en charge.",
         "SELECT_SOURCE": "Sélectionner la source",
         "FROM_FILE": "Ajouter depuis un fichier",
-        "FILE_NO_CODE": "Aucun code n'a été trouvé dans cette image."
+        "FILE_NO_CODE": "Aucun code n'a été trouvé dans cette image.",
+        "TORCH": "Éclairage"
       },
       "SUCCESS": {
         "SAVE": "Carte enregistrée",
