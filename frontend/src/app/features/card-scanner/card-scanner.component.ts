@@ -101,11 +101,17 @@ const FRAME_MAX_EDGE = 1280;
 const FILE_MAX_EDGE = 2048;
 
 /**
- * Resolution asked of the camera.
+ * Resolution asked of the camera, once it is open.
  *
  * A default stream is often 640x480, which is thin for the narrow bars of a
- * 1D code. Both values are wishes: a camera that cannot honour them still
- * opens at whatever it does have.
+ * 1D code. Both values are wishes: a camera that cannot honour them keeps
+ * whatever it does have.
+ *
+ * Deliberately not part of the getUserMedia request. An "ideal" value there
+ * is not a preference the browser applies afterwards, it is a term in the
+ * fitness distance it uses to rank cameras, so asking for a resolution while
+ * opening can change which camera is handed over. Asking once the camera is
+ * chosen keeps that choice out of it.
  */
 const VIDEO_CONSTRAINTS: MediaTrackConstraints = {
   width: { ideal: 1280 },
@@ -370,21 +376,26 @@ export class CardScannerComponent implements OnDestroy {
   }
 
   /**
-   * Keeps the camera focusing by itself as the card moves.
+   * Asks the open camera for the resolution and the focus behaviour wanted.
    *
-   * A camera able to focus does not necessarily start out doing it
-   * continuously, and a card is rarely still.
+   * Both are asked here rather than while opening, so that neither has a say
+   * in which camera is opened. A camera able to focus does not necessarily
+   * start out doing it continuously, and a card is rarely still.
    */
-  private async applyContinuousFocus(): Promise<void> {
+  private async applyTrackSettings(): Promise<void> {
     const track = this.getVideoTrack();
-    if (!track || !this.supportsContinuousFocus(track)) {
+    if (!track?.applyConstraints) {
       return;
     }
-    await track
-      .applyConstraints({
-        advanced: [{ focusMode: CONTINUOUS_FOCUS } as MediaTrackConstraintSet],
-      })
-      .catch(() => undefined);
+    const constraints: MediaTrackConstraints = { ...VIDEO_CONSTRAINTS };
+    if (this.supportsContinuousFocus(track)) {
+      constraints.advanced = [
+        { focusMode: CONTINUOUS_FOCUS } as MediaTrackConstraintSet,
+      ];
+    }
+    // A camera that refuses keeps the settings it opened with, which is the
+    // same place the previous release left it.
+    await track.applyConstraints(constraints).catch(() => undefined);
   }
 
   private rememberCamera(deviceId: string): void {
@@ -441,9 +452,10 @@ export class CardScannerComponent implements OnDestroy {
     this.releaseStream();
     try {
       const stream = await this.mediaDevicesService.getUserMedia({
+        // Nothing here beyond which camera is wanted, see VIDEO_CONSTRAINTS.
         video: deviceId
-          ? { ...VIDEO_CONSTRAINTS, deviceId: { exact: deviceId } }
-          : { ...VIDEO_CONSTRAINTS, facingMode: { ideal: 'environment' } },
+          ? { deviceId: { exact: deviceId } }
+          : { facingMode: { ideal: 'environment' } },
       });
       if (token !== this.openToken) {
         stream?.getTracks?.().forEach((track) => track.stop());
@@ -451,7 +463,7 @@ export class CardScannerComponent implements OnDestroy {
       }
       this.stream.set(stream);
       this.cameraError.set(null);
-      await this.applyContinuousFocus();
+      await this.applyTrackSettings();
       this.readTorchCapability();
       this.startLoop();
     } catch (error) {

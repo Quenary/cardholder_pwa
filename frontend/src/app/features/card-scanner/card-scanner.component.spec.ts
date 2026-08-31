@@ -263,6 +263,32 @@ describe('CardScannerComponent', () => {
     expect(video.deviceId).toBeUndefined();
   });
 
+  it('should not let a wanted resolution sway which camera is opened', async () => {
+    const { stream, track } = createStream('backcamera2');
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(stream);
+    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+      testMediaDevices,
+    );
+    fixture = TestBed.createComponent(CardScannerComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+    await fixture.whenStable();
+    TestBed.tick();
+
+    // An "ideal" width in the request is a term in the fitness distance the
+    // browser ranks cameras by, so it belongs after the camera is chosen.
+    const video = mediaDevicesServiceMock.getUserMedia.mock.calls[0][0]
+      .video as MediaTrackConstraints;
+    expect(video.width).toBeUndefined();
+    expect(video.height).toBeUndefined();
+    expect(track.applyConstraints).toHaveBeenCalledWith(
+      expect.objectContaining({
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+      }),
+    );
+  });
+
   it('should name the camera granted by the platform', async () => {
     await create('backcamera2');
 
@@ -582,9 +608,11 @@ describe('CardScannerComponent', () => {
 
       await bring();
 
-      expect(main.track.applyConstraints).toHaveBeenCalledWith({
-        advanced: [{ focusMode: 'continuous' }],
-      });
+      expect(main.track.applyConstraints).toHaveBeenCalledWith(
+        expect.objectContaining({
+          advanced: [{ focusMode: 'continuous' }],
+        }),
+      );
     });
 
     it('should offer the light of the camera it moved to', async () => {
