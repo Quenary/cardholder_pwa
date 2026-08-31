@@ -4,39 +4,33 @@
   .mat-dialog-content {
     overflow: hidden;
     padding: 0;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 
-    &-scanner {
+    &-video {
       display: block;
       width: 100%;
       height: 100%;
+      // The camera aspect ratio rarely matches the dialog, and letterboxing
+      // wastes the width a wide 1D code needs most.
+      object-fit: cover;
+      background-color: #000;
     }
-    &-spinner {
-      width: auto;
-      height: auto;
+
+    &-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.4);
     }
   }
 
   .mat-dialog-actions {
     @include mx.mat-dialog-actions;
-
-    &-scanner {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: flex-end;
-      width: 100%;
-      gap: 16px;
-
-      & > span {
-        color: var(--mat-sys-on-surface);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-    }
   }
 }

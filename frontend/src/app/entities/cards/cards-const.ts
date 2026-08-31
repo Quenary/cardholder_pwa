@@ -264,3 +264,45 @@ export const Quagga2ToBwipMap: Record<
   'pharmacode': 'pharmacode',
 };
 //#endregion
+
+//#region BarcodeDetector
+/**
+ * Formats named by the BarcodeDetector api. Its strings match neither
+ * zxing's nor quagga2's, so it needs a map of its own.
+ */
+export type TNativeBarcodeFormat =
+  | 'aztec'
+  | 'codabar'
+  | 'code_128'
+  | 'code_39'
+  | 'code_93'
+  | 'data_matrix'
+  | 'ean_13'
+  | 'ean_8'
+  | 'itf'
+  | 'pdf417'
+  | 'qr_code'
+  | 'upc_a'
+  | 'upc_e';
+
+export const NativeToBwipMap: Record<
+  TNativeBarcodeFormat,
+  (keyof typeof EBwipBcid & keyof typeof bwip) | null
+> = {
+  // 2D barcodes
+  'aztec': 'azteccode',
+  'data_matrix': 'datamatrix',
+  'pdf417': 'pdf417',
+  'qr_code': 'qrcode',
+  // 1D barcodes
+  'codabar': 'rationalizedCodabar',
+  'code_128': 'code128',
+  'code_39': 'code39',
+  'code_93': 'code93',
+  'ean_13': 'ean13',
+  'ean_8': 'ean8',
+  'itf': 'interleaved2of5',
+  'upc_a': 'upca',
+  'upc_e': 'upce',
+};
+//#endregion

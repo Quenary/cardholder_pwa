@@ -1,8 +1,4 @@
-import {
-  ComponentFixture,
-  DeferBlockState,
-  TestBed,
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CardScannerComponent } from './card-scanner.component';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
@@ -20,7 +16,10 @@ import { MediaDevicesService } from 'src/app/core/services/media-devices.service
 import { Mocked } from 'vitest';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { NEVER, of } from 'rxjs';
+import { of } from 'rxjs';
+import { BarcodeDecodingService } from './decoders/barcode-decoding.service';
+import { IBarcodeDecoder } from './decoders/barcode-decoder';
+import { EBwipBcid } from 'src/app/entities/cards/cards-const';
 
 const testMediaDevices: MediaDeviceInfo[] = [
   {
@@ -60,17 +59,27 @@ const testMediaDevices: MediaDeviceInfo[] = [
   },
 ];
 
-/** Stream stub exposing the camera the platform granted. */
-const grantedStream = (deviceId: string) => {
+/** Stream stub reporting the camera the platform granted, and its stop calls. */
+const createStream = (deviceId?: string) => {
   const track = {
     getSettings: () => ({ deviceId }),
     stop: vi.fn(),
-  } as unknown as MediaStreamTrack;
-  return {
+  } as unknown as MediaStreamTrack & { stop: ReturnType<typeof vi.fn> };
+  const stream = {
     getVideoTracks: () => [track],
     getTracks: () => [track],
   } as unknown as MediaStream;
+  return { stream, track };
 };
+
+/** Decoder stub reading the given code, or nothing at all. */
+const createDecoder = (name: string, code?: string) =>
+  ({
+    name,
+    decode: vi
+      .fn()
+      .mockResolvedValue(code ? { code, type: EBwipBcid.code128 } : null),
+  }) as unknown as IBarcodeDecoder & { decode: ReturnType<typeof vi.fn> };
 
 describe('CardScannerComponent', () => {
   let component: CardScannerComponent;
@@ -80,6 +89,7 @@ describe('CardScannerComponent', () => {
   let matBottomSheetMock: ReturnType<typeof createMatBottomSheetMock>;
   let snackServiceMock: ReturnType<typeof createSnackServiceMock>;
   let mediaDevicesServiceMock: Partial<Mocked<MediaDevicesService>>;
+  let decodingServiceMock: Partial<Mocked<BarcodeDecodingService>>;
   let initialState: ITestAppState;
 
   beforeEach(async () => {
@@ -91,6 +101,10 @@ describe('CardScannerComponent', () => {
       getUserMedia: vi.fn(),
       enumerateDevices: vi.fn(),
     };
+    decodingServiceMock = {
+      createDecoders: vi.fn().mockResolvedValue([]),
+      decodeAll: vi.fn().mockResolvedValue(null),
+    };
 
     await TestBed.configureTestingModule({
       providers: [
@@ -100,6 +114,7 @@ describe('CardScannerComponent', () => {
         { provide: MatBottomSheet, useValue: matBottomSheetMock },
         { provide: SnackService, useValue: snackServiceMock },
         { provide: MediaDevicesService, useValue: mediaDevicesServiceMock },
+        { provide: BarcodeDecodingService, useValue: decodingServiceMock },
         provideTranslateService(),
         provideZonelessChangeDetection(),
       ],
@@ -107,215 +122,201 @@ describe('CardScannerComponent', () => {
     }).compileComponents();
   });
 
-  it('should create', () => {
-    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(null);
+  /** Serves a camera and a device list, then brings the component up. */
+  const create = async (deviceId?: string) => {
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
+      createStream(deviceId).stream,
+    );
     mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
       testMediaDevices,
     );
     fixture = TestBed.createComponent(CardScannerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    await fixture.whenStable();
+    await fixture.whenRenderingDone();
+    TestBed.tick();
+  };
+
+  it('should create', async () => {
+    await create('backcamera2');
     expect(component).toBeTruthy();
   });
 
   it('should show an error on denied permission', async () => {
     mediaDevicesServiceMock.getUserMedia.mockRejectedValue(null);
-    mediaDevicesServiceMock.enumerateDevices.mockRejectedValue(null);
+    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue([]);
     fixture = TestBed.createComponent(CardScannerComponent);
     component = fixture.componentInstance;
-    fixture.autoDetectChanges();
+    fixture.detectChanges();
     await fixture.whenStable();
+    TestBed.tick();
+
     expect(mediaDevicesServiceMock.getUserMedia).toHaveBeenCalledTimes(1);
-    expect(mediaDevicesServiceMock.enumerateDevices).toHaveBeenCalledTimes(0);
     expect(snackServiceMock.error).toHaveBeenCalledTimes(1);
   });
 
-  it('should default to the camera granted by the platform', async () => {
-    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
-      grantedStream('backcamera2'),
-    );
-    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
-      testMediaDevices,
-    );
-    fixture = TestBed.createComponent(CardScannerComponent);
-    component = fixture.componentInstance;
+  it('should let the platform pick the camera on the first open', async () => {
+    await create('backcamera2');
 
-    fixture.detectChanges();
-    await fixture.whenStable();
-    await fixture.whenRenderingDone();
-    TestBed.tick();
+    const constraints = mediaDevicesServiceMock.getUserMedia.mock.calls[0][0];
+    const video = constraints.video as MediaTrackConstraints;
+    expect(video.facingMode).toEqual({ ideal: 'environment' });
+    expect(video.deviceId).toBeUndefined();
+  });
+
+  it('should name the camera granted by the platform', async () => {
+    await create('backcamera2');
 
     expect(component['selectedDevice']()).toEqual(testMediaDevices[3]);
   });
 
   it('should fall back to the label when no device id is reported', async () => {
-    if (typeof globalThis.MediaStream === 'undefined') {
-      globalThis.MediaStream = class {} as typeof MediaStream;
-    }
-    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
-      new globalThis.MediaStream(),
-    );
-    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
-      testMediaDevices,
-    );
-    fixture = TestBed.createComponent(CardScannerComponent);
-    component = fixture.componentInstance;
-
-    fixture.detectChanges();
-    await fixture.whenStable();
-    await fixture.whenRenderingDone();
-    TestBed.tick();
+    await create(undefined);
 
     expect(component['selectedDevice']()).toEqual(testMediaDevices[2]);
   });
 
-  /** Brings the component up with a camera selected and timers frozen. */
-  const withRunningScanner = async () => {
-    vi.useFakeTimers();
-    if (typeof globalThis.MediaStream === 'undefined') {
-      globalThis.MediaStream = class {} as typeof MediaStream;
-    }
-    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
-      new globalThis.MediaStream(),
-    );
+  it('should offer only the cameras in the picker', async () => {
+    await create('backcamera2');
+
+    expect(component['devices']().map((device) => device.deviceId)).toEqual([
+      'frontcamera1',
+      'backcamera1',
+      'backcamera2',
+    ]);
+  });
+
+  it('should keep the stream when the picker returns the running camera', async () => {
+    await create('backcamera2');
+    matBottomSheetMock.open.mockReturnValue({
+      afterDismissed: () => of({ device: testMediaDevices[3] }),
+    } as never);
+
+    component['onClickSelectDevice']();
+    await fixture.whenStable();
+
+    expect(mediaDevicesServiceMock.getUserMedia).toHaveBeenCalledTimes(1);
+  });
+
+  it('should release the running camera before opening another', async () => {
+    const first = createStream('backcamera2');
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(first.stream);
     mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
       testMediaDevices,
     );
     fixture = TestBed.createComponent(CardScannerComponent);
     component = fixture.componentInstance;
-
-    fixture.detectChanges();
-    await vi.advanceTimersByTimeAsync(0);
-    TestBed.tick();
-  };
-
-  it('should not start the countdown before the scanner is running', async () => {
-    await withRunningScanner();
-
-    const first = component['selectedScanner']();
-    await vi.advanceTimersByTimeAsync(6000);
-
-    expect(component['selectedScanner']()).toEqual(first);
-    vi.useRealTimers();
-  });
-
-  it('should hand over to the other scanner when nothing is read', async () => {
-    await withRunningScanner();
-
-    const first = component['selectedScanner']();
-    component['onScannerStarted']();
-    await vi.advanceTimersByTimeAsync(6000);
-
-    expect(component['selectedScanner']().code).not.toEqual(first.code);
-    vi.useRealTimers();
-  });
-
-  it('should hand over only once', async () => {
-    await withRunningScanner();
-
-    component['onScannerStarted']();
-    await vi.advanceTimersByTimeAsync(6000);
-    const afterFirst = component['selectedScanner']();
-
-    component['onScannerStarted']();
-    await vi.advanceTimersByTimeAsync(6000);
-
-    expect(component['selectedScanner']()).toEqual(afterFirst);
-    vi.useRealTimers();
-  });
-
-  it('should leave a manual scanner choice alone', async () => {
-    await withRunningScanner();
-
-    const chosen = component['scanners'][1];
-    component['onSelectScanner'](chosen);
-    component['onScannerStarted']();
-    await vi.advanceTimersByTimeAsync(6000);
-
-    expect(component['selectedScanner']()).toEqual(chosen);
-    vi.useRealTimers();
-  });
-
-  it('should keep the active scanner when its toggle is clicked', async () => {
-    await withRunningScanner();
-    component['onScannerStarted']();
-
-    const active = component['selectedScanner']();
-    const toggle: HTMLElement = fixture.nativeElement.querySelector(
-      'mat-button-toggle-group mat-button-toggle button',
-    );
-    expect(toggle).toBeTruthy();
-    toggle.click();
-    await vi.advanceTimersByTimeAsync(6000);
-
-    expect(component['selectedScanner']()).toEqual(active);
-    vi.useRealTimers();
-  });
-
-  it('should hold the countdown while the file picker is open', async () => {
-    await withRunningScanner();
-    component['onScannerStarted']();
-
-    const first = component['selectedScanner']();
-    component['onPickFile']();
-    await vi.advanceTimersByTimeAsync(6000);
-
-    expect(component['selectedScanner']()).toEqual(first);
-    vi.useRealTimers();
-  });
-
-  it('should hold the countdown while the camera sheet is open', async () => {
-    await withRunningScanner();
-    component['onScannerStarted']();
-
-    // sheet stays open: afterDismissed never emits
-    matBottomSheetMock.open.mockReturnValue({
-      afterDismissed: () => NEVER,
-    } as never);
-
-    const first = component['selectedScanner']();
-    component['onClickSelectDevice']();
-    await vi.advanceTimersByTimeAsync(6000);
-
-    expect(component['selectedScanner']()).toEqual(first);
-    vi.useRealTimers();
-  });
-
-  it('should resume the countdown once the camera sheet closes', async () => {
-    await withRunningScanner();
-    component['onScannerStarted']();
-
-    matBottomSheetMock.open.mockReturnValue({
-      afterDismissed: () => of(undefined),
-    } as never);
-
-    const first = component['selectedScanner']();
-    component['onClickSelectDevice']();
-    await vi.advanceTimersByTimeAsync(6000);
-
-    expect(component['selectedScanner']().code).not.toEqual(first.code);
-    vi.useRealTimers();
-  });
-
-  it('should display scanner if permission granted', async () => {
-    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(null);
-    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
-      testMediaDevices,
-    );
-    fixture = TestBed.createComponent(CardScannerComponent);
-    component = fixture.componentInstance;
-
     fixture.detectChanges();
     await fixture.whenStable();
-    await fixture.whenRenderingDone();
     TestBed.tick();
 
-    const deferBlocks = await fixture.getDeferBlocks();
-    expect(deferBlocks.length).toEqual(1);
+    matBottomSheetMock.open.mockReturnValue({
+      afterDismissed: () => of({ device: testMediaDevices[0] }),
+    } as never);
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
+      createStream('frontcamera1').stream,
+    );
 
-    await deferBlocks[0].render(DeferBlockState.Complete);
-    expect(
-      fixture.nativeElement.querySelector('app-card-scanner-zxing'),
-    ).toBeTruthy();
+    component['onClickSelectDevice']();
+    await fixture.whenStable();
+
+    expect(first.track.stop).toHaveBeenCalled();
+    expect(mediaDevicesServiceMock.getUserMedia).toHaveBeenCalledTimes(2);
+    const constraints = mediaDevicesServiceMock.getUserMedia.mock.calls[1][0];
+    expect((constraints.video as MediaTrackConstraints).deviceId).toEqual({
+      exact: 'frontcamera1',
+    });
+  });
+
+  it('should take the decoders in turn on successive frames', async () => {
+    const first = createDecoder('first');
+    const second = createDecoder('second');
+    decodingServiceMock.createDecoders.mockResolvedValue([first, second]);
+    await create('backcamera2');
+    // Stands in for the live camera, which delivers no frame under test.
+    vi.spyOn(
+      component as unknown as { grabFrame: () => HTMLCanvasElement },
+      'grabFrame',
+    ).mockReturnValue(document.createElement('canvas'));
+
+    await component['decodeNextFrame']();
+    await component['decodeNextFrame']();
+    await component['decodeNextFrame']();
+
+    expect(first.decode).toHaveBeenCalledTimes(2);
+    expect(second.decode).toHaveBeenCalledTimes(1);
+  });
+
+  it('should close with the code once a decoder reads one', async () => {
+    await create('backcamera2');
+
+    component['onResult']({ code: '12345', type: EBwipBcid.code128 });
+
+    expect(matDialogRefMock.close).toHaveBeenCalledWith({
+      text: '12345',
+      format: EBwipBcid.code128,
+    });
+  });
+
+  it('should report a picked image that holds no code', async () => {
+    await create('backcamera2');
+    vi.spyOn(
+      component as unknown as {
+        drawImage: () => Promise<HTMLCanvasElement>;
+      },
+      'drawImage',
+    ).mockResolvedValue(document.createElement('canvas'));
+    decodingServiceMock.decodeAll.mockResolvedValue(null);
+
+    const input = { files: [new File([], 'card.png')], value: 'card.png' };
+    await component['decodeFromFile']({
+      target: input,
+    } as unknown as Event & { target: HTMLInputElement });
+
+    expect(snackServiceMock.error).toHaveBeenCalledTimes(1);
+    expect(matDialogRefMock.close).not.toHaveBeenCalled();
+    // Reset so picking the very same file again still fires change.
+    expect(input.value).toEqual('');
+  });
+
+  it('should close with the code read from a picked image', async () => {
+    await create('backcamera2');
+    vi.spyOn(
+      component as unknown as {
+        drawImage: () => Promise<HTMLCanvasElement>;
+      },
+      'drawImage',
+    ).mockResolvedValue(document.createElement('canvas'));
+    decodingServiceMock.decodeAll.mockResolvedValue({
+      code: '67890',
+      type: EBwipBcid.ean13,
+    });
+
+    await component['decodeFromFile']({
+      target: { files: [new File([], 'card.png')], value: 'card.png' },
+    } as unknown as Event & { target: HTMLInputElement });
+
+    expect(matDialogRefMock.close).toHaveBeenCalledWith({
+      text: '67890',
+      format: EBwipBcid.ean13,
+    });
+  });
+
+  it('should release the camera when the dialog is destroyed', async () => {
+    const { stream, track } = createStream('backcamera2');
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(stream);
+    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+      testMediaDevices,
+    );
+    fixture = TestBed.createComponent(CardScannerComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+    await fixture.whenStable();
+    TestBed.tick();
+
+    fixture.destroy();
+
+    expect(track.stop).toHaveBeenCalled();
   });
 });
