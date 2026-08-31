@@ -61,10 +61,17 @@ const testMediaDevices: MediaDeviceInfo[] = [
 ];
 
 /** Stream stub reporting the camera the platform granted, and its stop calls. */
-const createStream = (deviceId?: string, torch = false) => {
+const createStream = (
+  deviceId?: string,
+  torch = false,
+  focusModes: string[] = ['manual', 'single-shot', 'continuous'],
+) => {
   const track = {
     getSettings: () => ({ deviceId }),
-    getCapabilities: () => (torch ? { torch: true } : {}),
+    getCapabilities: () => ({
+      ...(torch ? { torch: true } : {}),
+      ...(focusModes.length ? { focusMode: focusModes } : {}),
+    }),
     applyConstraints: vi.fn().mockResolvedValue(undefined),
     stop: vi.fn(),
   } as unknown as MediaStreamTrack & {
@@ -77,6 +84,41 @@ const createStream = (deviceId?: string, torch = false) => {
   } as unknown as MediaStream;
   return { stream, track };
 };
+
+/**
+ * The four cameras a Samsung reported here. The rear camera the platform
+ * grants is fixed focus; the other rear one is the main sensor.
+ */
+const samsungDevices: MediaDeviceInfo[] = [
+  {
+    deviceId: 'front-1',
+    groupId: null,
+    kind: 'videoinput',
+    label: 'camera 1, facing front',
+    toJSON: null,
+  },
+  {
+    deviceId: 'front-3',
+    groupId: null,
+    kind: 'videoinput',
+    label: 'camera 3, facing front',
+    toJSON: null,
+  },
+  {
+    deviceId: 'back-fixed',
+    groupId: null,
+    kind: 'videoinput',
+    label: 'camera 2, facing back',
+    toJSON: null,
+  },
+  {
+    deviceId: 'back-main',
+    groupId: null,
+    kind: 'videoinput',
+    label: 'camera 0, facing back',
+    toJSON: null,
+  },
+];
 
 /** Decoder stub reading the given code, or nothing at all. */
 const createDecoder = (name: string, code?: string) =>
@@ -100,6 +142,9 @@ describe('CardScannerComponent', () => {
   let initialState: ITestAppState;
 
   beforeEach(async () => {
+    // The scanner remembers the camera that worked, so a test that opened one
+    // would otherwise decide what the next test opens.
+    localStorage.clear();
     initialState = { ...testAppState };
     matDialogRefMock = createMatDialogRefMock();
     matBottomSheetMock = createMatBottomSheetMock();
@@ -466,6 +511,124 @@ describe('CardScannerComponent', () => {
     await fixture.whenStable();
 
     expect(component['hasTorch']()).toEqual(false);
+  });
+
+  describe('choosing a camera that can focus', () => {
+    /**
+     * Serves the Samsung camera set: the granted rear camera reports manual
+     * focus alone, the other rear one reports continuous.
+     */
+    const givenSamsung = () => {
+      const fixed = createStream('back-fixed', false, ['manual']);
+      const main = createStream('back-main', true, [
+        'manual',
+        'single-shot',
+        'continuous',
+      ]);
+      mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+        samsungDevices,
+      );
+      mediaDevicesServiceMock.getUserMedia.mockImplementation(
+        (constraints: MediaStreamConstraints) => {
+          const video = constraints.video as MediaTrackConstraints;
+          const wanted = (video?.deviceId as ConstrainDOMStringParameters)
+            ?.exact;
+          if (wanted === 'back-main') {
+            return Promise.resolve(main.stream);
+          }
+          if (wanted && wanted !== 'back-fixed') {
+            return Promise.reject({ name: 'NotFoundError' });
+          }
+          // No device id asked for: the platform grants the fixed one.
+          return Promise.resolve(fixed.stream);
+        },
+      );
+      return { fixed, main };
+    };
+
+    const bring = async () => {
+      fixture = TestBed.createComponent(CardScannerComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+      await fixture.whenStable();
+      TestBed.tick();
+    };
+
+    it('should move off the granted camera when it cannot focus', async () => {
+      givenSamsung();
+
+      await bring();
+
+      expect(component['getStreamDeviceId']()).toEqual('back-main');
+    });
+
+    it('should keep the granted camera when it can focus', async () => {
+      mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+        samsungDevices,
+      );
+      mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
+        createStream('back-fixed', false, ['manual', 'continuous']).stream,
+      );
+
+      await bring();
+
+      expect(component['getStreamDeviceId']()).toEqual('back-fixed');
+      // No probing was needed, so only the first open happened.
+      expect(mediaDevicesServiceMock.getUserMedia).toHaveBeenCalledTimes(1);
+    });
+
+    it('should ask a focusing camera to keep focusing', async () => {
+      const { main } = givenSamsung();
+
+      await bring();
+
+      expect(main.track.applyConstraints).toHaveBeenCalledWith({
+        advanced: [{ focusMode: 'continuous' }],
+      });
+    });
+
+    it('should offer the light of the camera it moved to', async () => {
+      givenSamsung();
+
+      await bring();
+
+      // The fixed focus camera has no lamp; the main one does.
+      expect(component['hasTorch']()).toEqual(true);
+    });
+
+    it('should remember the working camera and go straight to it', async () => {
+      givenSamsung();
+      await bring();
+      expect(component['getStreamDeviceId']()).toEqual('back-main');
+      const firstRun = mediaDevicesServiceMock.getUserMedia.mock.calls.length;
+
+      // Second visit, same phone, storage kept.
+      await bring();
+
+      expect(component['getStreamDeviceId']()).toEqual('back-main');
+      const secondRun =
+        mediaDevicesServiceMock.getUserMedia.mock.calls.length - firstRun;
+      expect(secondRun).toEqual(1);
+      const constraints =
+        mediaDevicesServiceMock.getUserMedia.mock.calls[firstRun][0];
+      expect((constraints.video as MediaTrackConstraints).deviceId).toEqual({
+        exact: 'back-main',
+      });
+    });
+
+    it('should stay put when no camera can focus', async () => {
+      mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+        samsungDevices,
+      );
+      mediaDevicesServiceMock.getUserMedia.mockImplementation(() =>
+        Promise.resolve(createStream('back-fixed', false, ['manual']).stream),
+      );
+
+      await bring();
+
+      expect(component['getStreamDeviceId']()).toEqual('back-fixed');
+      expect(component['cameraError']()).toBeNull();
+    });
   });
 
   it('should release the camera when the dialog is destroyed', async () => {
