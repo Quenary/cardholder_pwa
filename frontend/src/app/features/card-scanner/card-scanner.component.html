@@ -6,6 +6,13 @@
     autoplay
     [muted]="true"
     (playing)="onVideoPlaying()"></video>
+  @if (!isStarting()) {
+    <div
+      class="mat-dialog-content-viewfinder"
+      aria-hidden="true">
+      <div class="mat-dialog-content-viewfinder-frame"></div>
+    </div>
+  }
   @if (isStarting() || isDecodingFile()) {
     <div class="mat-dialog-content-overlay">
       <mat-spinner [diameter]="50"></mat-spinner>

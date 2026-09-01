@@ -18,6 +18,7 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { of } from 'rxjs';
 import { BarcodeDecodingService } from './decoders/barcode-decoding.service';
+import { HapticsService } from 'src/app/core/services/haptics.service';
 import { IBarcodeDecoder } from './decoders/barcode-decoder';
 import { EBwipBcid } from 'src/app/entities/cards/cards-const';
 
@@ -95,6 +96,7 @@ describe('CardScannerComponent', () => {
   let snackServiceMock: ReturnType<typeof createSnackServiceMock>;
   let mediaDevicesServiceMock: Partial<Mocked<MediaDevicesService>>;
   let decodingServiceMock: Partial<Mocked<BarcodeDecodingService>>;
+  let hapticsServiceMock: Partial<Mocked<HapticsService>>;
   let initialState: ITestAppState;
 
   beforeEach(async () => {
@@ -110,6 +112,7 @@ describe('CardScannerComponent', () => {
       createDecoders: vi.fn().mockResolvedValue([]),
       decodeAll: vi.fn().mockResolvedValue(null),
     };
+    hapticsServiceMock = { confirm: vi.fn() };
 
     await TestBed.configureTestingModule({
       providers: [
@@ -120,6 +123,7 @@ describe('CardScannerComponent', () => {
         { provide: SnackService, useValue: snackServiceMock },
         { provide: MediaDevicesService, useValue: mediaDevicesServiceMock },
         { provide: BarcodeDecodingService, useValue: decodingServiceMock },
+        { provide: HapticsService, useValue: hapticsServiceMock },
         provideTranslateService(),
         provideZonelessChangeDetection(),
       ],
@@ -306,6 +310,30 @@ describe('CardScannerComponent', () => {
       text: '67890',
       format: EBwipBcid.ean13,
     });
+  });
+
+  it('should confirm a read code by touch', async () => {
+    await create('backcamera2');
+
+    component['onResult']({ code: '12345', type: EBwipBcid.code128 });
+
+    expect(hapticsServiceMock.confirm).toHaveBeenCalledTimes(1);
+  });
+
+  it('should show the viewfinder once the camera is running', async () => {
+    await create('backcamera2');
+    const frame = () =>
+      fixture.nativeElement.querySelector(
+        '.mat-dialog-content-viewfinder-frame',
+      );
+
+    expect(component['isStarting']()).toEqual(true);
+    expect(frame()).toBeFalsy();
+
+    component['onVideoPlaying']();
+    fixture.detectChanges();
+
+    expect(frame()).toBeTruthy();
   });
 
   it('should offer no light when the camera reports none', async () => {
