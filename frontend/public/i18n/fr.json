@@ -78,27 +78,7 @@
         "PERMISSION_ERROR": "L'accès au périphérique vidéo est refusé ou la fonctionnalité n'est pas prise en charge.",
         "SELECT_SOURCE": "Sélectionner la source",
         "FROM_FILE": "Ajouter depuis un fichier",
-        "SCANNER": "Scanner",
-        "SCANNERS": {
-          "GENERAL": {
-            "TITLE": "Général",
-            "0": "Un code 2D est par exemple un QR code ou un DataMatrix",
-            "1": "Un code 1D est par exemple un code-barres classique",
-            "2": "Le scan de fichier utilise également le scanner actif",
-            "3": "Si rien n'est lu au bout de quelques secondes, l'autre scanner prend le relais"
-          },
-          "ZXING": {
-            "TITLE": "Zxing",
-            "0": "Prend en charge le scan des codes 2D",
-            "1": "Moins performant pour les codes 1D"
-          },
-          "QUAGGA2": {
-            "TITLE": "Quagga2",
-            "0": "Ne prend pas en charge le scan des codes 2D",
-            "1": "Meilleur pour les codes 1D",
-            "2": "Prend en charge plus de formats 1D"
-          }
-        }
+        "FILE_NO_CODE": "Aucun code n'a été trouvé dans cette image."
       },
       "SUCCESS": {
         "SAVE": "Carte enregistrée",
