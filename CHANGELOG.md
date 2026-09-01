@@ -1,6 +1,35 @@
 # CHANGELOG
 
 
+## v1.11.0 (2026-09-01)
+
+### Bug Fixes
+
+- **frontend**: Keep the wanted resolution out of choosing a camera
+  ([`026e282`](https://github.com/Quenary/cardholder_pwa/commit/026e28269d65bfaee9839c0b6ca4ccf081020194))
+
+- **frontend**: Scan with a camera that can actually focus
+  ([`6657430`](https://github.com/Quenary/cardholder_pwa/commit/6657430641672c9d6b9f70d1871bfefa97a4f571))
+
+### Features
+
+- **frontend**: Let the scanner switch the camera light on
+  ([`c06367e`](https://github.com/Quenary/cardholder_pwa/commit/c06367ea2c09c5044af619f043e108ffef5842fb))
+
+- **frontend**: Recover from a camera that will not open, and name the ones that do
+  ([`2a20fe8`](https://github.com/Quenary/cardholder_pwa/commit/2a20fe81bbbbe910b529ab1ae646896c8452a2fe))
+
+- **frontend**: Scan without asking which engine to use
+  ([#57](https://github.com/Quenary/cardholder_pwa/pull/57),
+  [`14aa805`](https://github.com/Quenary/cardholder_pwa/commit/14aa8059cdcad22d4fa7dd9f9c5b91f46b3dca43))
+
+- **frontend**: Scan without asking which engine to use
+  ([`f5871cf`](https://github.com/Quenary/cardholder_pwa/commit/f5871cf50053709a27e417405724cd24a51d4eed))
+
+- **frontend**: Show where to aim, and confirm a read by touch
+  ([`6b9d908`](https://github.com/Quenary/cardholder_pwa/commit/6b9d9089bb848bfcec67016b7d6c65fca4501d0a))
+
+
 ## v1.10.1 (2026-08-27)
 
 ### Bug Fixes
