@@ -26,6 +26,11 @@ export enum ELocalStorageKey {
    * Wether to invert code colors by default
    */
   CODE_COLOR_INVERSION = 'cardholder-code-color-inversion',
+  /**
+   * Device id of the last camera that scanned well on this phone.
+   * Saves working out again which of several rear cameras can focus.
+   */
+  SCANNER_CAMERA = 'cardholder-scanner-camera',
 }
 /**
  * Enum of useful regexp

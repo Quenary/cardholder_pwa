@@ -36,6 +36,11 @@ import { HapticsService } from 'src/app/core/services/haptics.service';
 import { BarcodeDecodingService } from './decoders/barcode-decoding.service';
 import { IBarcodeDecoder, IScannerResult } from './decoders/barcode-decoder';
 import { describeCameras, ICameraOption } from './camera-label';
+import { ELocalStorageKey } from 'src/app/app.consts';
+import {
+  storageGetItemJson,
+  storageSetItemJson,
+} from 'src/app/shared/functions/storage.function';
 
 export interface ICardScannerResult {
   text: string;
@@ -96,16 +101,28 @@ const FRAME_MAX_EDGE = 1280;
 const FILE_MAX_EDGE = 2048;
 
 /**
- * Resolution asked of the camera.
+ * Resolution asked of the camera, once it is open.
  *
  * A default stream is often 640x480, which is thin for the narrow bars of a
- * 1D code. Both values are wishes: a camera that cannot honour them still
- * opens at whatever it does have.
+ * 1D code. Both values are wishes: a camera that cannot honour them keeps
+ * whatever it does have.
+ *
+ * Deliberately not part of the getUserMedia request. An "ideal" value there
+ * is not a preference the browser applies afterwards, it is a term in the
+ * fitness distance it uses to rank cameras, so asking for a resolution while
+ * opening can change which camera is handed over. Asking once the camera is
+ * chosen keeps that choice out of it.
  */
 const VIDEO_CONSTRAINTS: MediaTrackConstraints = {
   width: { ideal: 1280 },
   height: { ideal: 720 },
 };
+
+/** The focus mode that keeps refocusing as the card moves. */
+const CONTINUOUS_FOCUS = 'continuous';
+
+/** Labels a rear camera gives itself, across platforms. */
+const REAR_LABEL = /back|rear|environment/i;
 
 @Component({
   selector: 'app-card-scanner',
@@ -222,6 +239,9 @@ export class CardScannerComponent implements OnDestroy {
         const device = data?.device;
         if (device && device.deviceId !== this.selectedDevice()?.deviceId) {
           this.selectedDevice.set(device);
+          // A camera picked by hand is the one to come back to, whatever the
+          // platform would have granted.
+          this.rememberCamera(device.deviceId);
           void this.whileUnstable(() => this.openCamera(device.deviceId));
         }
       });
@@ -262,8 +282,126 @@ export class CardScannerComponent implements OnDestroy {
 
   private async start(): Promise<void> {
     this.decoders = await this.decodingService.createDecoders();
-    await this.openCamera(null);
+    const remembered = storageGetItemJson<string>(
+      ELocalStorageKey.SCANNER_CAMERA,
+    );
+    await this.openCamera(remembered ?? null);
     await this.listDevices();
+    // A remembered camera was already proved to focus, so the search is only
+    // worth running the first time, or if that camera has since gone.
+    if (!remembered || this.getStreamDeviceId() !== remembered) {
+      await this.ensureFocusableCamera();
+    }
+  }
+
+  /**
+   * Moves off a camera that cannot focus.
+   *
+   * Asking for the rear camera leaves the choice to the platform, and the one
+   * it grants is not always able to focus. A Samsung tested here offers four
+   * cameras: the granted one reports `focusMode: ["manual"]` alone and a
+   * focus range stopping at 0.78, while another rear camera reports
+   * `["manual","single-shot","continuous"]` over a range of 0.1 to 4.05. A
+   * card held at arm's length is a blur on the first and sharp on the second,
+   * and no constraint fixes the first because the hardware has no autofocus
+   * at all.
+   *
+   * So the granted camera is checked, and only if it cannot focus are the
+   * other rear cameras tried. The winner is remembered, which also spares the
+   * search on later scans.
+   */
+  private async ensureFocusableCamera(): Promise<void> {
+    const track = this.getVideoTrack();
+    if (!track) {
+      return;
+    }
+    const currentId = this.getStreamDeviceId();
+    if (this.supportsContinuousFocus(track)) {
+      this.rememberCamera(currentId);
+      return;
+    }
+    // Probing opens cameras one at a time, and some phones refuse a second
+    // camera while the first is held. Nothing is lost by letting go: we are
+    // leaving this camera either way.
+    this.releaseStream();
+    const focusable = await this.findFocusableCamera(currentId);
+    await this.openCamera(focusable ?? currentId);
+    if (focusable) {
+      this.rememberCamera(focusable);
+      this.selectedDevice.set(
+        this.cameras().find((camera) => camera.device.deviceId === focusable)
+          ?.device ?? this.selectedDevice(),
+      );
+    }
+  }
+
+  /**
+   * Opens each remaining rear camera just long enough to read what it can do.
+   *
+   * Capabilities are only legible on a live track, so there is no way to ask
+   * this of a device without opening it.
+   */
+  private async findFocusableCamera(excludeId: string): Promise<string | null> {
+    const candidates = this.cameras()
+      .map((camera) => camera.device)
+      .filter((device) => device.deviceId && device.deviceId !== excludeId)
+      // An empty label says nothing either way, so such a device stays in.
+      .filter((device) => !device.label || REAR_LABEL.test(device.label));
+    for (const device of candidates) {
+      let probe: MediaStream = null;
+      try {
+        probe = await this.mediaDevicesService.getUserMedia({
+          video: { deviceId: { exact: device.deviceId } },
+        });
+        const focusable = this.supportsContinuousFocus(
+          probe?.getVideoTracks?.()?.[0],
+        );
+        if (focusable) {
+          return device.deviceId;
+        }
+      } catch {
+        // A camera that will not open is simply not a candidate.
+      } finally {
+        probe?.getTracks?.().forEach((track) => track.stop());
+      }
+    }
+    return null;
+  }
+
+  private supportsContinuousFocus(track: MediaStreamTrack): boolean {
+    const capabilities = track?.getCapabilities?.() as
+      | { focusMode?: string[] }
+      | undefined;
+    return !!capabilities?.focusMode?.includes(CONTINUOUS_FOCUS);
+  }
+
+  /**
+   * Asks the open camera for the resolution and the focus behaviour wanted.
+   *
+   * Both are asked here rather than while opening, so that neither has a say
+   * in which camera is opened. A camera able to focus does not necessarily
+   * start out doing it continuously, and a card is rarely still.
+   */
+  private async applyTrackSettings(): Promise<void> {
+    const track = this.getVideoTrack();
+    if (!track?.applyConstraints) {
+      return;
+    }
+    const constraints: MediaTrackConstraints = { ...VIDEO_CONSTRAINTS };
+    if (this.supportsContinuousFocus(track)) {
+      constraints.advanced = [
+        { focusMode: CONTINUOUS_FOCUS } as MediaTrackConstraintSet,
+      ];
+    }
+    // A camera that refuses keeps the settings it opened with, which is the
+    // same place the previous release left it.
+    await track.applyConstraints(constraints).catch(() => undefined);
+  }
+
+  private rememberCamera(deviceId: string): void {
+    if (deviceId) {
+      storageSetItemJson(ELocalStorageKey.SCANNER_CAMERA, deviceId);
+    }
   }
 
   /**
@@ -301,10 +439,9 @@ export class CardScannerComponent implements OnDestroy {
   /**
    * Opens a camera and keeps its stream for as long as the dialog lives.
    *
-   * Passing no device id on the first call lets the platform choose the rear
-   * camera itself, which it does better than a label match can: a phone
-   * exposes several rear cameras and the ultra wide one, often first in the
-   * list, cannot focus close enough to read a barcode.
+   * Passing no device id lets the platform choose the rear camera, which is
+   * only a starting point: see ensureFocusableCamera for why its choice
+   * cannot be trusted on its own.
    */
   private async openCamera(deviceId: string | null): Promise<void> {
     const token = ++this.openToken;
@@ -315,9 +452,10 @@ export class CardScannerComponent implements OnDestroy {
     this.releaseStream();
     try {
       const stream = await this.mediaDevicesService.getUserMedia({
+        // Nothing here beyond which camera is wanted, see VIDEO_CONSTRAINTS.
         video: deviceId
-          ? { ...VIDEO_CONSTRAINTS, deviceId: { exact: deviceId } }
-          : { ...VIDEO_CONSTRAINTS, facingMode: { ideal: 'environment' } },
+          ? { deviceId: { exact: deviceId } }
+          : { facingMode: { ideal: 'environment' } },
       });
       if (token !== this.openToken) {
         stream?.getTracks?.().forEach((track) => track.stop());
@@ -325,6 +463,7 @@ export class CardScannerComponent implements OnDestroy {
       }
       this.stream.set(stream);
       this.cameraError.set(null);
+      await this.applyTrackSettings();
       this.readTorchCapability();
       this.startLoop();
     } catch (error) {
@@ -384,7 +523,7 @@ export class CardScannerComponent implements OnDestroy {
     const grantedId = this.getStreamDeviceId();
     return (
       (grantedId && cameras.find((device) => device.deviceId === grantedId)) ||
-      cameras.find((device) => /back|rear|environment/i.test(device.label)) ||
+      cameras.find((device) => REAR_LABEL.test(device.label)) ||
       cameras[0]
     );
   }
