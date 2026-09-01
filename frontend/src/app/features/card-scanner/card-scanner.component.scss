@@ -4,39 +4,107 @@
   .mat-dialog-content {
     overflow: hidden;
     padding: 0;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 
-    &-scanner {
+    &-video {
       display: block;
       width: 100%;
       height: 100%;
+      // The camera aspect ratio rarely matches the dialog, and letterboxing
+      // wastes the width a wide 1D code needs most.
+      object-fit: cover;
+      background-color: #000;
     }
-    &-spinner {
-      width: auto;
-      height: auto;
+
+    // Shows where to hold the card. The decoders still read the whole frame,
+    // so a card framed loosely is read anyway: this guides the aim without
+    // punishing it.
+    &-viewfinder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+
+      &-frame {
+        position: relative;
+        width: min(82%, 24rem);
+        // ISO/IEC 7810 ID-1, the shape of the card being held up to it.
+        aspect-ratio: 1.586;
+        border-radius: 12px;
+        // Dims everything outside the frame without a second element.
+        box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.45);
+
+        // Corner marks, on opposite corners, enough to read the frame
+        // without drawing a box around the card itself.
+        &::before,
+        &::after {
+          content: '';
+          position: absolute;
+          width: 28px;
+          height: 28px;
+          border-color: #fff;
+          border-style: solid;
+        }
+        &::before {
+          top: -1px;
+          left: -1px;
+          border-width: 3px 0 0 3px;
+          border-top-left-radius: 12px;
+        }
+        &::after {
+          right: -1px;
+          bottom: -1px;
+          border-width: 0 3px 3px 0;
+          border-bottom-right-radius: 12px;
+        }
+      }
+    }
+
+    &-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    // Stands in for the camera when there is none. The picked photo route
+    // still works from here, so this is a detour rather than a dead end.
+    &-error {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 24px;
+      text-align: center;
+
+      &-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 48px;
+        color: var(--mat-sys-on-surface-variant);
+      }
+      &-title {
+        color: var(--mat-sys-on-surface);
+        font: var(--mat-sys-title-medium);
+      }
+      &-hint {
+        color: var(--mat-sys-on-surface-variant);
+        font: var(--mat-sys-body-medium);
+        max-width: 32rem;
+      }
     }
   }
 
   .mat-dialog-actions {
     @include mx.mat-dialog-actions;
-
-    &-scanner {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: flex-end;
-      width: 100%;
-      gap: 16px;
-
-      & > span {
-        color: var(--mat-sys-on-surface);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-    }
   }
 }

@@ -75,30 +75,18 @@
       "UPDATED_AT": "Updated at",
       "CODE_FORMAT_WARN": "The app now uses different names for code types. Save the card with the new code type.",
       "SCAN": {
-        "PERMISSION_ERROR": "Access to video device is denied or feature is not supported.",
         "SELECT_SOURCE": "Select source",
         "FROM_FILE": "Add from file",
-        "SCANNER": "Scanner",
-        "SCANNERS": {
-          "GENERAL": {
-            "TITLE": "General",
-            "0": "A 2D code is, for example, a QR or DataMatrix",
-            "1": "A 1D code is, for example, a regular barcode",
-            "2": "File scanning also uses the active scanner",
-            "3": "If nothing is read after a few seconds, the other scanner is tried"
-          },
-          "ZXING": {
-            "TITLE": "Zxing",
-            "0": "Supports scanning 2D codes",
-            "1": "Worse at scanning 1D codes"
-          },
-          "QUAGGA2": {
-            "TITLE": "Quagga2",
-            "0": "Does not support scanning 2D codes",
-            "1": "Better at scanning 1D codes",
-            "2": "Supports more 1D formats"
-          }
-        }
+        "FILE_NO_CODE": "No code found in this image.",
+        "TORCH": "Light",
+        "DENIED_TITLE": "Camera access is off",
+        "DENIED_HINT": "Allow the camera for this site in your browser settings, then try again. You can also add the card from a photo.",
+        "UNAVAILABLE_TITLE": "No camera available",
+        "UNAVAILABLE_HINT": "No camera was found, or another app is using it. You can add the card from a photo instead.",
+        "RETRY": "Try again",
+        "CAMERA": "Camera",
+        "CAMERA_BACK": "Back camera",
+        "CAMERA_FRONT": "Front camera"
       },
       "SUCCESS": {
         "SAVE": "Card saved",
