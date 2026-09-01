@@ -13,6 +13,18 @@
   }
 </mat-dialog-content>
 <mat-dialog-actions class="mat-dialog-actions">
+  @if (hasTorch()) {
+    <button
+      mat-icon-button
+      [attr.aria-label]="'CARDS.CARD.SCAN.TORCH' | translate"
+      [attr.aria-pressed]="isTorchOn()"
+      [matTooltip]="'CARDS.CARD.SCAN.TORCH' | translate"
+      (click)="toggleTorch()">
+      <mat-icon
+        >{{ isTorchOn() ? 'flashlight_on' : 'flashlight_off' }}</mat-icon
+      >
+    </button>
+  }
   <button
     mat-button
     [disabled]="!devices().length"

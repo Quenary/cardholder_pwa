@@ -60,11 +60,16 @@ const testMediaDevices: MediaDeviceInfo[] = [
 ];
 
 /** Stream stub reporting the camera the platform granted, and its stop calls. */
-const createStream = (deviceId?: string) => {
+const createStream = (deviceId?: string, torch = false) => {
   const track = {
     getSettings: () => ({ deviceId }),
+    getCapabilities: () => (torch ? { torch: true } : {}),
+    applyConstraints: vi.fn().mockResolvedValue(undefined),
     stop: vi.fn(),
-  } as unknown as MediaStreamTrack & { stop: ReturnType<typeof vi.fn> };
+  } as unknown as MediaStreamTrack & {
+    stop: ReturnType<typeof vi.fn>;
+    applyConstraints: ReturnType<typeof vi.fn>;
+  };
   const stream = {
     getVideoTracks: () => [track],
     getTracks: () => [track],
@@ -123,9 +128,9 @@ describe('CardScannerComponent', () => {
   });
 
   /** Serves a camera and a device list, then brings the component up. */
-  const create = async (deviceId?: string) => {
+  const create = async (deviceId?: string, torch = false) => {
     mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
-      createStream(deviceId).stream,
+      createStream(deviceId, torch).stream,
     );
     mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
       testMediaDevices,
@@ -301,6 +306,90 @@ describe('CardScannerComponent', () => {
       text: '67890',
       format: EBwipBcid.ean13,
     });
+  });
+
+  it('should offer no light when the camera reports none', async () => {
+    await create('backcamera2');
+
+    expect(component['hasTorch']()).toEqual(false);
+    expect(
+      fixture.nativeElement.querySelector(
+        'mat-dialog-actions button[mat-icon-button]',
+      ),
+    ).toBeFalsy();
+  });
+
+  it('should offer the light when the camera reports one', async () => {
+    await create('backcamera2', true);
+
+    expect(component['hasTorch']()).toEqual(true);
+    expect(
+      fixture.nativeElement.querySelector(
+        'mat-dialog-actions button[mat-icon-button]',
+      ),
+    ).toBeTruthy();
+  });
+
+  it('should switch the light on and back off', async () => {
+    const { stream, track } = createStream('backcamera2', true);
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(stream);
+    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+      testMediaDevices,
+    );
+    fixture = TestBed.createComponent(CardScannerComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+    await fixture.whenStable();
+    TestBed.tick();
+
+    await component['toggleTorch']();
+    expect(track.applyConstraints).toHaveBeenCalledWith({
+      advanced: [{ torch: true }],
+    });
+    expect(component['isTorchOn']()).toEqual(true);
+
+    await component['toggleTorch']();
+    expect(track.applyConstraints).toHaveBeenLastCalledWith({
+      advanced: [{ torch: false }],
+    });
+    expect(component['isTorchOn']()).toEqual(false);
+  });
+
+  it('should withdraw the light when the camera refuses it', async () => {
+    const { stream, track } = createStream('backcamera2', true);
+    track.applyConstraints.mockRejectedValue(new Error('unsupported'));
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(stream);
+    mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+      testMediaDevices,
+    );
+    fixture = TestBed.createComponent(CardScannerComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+    await fixture.whenStable();
+    TestBed.tick();
+
+    await component['toggleTorch']();
+
+    expect(component['hasTorch']()).toEqual(false);
+    expect(component['isTorchOn']()).toEqual(false);
+  });
+
+  it('should read the light again when another camera is picked', async () => {
+    await create('backcamera2', true);
+    expect(component['hasTorch']()).toEqual(true);
+
+    matBottomSheetMock.open.mockReturnValue({
+      afterDismissed: () => of({ device: testMediaDevices[0] }),
+    } as never);
+    // Front cameras rarely have a lamp.
+    mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
+      createStream('frontcamera1', false).stream,
+    );
+
+    component['onClickSelectDevice']();
+    await fixture.whenStable();
+
+    expect(component['hasTorch']()).toEqual(false);
   });
 
   it('should release the camera when the dialog is destroyed', async () => {

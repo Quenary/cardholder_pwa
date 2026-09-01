@@ -78,7 +78,8 @@
         "PERMISSION_ERROR": "Access to video device is denied or feature is not supported.",
         "SELECT_SOURCE": "Select source",
         "FROM_FILE": "Add from file",
-        "FILE_NO_CODE": "No code found in this image."
+        "FILE_NO_CODE": "No code found in this image.",
+        "TORCH": "Light"
       },
       "SUCCESS": {
         "SAVE": "Card saved",
