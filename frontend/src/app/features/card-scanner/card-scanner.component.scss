@@ -74,6 +74,34 @@
       justify-content: center;
       background-color: rgba(0, 0, 0, 0.4);
     }
+
+    // Stands in for the camera when there is none. The picked photo route
+    // still works from here, so this is a detour rather than a dead end.
+    &-error {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 24px;
+      text-align: center;
+
+      &-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 48px;
+        color: var(--mat-sys-on-surface-variant);
+      }
+      &-title {
+        color: var(--mat-sys-on-surface);
+        font: var(--mat-sys-title-medium);
+      }
+      &-hint {
+        color: var(--mat-sys-on-surface-variant);
+        font: var(--mat-sys-body-medium);
+        max-width: 32rem;
+      }
+    }
   }
 
   .mat-dialog-actions {
