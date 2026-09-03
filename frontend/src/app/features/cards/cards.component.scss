@@ -18,6 +18,22 @@
       flex: 1;
     }
   }
+
+  .cards-section-divider {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface);
+    margin: 24px 0 8px 0;
+
+    mat-icon {
+      color: var(--mat-sys-primary);
+    }
+  }
+
   .cards-list {
     @include mx.flex-container;
 
@@ -52,36 +68,6 @@
           & > * {
             color: var(--mat-sys-primary);
           }
-        }
-      }
-
-      &-preview {
-        padding: 8px 16px 16px 16px;
-        width: 100%;
-        flex: 1;
-        align-self: center;
-      }
-
-      &-logo {
-        margin: 0 16px 16px 16px;
-        padding: 12px;
-        flex: 1;
-        min-height: 0;
-        align-self: stretch;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
-        // Almost every brand logo is drawn for a white background, so it gets
-        // its own light panel instead of sitting straight on the surface,
-        // where dark wordmarks would disappear in the dark theme.
-        background-color: #fff;
-
-        img {
-          max-width: 100%;
-          max-height: 100%;
-          // Logos come in every shape: contain keeps them undistorted.
-          object-fit: contain;
         }
       }
     }

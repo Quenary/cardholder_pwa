@@ -9,6 +9,7 @@ from starlette.concurrency import run_in_threadpool
 from backend.config import Config
 from backend.core.auth_core import is_user
 from backend.db.models.card_model import CardModel
+from backend.db.models.card_share_model import CardShareModel
 from backend.db.models.user_model import UserModel
 from backend.db.session import get_async_session
 from backend.helpers.logo_storage import (
@@ -44,16 +45,7 @@ async def get_card(
     session: AsyncSession = Depends(get_async_session),
     user: UserModel = Depends(is_user),
 ):
-    stmt = (
-        select(CardModel)
-        .where(CardModel.id == card_id, CardModel.user_id == user.id)
-        .limit(1)
-    )
-    result = await session.execute(stmt)
-    card = result.scalar_one_or_none()
-    if not card:
-        raise HTTPException(status_code=404, detail="Card not found")
-    return card
+    return await _get_accessible_card(card_id, session, user)
 
 
 @router.post("/cards", response_model=CardSchema, status_code=201)
@@ -162,6 +154,27 @@ async def _get_own_card(
     return card
 
 
+async def _get_accessible_card(
+    card_id: int, session: AsyncSession, user: UserModel
+) -> CardModel:
+    """Fetch a card owned by or shared with the caller, or raise 404."""
+    stmt = (
+        select(CardModel)
+        .outerjoin(CardShareModel, CardShareModel.card_id == CardModel.id)
+        .where(
+            CardModel.id == card_id,
+            (CardModel.user_id == user.id)
+            | (CardShareModel.shared_with_user_id == user.id),
+        )
+        .limit(1)
+    )
+    result = await session.execute(stmt)
+    card = result.scalar_one_or_none()
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found")
+    return card
+
+
 async def _read_capped(file: UploadFile) -> bytes:
     """Read an upload, giving up as soon as it exceeds the allowed size.
 
@@ -222,8 +235,8 @@ async def get_card_logo(
     session: AsyncSession = Depends(get_async_session),
     user: UserModel = Depends(is_user),
 ):
-    """Serve the logo of a card owned by the caller."""
-    card = await _get_own_card(card_id, session, user)
+    """Serve the logo of a card owned by or shared with the caller."""
+    card = await _get_accessible_card(card_id, session, user)
     path = logo_path(card.logo_file) if card.logo_file else None
     if not path:
         raise HTTPException(status_code=404, detail="Card has no logo")

@@ -20,6 +20,7 @@ It's powered by free providers and can be suspended, which will lead to a long i
 
 - PWA - you can install it on device from browser and use even offline (read-only)
 - Multi-user support with owner, admin, and member roles
+- Card sharing between users (share one card or all cards at once)
 - Password recovery by email (when SMTP is configured)
 - Easy to self-host
 - Open-source
@@ -82,6 +83,10 @@ docker-compose -f <filename> up -d
   - Change some app settings from the UI
   - Delete members accounts
 
+### Shared cards
+
+See [docs/SHARED_CARDS.md](/docs/SHARED_CARDS.md).
+
 ### Contributing
 
 See [docs/CONTRIBUTING.md](/docs/CONTRIBUTING.md).
@@ -89,3 +94,4 @@ See [docs/CONTRIBUTING.md](/docs/CONTRIBUTING.md).
 ### Security
 
 See [docs/SECURITY.md](/docs/SECURITY.md).
+

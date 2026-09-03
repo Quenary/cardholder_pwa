@@ -79,42 +79,49 @@
               }
             </section>
           </section>
-          @if (card.has_logo) {
-            <!--
-              The logo replaces the code preview: the card is recognisable at a
-              glance and the codes are no longer all laid out on one screen.
-              Tapping it opens the code full size, exactly as tapping the
-              preview did, because that is what the card is opened for.
-              Propagation is stopped so the surrounding routerLink does not
-              also navigate to the card screen.
-            -->
-            <div
-              class="cards-list-item-logo"
-              role="button"
-              tabindex="0"
-              [attr.aria-label]="card.name"
-              (click)="$event.stopPropagation(); showCode(card)"
-              (keydown.enter)="$event.stopPropagation(); showCode(card)"
-              (keydown.space)="$event.preventDefault(); $event.stopPropagation(); showCode(card)">
-              @if (card | cardLogo | async; as logo) {
-                <img
-                  [src]="logo"
-                  [alt]="card.name" />
-              }
-            </div>
-          } @else if (card | isValidCard) {
-            @defer {
-              <app-card-code-viewer
-                class="cards-list-item-preview"
-                [style.background]="card.color"
-                [color]="card.color | getOnColor"
-                [card]="card"
-                (click)="$event.stopPropagation(); updateUsedDate(card);">
-              </app-card-code-viewer>
-            }
-          }
+          <app-card-preview
+            class="cards-list-item-preview"
+            [card]="card"
+            [interactive]="true"
+            (previewClick)="updateUsedDate(card)">
+          </app-card-preview>
         </div>
       }
     }
   </section>
+
+  @if (!isLoading() && filteredSharedCards().length > 0) {
+    <div class="cards-section-divider">
+      <mat-icon>group</mat-icon>
+      <span>{{ 'CARDS.SHARED_WITH_YOU' | translate }}</span>
+    </div>
+
+    <section class="cards-list">
+      @for (item of filteredSharedCards(); track item.card.id) {
+        <div
+          class="cards-list-item shared-card"
+          matRipple
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="item.card.name"
+          (click)="showSharedCardCode(item.card)"
+          (keydown.enter)="showSharedCardCode(item.card)"
+          (keydown.space)="$event.preventDefault(); showSharedCardCode(item.card)">
+          <section class="cards-list-item-header">
+            <span class="cards-list-item-header-text">
+              {{ item.card.name }}
+            </span>
+            <section class="cards-list-item-header-icons">
+              <mat-icon class="accent-color"> group </mat-icon>
+            </section>
+          </section>
+          <app-card-preview
+            class="cards-list-item-preview"
+            [card]="item.card"
+            [interactive]="false">
+          </app-card-preview>
+        </div>
+      }
+    </section>
+  }
 }

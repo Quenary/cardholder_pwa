@@ -17,8 +17,12 @@ multi-tenant SaaS. Please read this page before opening a security advisory.
     registered account after a fresh deploy becomes owner; that role cannot be
     reassigned in the UI
 - A user's loyalty cards (barcodes, numbers, logos) are **private to that
-  user**. Owner and admin must not read another user's cards through the API.
-  Deleting an account (and its cards) is an intended admin/owner action.
+  user** by default, unless explicitly shared with specific accounts via the
+  shared cards feature. Even when shared:
+  - Recipients receive **read-only** access (barcode and logo); they cannot
+    modify, delete, or re-share the card.
+  - Owner and admin roles do not grant access to another user's unshared cards.
+  - Deleting an account (and its cards) is an intended admin/owner action.
 - Registration can be turned off in settings. Password recovery depends on
   SMTP; without it, that path is simply unavailable.
 
@@ -30,7 +34,8 @@ Cross-user isolation and privilege boundaries **are** security boundaries here.
 - Unauthenticated access to cards, accounts, or privileged API
 - Authentication / authorization bypass
 - Privilege escalation (member → admin/owner, admin → owner)
-- One user reading or changing another user's cards
+- One user reading another user's unshared cards, or modifying/deleting any card
+  they do not own
 - Secret leakage to unauthenticated callers (tokens, recovery codes, SMTP
   credentials, JWT secret)
 - Password-recovery flaws that let an attacker reset someone else's password
@@ -80,6 +85,13 @@ database stay valid. Set a stable secret in production.
 Uploaded logos are size-capped, SVG is rasterised in a child process with a
 timeout, and the result is re-encoded to WebP before it is stored. The original
 bytes are never served back.
+
+### Shared cards
+
+Card sharing allows granting read-only access to specific user accounts. Only
+the card owner can grant, modify, or revoke sharing rules. Recipients can remove
+a shared card from their own view at any time, but cannot alter the underlying
+card or its sharing permissions.
 
 ## Severity
 

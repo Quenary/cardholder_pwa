@@ -10,6 +10,7 @@ from backend.api import (
     admin_router,
     auth_router,
     card_router,
+    card_share_router,
     password_recovery_router,
     public_router,
     user_router,
@@ -62,6 +63,7 @@ async def log_request_validation_error(request: Request, exc: RequestValidationE
 
 app.include_router(auth_router)
 app.include_router(user_router)
+app.include_router(card_share_router)
 app.include_router(card_router)
 app.include_router(password_recovery_router)
 app.include_router(public_router)

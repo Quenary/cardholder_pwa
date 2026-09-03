@@ -24,14 +24,8 @@ import {
 } from 'src/app/entities/cards/state/cards.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatFabButton } from '@angular/material/button';
-import {
-  CardCodeViewerComponent,
-  CardCodeViewerDialogComponent,
-} from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
-import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
-import { CardLogoPipe } from 'src/app/shared/pipes/card-logo.pipe';
-import { AsyncPipe } from '@angular/common';
-import { GetOnColorPipe } from 'src/app/shared/pipes/get-on-color.pipe';
+import { CardCodeViewerDialogComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
+import { CardPreviewComponent } from 'src/app/shared/components/card-preview/card-preview.component';
 import { IsOldCodeType } from 'src/app/shared/pipes/is-old-code-type.pipe';
 import { MatDialog } from '@angular/material/dialog';
 import {
@@ -43,6 +37,8 @@ import { ECardFieldType, ICard } from 'src/app/entities/cards/cards-interface';
 import { Filter, Sorting } from 'src/app/shared/types';
 import { ELocalStorageKey } from 'src/app/app.consts';
 import { MatBadgeModule } from '@angular/material/badge';
+import { CardShareApiService } from '../shared-cards/services/card-share-api.service';
+import { ISharedWithMeItem } from '../shared-cards/shared-cards.interface';
 
 @Component({
   selector: 'app-cards',
@@ -60,14 +56,10 @@ import { MatBadgeModule } from '@angular/material/badge';
     ReactiveFormsModule,
     MatRipple,
     MatFabButton,
-    CardCodeViewerComponent,
-    IsValidCardPipe,
+    CardPreviewComponent,
     RouterLink,
-    GetOnColorPipe,
     IsOldCodeType,
     MatBadgeModule,
-    CardLogoPipe,
-    AsyncPipe,
   ],
   templateUrl: './cards.component.html',
   styleUrl: './cards.component.scss',
@@ -75,9 +67,11 @@ import { MatBadgeModule } from '@angular/material/badge';
 export class CardsComponent {
   private readonly store = inject(Store);
   private readonly matDialog = inject(MatDialog);
+  private readonly cardShareApiService = inject(CardShareApiService);
 
   protected readonly showParent = signal<boolean>(true);
   protected readonly cardsPlaceholder: number[] = Array(6).fill(Math.random());
+  protected readonly sharedCards = signal<ISharedWithMeItem[]>([]);
   protected readonly isLoading = this.store.selectSignal(selectCardsIsLoading);
   /**
    * Form control for search field
@@ -114,9 +108,52 @@ export class CardsComponent {
   /**
    * Filtered autocomplete list
    */
-  protected readonly autocompleteOptions = computed(() =>
-    this.cards().map((item) => item.name),
-  );
+  protected readonly autocompleteOptions = computed(() => [
+    ...this.cards().map((item) => item.name),
+    ...this.filteredSharedCards().map((item) => item.card.name),
+  ]);
+
+  /**
+   * Filtered cards shared with current user
+   */
+  protected readonly filteredSharedCards = computed(() => {
+    let items = this.sharedCards();
+    let search = this._search();
+    const sorting = this._sorting();
+    const filters = this._filters();
+    items = [...items];
+
+    if (search) {
+      search = search.toLowerCase();
+      items = items.filter(
+        (item) =>
+          item.card.name.toLowerCase().includes(search) ||
+          item.owner.username.toLowerCase().includes(search),
+      );
+    }
+
+    for (const f of filters ?? []) {
+      items = items.filter((item) => {
+        const filtered = Filter.filterBy([item.card], f, ECardFieldType[f.key]);
+        return filtered.length > 0;
+      });
+    }
+
+    if (sorting) {
+      const sortedCards = Sorting.sortBy(
+        items.map((i) => i.card),
+        sorting,
+        ECardFieldType[sorting.key],
+      );
+      const cardOrder = new Map(sortedCards.map((c, idx) => [c.id, idx]));
+      items.sort(
+        (a, b) =>
+          (cardOrder.get(a.card.id) ?? 0) - (cardOrder.get(b.card.id) ?? 0),
+      );
+    }
+
+    return items;
+  });
 
   /**
    * All cards
@@ -143,6 +180,9 @@ export class CardsComponent {
       const showParent = this.showParent();
       if (showParent) {
         this.store.dispatch(CardsActions.list());
+        this.cardShareApiService.getCardsSharedWithMe().subscribe({
+          next: (items) => this.sharedCards.set(items),
+        });
       }
     });
   }
@@ -175,6 +215,20 @@ export class CardsComponent {
       height: 'calc(100% - 50px)',
       // `color` is left out on purpose: the dialog component defaults it to the
       // current theme colour, same as the preview does.
+      data: {
+        card,
+        scale: 6,
+      },
+    });
+  }
+
+  /**
+   * Opens code viewer for shared card without updating used_at.
+   */
+  protected showSharedCardCode(card: ICard): void {
+    this.matDialog.open(CardCodeViewerDialogComponent, {
+      width: 'calc(100% - 50px)',
+      height: 'calc(100% - 50px)',
       data: {
         card,
         scale: 6,

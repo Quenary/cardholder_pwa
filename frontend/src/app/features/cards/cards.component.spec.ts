@@ -9,6 +9,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
 import { CardCodeViewerDialogComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
+import { CardShareApiService } from '../shared-cards/services/card-share-api.service';
+import { of } from 'rxjs';
 
 describe('CardsComponent', () => {
   let component: CardsComponent;
@@ -25,6 +27,12 @@ describe('CardsComponent', () => {
         provideMockStore({ initialState }),
         provideRouter([]),
         provideTranslateService(),
+        {
+          provide: CardShareApiService,
+          useValue: {
+            getCardsSharedWithMe: () => of([]),
+          },
+        },
       ],
       imports: [CardsComponent],
     }).compileComponents();

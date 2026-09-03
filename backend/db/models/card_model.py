@@ -9,6 +9,7 @@ from backend.helpers.now import now
 from .base_model import BaseModel
 
 if TYPE_CHECKING:
+    from .card_share_model import CardShareModel
     from .user_model import UserModel
 
 
@@ -45,3 +46,6 @@ class CardModel(BaseModel):
     )
 
     user: Mapped["UserModel"] = relationship("UserModel", back_populates="cards")
+    shares: Mapped[list["CardShareModel"]] = relationship(
+        "CardShareModel", back_populates="card", cascade="all, delete-orphan"
+    )

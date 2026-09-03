@@ -1,0 +1,95 @@
+<h2 mat-dialog-title>
+  @if (data.mode === 'ADD_SINGLE') {
+    {{ 'SHARED_CARDS.DIALOG.TITLE_ADD' | translate }}
+  } @else if (data.mode === 'EDIT_SINGLE') {
+    {{ 'SHARED_CARDS.DIALOG.TITLE_EDIT' | translate }}
+  } @else {
+    {{ 'SHARED_CARDS.DIALOG.TITLE_SHARE_ALL' | translate }}
+  }
+</h2>
+
+<mat-dialog-content
+  [formGroup]="form"
+  class="share-dialog-content">
+  @if (data.mode === 'ADD_SINGLE') {
+    <mat-form-field
+      appearance="outline"
+      class="full-width">
+      <mat-label>{{ 'SHARED_CARDS.DIALOG.SELECT_CARD' | translate }}</mat-label>
+      <mat-select formControlName="cardId">
+        @for (card of data.availableCards ?? []; track card.id) {
+          <mat-option [value]="card.id">
+            {{ card.name }}
+          </mat-option>
+        }
+      </mat-select>
+      @if (
+        form.controls.cardId.touched && form.controls.cardId.hasError('required')
+      ) {
+        <mat-error
+          >{{ 'SHARED_CARDS.DIALOG.CARD_REQUIRED' | translate }}</mat-error
+        >
+      }
+    </mat-form-field>
+  } @else if (data.mode === 'EDIT_SINGLE' && data.card) {
+    <div class="selected-card-banner">
+      <mat-icon>credit_card</mat-icon>
+      <span class="card-name">{{ data.card.name }}</span>
+    </div>
+  } @else if (data.mode === 'SHARE_ALL') {
+    <div class="share-all-hint">
+      <mat-icon class="hint-icon">info</mat-icon>
+      <span>{{ 'SHARED_CARDS.DIALOG.SHARE_ALL_HINT' | translate }}</span>
+    </div>
+  }
+
+  @if (isLoadingUsers()) {
+    <div class="spinner-container">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else if (availableUsers().length === 0) {
+    <p
+      class="no-users-message"
+      >{{ 'SHARED_CARDS.DIALOG.NO_USERS' | translate }}</p
+    >
+  } @else {
+    <mat-form-field
+      appearance="outline"
+      class="full-width">
+      <mat-label
+        >{{ 'SHARED_CARDS.DIALOG.SELECT_USERS' | translate }}</mat-label
+      >
+      <mat-select
+        formControlName="userIds"
+        multiple>
+        @for (user of availableUsers(); track user.id) {
+          <mat-option [value]="user.id">
+            {{ user.username }}
+          </mat-option>
+        }
+      </mat-select>
+      @if (
+        form.controls.userIds.touched && form.controls.userIds.hasError('required')
+      ) {
+        <mat-error
+          >{{ 'SHARED_CARDS.DIALOG.USERS_REQUIRED' | translate }}</mat-error
+        >
+      }
+    </mat-form-field>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button
+    mat-button
+    (click)="cancel()">
+    {{ 'GENERAL.CANCEL' | translate }}
+  </button>
+  <button
+    mat-flat-button
+    class="accent-color"
+    [disabled]="form.invalid || isLoadingUsers() || availableUsers().length === 0"
+    (click)="submit()">
+    {{ 'GENERAL.SAVE' | translate }}
+  </button>
+</mat-dialog-actions>
