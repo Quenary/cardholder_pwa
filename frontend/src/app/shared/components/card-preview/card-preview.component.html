@@ -1,0 +1,25 @@
+@if (card()?.has_logo) {
+  <div class="card-preview-logo">
+    @if (card() | cardLogo | async; as logo) {
+      <img
+        [src]="logo"
+        [alt]="card()?.name ?? ''" />
+    }
+  </div>
+} @else if (card() | isValidCard) {
+  <app-card-code-viewer
+    class="card-preview-barcode"
+    [style.background]="card()?.color"
+    [color]="(card()?.color | getOnColor) ?? undefined"
+    [card]="card()"
+    [scale]="scale()">
+  </app-card-code-viewer>
+} @else {
+  <div
+    class="card-preview-fallback"
+    [style.background]="card()?.color || 'var(--mat-sys-surface-variant)'">
+    <mat-icon [style.color]="(card()?.color | getOnColor) || '#fff'"
+      >credit_card</mat-icon
+    >
+  </div>
+}

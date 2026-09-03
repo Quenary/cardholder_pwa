@@ -1,4 +1,3 @@
-import { AsyncPipe } from '@angular/common';
 import { Component, computed, inject, resource, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
@@ -9,10 +8,6 @@ import { MatRippleModule } from '@angular/material/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { finalize, firstValueFrom } from 'rxjs';
 import { CardApiService } from 'src/app/entities/cards/cards-api.service';
-import { CardCodeViewerComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
-import { CardLogoPipe } from 'src/app/shared/pipes/card-logo.pipe';
-import { GetOnColorPipe } from 'src/app/shared/pipes/get-on-color.pipe';
-import { IsValidCardPipe } from 'src/app/shared/pipes/is-valid-card.pipe';
 import { CardShareApiService } from './services/card-share-api.service';
 import {
   IShareCardDialogData,
@@ -24,6 +19,7 @@ import {
   ConfirmDialogComponent,
   IConfirmDialogData,
 } from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
+import { CardPreviewComponent } from 'src/app/shared/components/card-preview/card-preview.component';
 
 @Component({
   selector: 'app-shared-cards',
@@ -34,11 +30,7 @@ import {
     MatProgressSpinnerModule,
     MatRippleModule,
     TranslatePipe,
-    CardCodeViewerComponent,
-    CardLogoPipe,
-    GetOnColorPipe,
-    IsValidCardPipe,
-    AsyncPipe,
+    CardPreviewComponent,
   ],
   templateUrl: './shared-cards.component.html',
   styleUrl: './shared-cards.component.scss',

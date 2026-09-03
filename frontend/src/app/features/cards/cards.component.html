@@ -79,40 +79,12 @@
               }
             </section>
           </section>
-          @if (card.has_logo) {
-            <!--
-              The logo replaces the code preview: the card is recognisable at a
-              glance and the codes are no longer all laid out on one screen.
-              Tapping it opens the code full size, exactly as tapping the
-              preview did, because that is what the card is opened for.
-              Propagation is stopped so the surrounding routerLink does not
-              also navigate to the card screen.
-            -->
-            <div
-              class="cards-list-item-logo"
-              role="button"
-              tabindex="0"
-              [attr.aria-label]="card.name"
-              (click)="$event.stopPropagation(); showCode(card)"
-              (keydown.enter)="$event.stopPropagation(); showCode(card)"
-              (keydown.space)="$event.preventDefault(); $event.stopPropagation(); showCode(card)">
-              @if (card | cardLogo | async; as logo) {
-                <img
-                  [src]="logo"
-                  [alt]="card.name" />
-              }
-            </div>
-          } @else if (card | isValidCard) {
-            @defer {
-              <app-card-code-viewer
-                class="cards-list-item-preview"
-                [style.background]="card.color"
-                [color]="card.color | getOnColor"
-                [card]="card"
-                (click)="$event.stopPropagation(); updateUsedDate(card);">
-              </app-card-code-viewer>
-            }
-          }
+          <app-card-preview
+            class="cards-list-item-preview"
+            [card]="card"
+            [interactive]="true"
+            (previewClick)="updateUsedDate(card)">
+          </app-card-preview>
         </div>
       }
     }
@@ -143,24 +115,11 @@
               <mat-icon class="accent-color"> group </mat-icon>
             </section>
           </section>
-          @if (item.card.has_logo) {
-            <div class="cards-list-item-logo">
-              @if (item.card | cardLogo | async; as logo) {
-                <img
-                  [src]="logo"
-                  [alt]="item.card.name" />
-              }
-            </div>
-          } @else if (item.card | isValidCard) {
-            @defer {
-              <app-card-code-viewer
-                class="cards-list-item-preview"
-                [style.background]="item.card.color"
-                [color]="item.card.color | getOnColor"
-                [card]="item.card">
-              </app-card-code-viewer>
-            }
-          }
+          <app-card-preview
+            class="cards-list-item-preview"
+            [card]="item.card"
+            [interactive]="false">
+          </app-card-preview>
         </div>
       }
     </section>
