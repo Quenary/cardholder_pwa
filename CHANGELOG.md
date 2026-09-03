@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v1.12.0 (2026-09-03)
+
+### Features
+
+- Implement card sharing functionality
+  ([`846d930`](https://github.com/Quenary/cardholder_pwa/commit/846d930850a4dfb7f0adedd8f75ade0c10a4bc9f))
+
+
 ## v1.11.0 (2026-09-01)
 
 ### Bug Fixes
