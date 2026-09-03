@@ -66,6 +66,11 @@ export class AppComponent {
         link: '/cards',
       },
       {
+        name: navTranslations.SHARED_CARDS,
+        icon: 'group',
+        link: '/cards/shared',
+      },
+      {
         name: navTranslations.USER,
         icon: 'person_outlined',
         link: '/user',

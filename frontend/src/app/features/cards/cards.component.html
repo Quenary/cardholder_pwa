@@ -117,4 +117,52 @@
       }
     }
   </section>
+
+  @if (!isLoading() && filteredSharedCards().length > 0) {
+    <div class="cards-section-divider">
+      <mat-icon>group</mat-icon>
+      <span>{{ 'CARDS.SHARED_WITH_YOU' | translate }}</span>
+    </div>
+
+    <section class="cards-list">
+      @for (item of filteredSharedCards(); track item.card.id) {
+        <div
+          class="cards-list-item shared-card"
+          matRipple
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="item.card.name"
+          (click)="showSharedCardCode(item.card)"
+          (keydown.enter)="showSharedCardCode(item.card)"
+          (keydown.space)="$event.preventDefault(); showSharedCardCode(item.card)">
+          <section class="cards-list-item-header">
+            <span class="cards-list-item-header-text">
+              {{ item.card.name }}
+            </span>
+            <section class="cards-list-item-header-icons">
+              <mat-icon class="accent-color"> group </mat-icon>
+            </section>
+          </section>
+          @if (item.card.has_logo) {
+            <div class="cards-list-item-logo">
+              @if (item.card | cardLogo | async; as logo) {
+                <img
+                  [src]="logo"
+                  [alt]="item.card.name" />
+              }
+            </div>
+          } @else if (item.card | isValidCard) {
+            @defer {
+              <app-card-code-viewer
+                class="cards-list-item-preview"
+                [style.background]="item.card.color"
+                [color]="item.card.color | getOnColor"
+                [card]="item.card">
+              </app-card-code-viewer>
+            }
+          }
+        </div>
+      }
+    </section>
+  }
 }

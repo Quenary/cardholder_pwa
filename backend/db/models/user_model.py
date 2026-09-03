@@ -20,6 +20,7 @@ from .base_model import BaseModel
 
 if TYPE_CHECKING:
     from .card_model import CardModel
+    from .card_share_model import CardShareModel
     from .password_recovery_code_model import (
         PasswordRecoveryCodeModel,
     )
@@ -68,4 +69,16 @@ class UserModel(BaseModel):
     )
     role: Mapped["UserRoleModel"] = relationship(
         "UserRoleModel", back_populates="users"
+    )
+    shared_cards: Mapped[list["CardShareModel"]] = relationship(
+        "CardShareModel",
+        foreign_keys="[CardShareModel.owner_id]",
+        back_populates="owner",
+        cascade="all, delete-orphan",
+    )
+    cards_shared_with_me: Mapped[list["CardShareModel"]] = relationship(
+        "CardShareModel",
+        foreign_keys="[CardShareModel.shared_with_user_id]",
+        back_populates="shared_with_user",
+        cascade="all, delete-orphan",
     )

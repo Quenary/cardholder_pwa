@@ -1,0 +1,165 @@
+<section class="shared-cards-container">
+  <div class="shared-cards-header">
+    <button
+      mat-flat-button
+      (click)="openShareSingleDialog()">
+      <mat-icon>share</mat-icon>
+      <span>{{ 'SHARED_CARDS.ACTION_SHARE_SINGLE' | translate }}</span>
+    </button>
+
+    <button
+      mat-flat-button
+      class="accent-color"
+      (click)="openShareAllDialog()">
+      <mat-icon>group_add</mat-icon>
+      <span>{{ 'SHARED_CARDS.ACTION_SHARE_ALL' | translate }}</span>
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <!-- SECTION: YOU SHARE -->
+    <div class="shared-cards-section">
+      <h3 class="section-title">
+        <mat-icon>arrow_upward</mat-icon>
+        <span>{{ 'SHARED_CARDS.SECTION_YOU_SHARE' | translate }}</span>
+        <span class="count-badge">({{ youShare().length }})</span>
+      </h3>
+
+      @if (youShare().length === 0) {
+        <div class="empty-state">
+          <span>{{ 'SHARED_CARDS.EMPTY_YOU_SHARE' | translate }}</span>
+        </div>
+      } @else {
+        <div class="shared-cards-list">
+          @for (item of youShare(); track item.card.id) {
+            <div class="shared-card-item">
+              <div class="mini-preview-container">
+                @if (item.card.has_logo) {
+                  <div class="mini-logo">
+                    @if (item.card | cardLogo | async; as logo) {
+                      <img
+                        [src]="logo"
+                        [alt]="item.card.name" />
+                    }
+                  </div>
+                } @else if (item.card | isValidCard) {
+                  <app-card-code-viewer
+                    class="mini-barcode"
+                    [style.background]="item.card.color"
+                    [color]="item.card.color | getOnColor"
+                    [card]="item.card">
+                  </app-card-code-viewer>
+                } @else {
+                  <div
+                    class="mini-color-fallback"
+                    [style.background]="item.card.color">
+                    <mat-icon>credit_card</mat-icon>
+                  </div>
+                }
+              </div>
+
+              <div class="card-info">
+                <span class="card-name">{{ item.card.name }}</span>
+                <div class="users-chips">
+                  @for (user of item.shared_with_users; track user.id) {
+                    <span class="user-chip">
+                      <mat-icon class="user-icon">person</mat-icon>
+                      {{ user.username }}
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <div class="card-actions">
+                <button
+                  mat-icon-button
+                  [attr.aria-label]="'GENERAL.EDIT' | translate"
+                  (click)="openEditShareDialog(item)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  class="delete-btn"
+                  [attr.aria-label]="'GENERAL.DELETE' | translate"
+                  (click)="deleteOwnShare(item)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- SECTION: SHARED WITH YOU -->
+    <div class="shared-cards-section">
+      <h3 class="section-title">
+        <mat-icon>arrow_downward</mat-icon>
+        <span>{{ 'SHARED_CARDS.SECTION_SHARED_WITH_YOU' | translate }}</span>
+        <span class="count-badge">({{ sharedWithYou().length }})</span>
+      </h3>
+
+      @if (sharedWithYou().length === 0) {
+        <div class="empty-state">
+          <span>{{ 'SHARED_CARDS.EMPTY_SHARED_WITH_YOU' | translate }}</span>
+        </div>
+      } @else {
+        <div class="shared-cards-list">
+          @for (item of sharedWithYou(); track item.card.id) {
+            <div class="shared-card-item">
+              <div class="mini-preview-container">
+                @if (item.card.has_logo) {
+                  <div class="mini-logo">
+                    @if (item.card | cardLogo | async; as logo) {
+                      <img
+                        [src]="logo"
+                        [alt]="item.card.name" />
+                    }
+                  </div>
+                } @else if (item.card | isValidCard) {
+                  <app-card-code-viewer
+                    class="mini-barcode"
+                    [style.background]="item.card.color"
+                    [color]="item.card.color | getOnColor"
+                    [card]="item.card">
+                  </app-card-code-viewer>
+                } @else {
+                  <div
+                    class="mini-color-fallback"
+                    [style.background]="item.card.color">
+                    <mat-icon>credit_card</mat-icon>
+                  </div>
+                }
+              </div>
+
+              <div class="card-info">
+                <span class="card-name">{{ item.card.name }}</span>
+                <div class="owner-info">
+                  <mat-icon class="owner-icon">person_outline</mat-icon>
+                  <span class="owner-text">
+                    {{ 'SHARED_CARDS.SHARED_BY' | translate }}:
+                    <strong>{{ item.owner.username }}</strong>
+                  </span>
+                </div>
+              </div>
+
+              <div class="card-actions">
+                <button
+                  mat-icon-button
+                  class="delete-btn"
+                  [attr.aria-label]="'GENERAL.DELETE' | translate"
+                  (click)="deleteSharedWithMe(item)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</section>

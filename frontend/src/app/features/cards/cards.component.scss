@@ -18,6 +18,22 @@
       flex: 1;
     }
   }
+
+  .cards-section-divider {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface);
+    margin: 24px 0 8px 0;
+
+    mat-icon {
+      color: var(--mat-sys-primary);
+    }
+  }
+
   .cards-list {
     @include mx.flex-container;
 

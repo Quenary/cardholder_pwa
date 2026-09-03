@@ -60,6 +60,15 @@ export const routes: Routes = [
   },
   // AUTHORIZED
   {
+    path: 'cards/shared',
+    canActivate: [authGuard, isOnlineGuard],
+    title: titleTranslate('NAV.SHARED_CARDS'),
+    loadComponent: () =>
+      import('./features/shared-cards/shared-cards.component').then(
+        (c) => c.SharedCardsComponent,
+      ),
+  },
+  {
     path: 'cards',
     canActivate: [authGuard],
     title: titleTranslate('NAV.CARD'),

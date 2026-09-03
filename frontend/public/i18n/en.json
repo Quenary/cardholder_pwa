@@ -24,6 +24,7 @@
     "REGISTER": "Registration",
     "PASSWORD_RECOVERY": "Password recovery",
     "CARD": "Cards",
+    "SHARED_CARDS": "Shared Cards",
     "USER": "User",
     "ADMIN": "Admin panel",
     "ABOUT": "About",
@@ -95,7 +96,8 @@
     },
     "VIEWER": {
       "INVERT": "Invert colors"
-    }
+    },
+    "SHARED_WITH_YOU": "Shared with you"
   },
   "USER": {
     "USERNAME": "Username",
@@ -183,6 +185,35 @@
       "LESS": "Less than",
       "GREATER_OR_EQUALS": "Greater or equal",
       "LESS_OR_EQUALS": "Less or equal"
+    }
+  },
+  "SHARED_CARDS": {
+    "TITLE": "Shared Cards",
+    "ACTION_SHARE_SINGLE": "Share",
+    "ACTION_SHARE_ALL": "Share all cards",
+    "SECTION_YOU_SHARE": "You share",
+    "SECTION_SHARED_WITH_YOU": "Shared with you",
+    "EMPTY_YOU_SHARE": "You have not shared any cards yet",
+    "EMPTY_SHARED_WITH_YOU": "No cards shared with you yet",
+    "SHARED_BY": "Shared by",
+    "DIALOG": {
+      "TITLE_ADD": "Share card",
+      "TITLE_EDIT": "Edit share access",
+      "TITLE_SHARE_ALL": "Share all cards",
+      "SELECT_CARD": "Select card",
+      "CARD_REQUIRED": "Card selection is required",
+      "SELECT_USERS": "Select users",
+      "USERS_REQUIRED": "At least one user must be selected",
+      "SHARE_ALL_HINT": "Warning: all existing sharing rules for all your cards will be replaced with access for the selected users.",
+      "NO_USERS": "No available users to share with"
+    },
+    "CONFIRM_DELETE_OWN": {
+      "TITLE": "Stop sharing card?",
+      "SUBTITLE": "All users will lose access to this card."
+    },
+    "CONFIRM_DELETE_SHARED": {
+      "TITLE": "Remove shared card?",
+      "SUBTITLE": "The card will no longer appear in your list."
     }
   }
 }
