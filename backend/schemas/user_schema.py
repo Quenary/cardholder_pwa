@@ -37,8 +37,9 @@ class UserCreateSchema(BaseModel):
 class UserUpdateSchema(BaseModel):
     """User update schema. Passwords optional.
 
-    current_password is required by the endpoint when the password or the
-    email address changes, since both are enough to take the account over.
+    current_password is required by the endpoint when the password, the
+    email address or the username changes. The first two are enough to take
+    the account over, and the username is what the account logs in with.
     """
 
     username: str
