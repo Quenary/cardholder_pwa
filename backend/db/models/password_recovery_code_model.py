@@ -16,9 +16,7 @@ class PasswordRecoveryCodeModel(BaseModel):
     """Model of table with password recovery codes"""
 
     __tablename__ = "password_recovery_codes"
-    id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, index=True, nullable=False
-    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False)
     code: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=False

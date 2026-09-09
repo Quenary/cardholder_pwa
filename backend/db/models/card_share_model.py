@@ -21,9 +21,7 @@ class CardShareModel(BaseModel):
         ),
     )
 
-    id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, index=True, nullable=False
-    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False)
     card_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("cards.id", ondelete="CASCADE"), nullable=False, index=True
     )

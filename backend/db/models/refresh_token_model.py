@@ -14,9 +14,7 @@ if TYPE_CHECKING:
 
 class RefreshTokenModel(BaseModel):
     __tablename__ = "refresh_tokens"
-    id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, index=True, nullable=False
-    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False)
     token: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=False
