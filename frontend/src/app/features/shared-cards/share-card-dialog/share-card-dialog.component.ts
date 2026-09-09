@@ -21,6 +21,9 @@ import { ICard } from 'src/app/entities/cards/cards-interface';
 import { CardShareApiService } from '../services/card-share-api.service';
 import { IShareUser } from '../shared-cards.interface';
 
+/** Matches the default page size of GET /cards/share/users. */
+const USERS_PAGE_SIZE = 50;
+
 export type ShareDialogMode = 'ADD_SINGLE' | 'EDIT_SINGLE' | 'SHARE_ALL';
 
 export interface IShareCardDialogData {
@@ -56,8 +59,29 @@ export class ShareCardDialogComponent {
   private readonly apiService = inject(CardShareApiService);
 
   private readonly usersResource = resource({
-    loader: () => firstValueFrom(this.apiService.getAvailableUsers()),
+    loader: () => this.loadUsers(),
   });
+
+  /**
+   * Reads the directory page by page.
+   *
+   * The select shows every account, so the pages are walked until the total
+   * is reached. On the size this app is built for that is a single request.
+   */
+  private async loadUsers(): Promise<IShareUser[]> {
+    const users: IShareUser[] = [];
+    let hasMore = true;
+
+    while (hasMore) {
+      const page = await firstValueFrom(
+        this.apiService.getAvailableUsers(USERS_PAGE_SIZE, users.length),
+      );
+      users.push(...page.items);
+      hasMore = page.items.length > 0 && users.length < page.total;
+    }
+
+    return users;
+  }
 
   protected readonly availableUsers = computed<IShareUser[]>(() => {
     if (this.usersResource.error()) {

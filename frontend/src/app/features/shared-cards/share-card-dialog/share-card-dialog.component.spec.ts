@@ -38,7 +38,13 @@ describe('ShareCardDialogComponent', () => {
         {
           provide: CardShareApiService,
           useValue: {
-            getAvailableUsers: () => of(mockUsers),
+            getAvailableUsers: (limit: number, offset: number) =>
+              of({
+                items: mockUsers.slice(offset, offset + limit),
+                total: mockUsers.length,
+                limit,
+                offset,
+              }),
           },
         },
       ],
@@ -170,5 +176,44 @@ describe('ShareCardDialogComponent', () => {
       await fixture.whenStable();
       expect(component['availableUsers']()).toEqual(mockUsers);
     });
+  });
+});
+
+describe('ShareCardDialogComponent user paging', () => {
+  it('walks every page of the directory', async () => {
+    const many = Array.from({ length: 120 }, (_, i) => ({
+      id: i + 1,
+      username: `user${i + 1}`,
+    }));
+    const calls: number[] = [];
+
+    await TestBed.configureTestingModule({
+      imports: [ShareCardDialogComponent],
+      providers: [
+        { provide: MatDialogRef, useValue: createMatDialogRefMock() },
+        { provide: MAT_DIALOG_DATA, useValue: { mode: 'ADD_SINGLE' } },
+        provideTranslateService(),
+        {
+          provide: CardShareApiService,
+          useValue: {
+            getAvailableUsers: (limit: number, offset: number) => {
+              calls.push(offset);
+              return of({
+                items: many.slice(offset, offset + limit),
+                total: many.length,
+                limit,
+                offset,
+              });
+            },
+          },
+        },
+      ],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(ShareCardDialogComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(calls).toEqual([0, 50, 100]);
   });
 });

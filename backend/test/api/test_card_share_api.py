@@ -33,11 +33,33 @@ async def test_get_available_users():
     result_mock = MagicMock()
     result_mock.scalars.return_value.all.return_value = [other_user]
     session_mock.execute.return_value = result_mock
+    session_mock.scalar.return_value = 1
 
-    users = await get_available_users(session=session_mock, user=current_user)
-    assert len(users) == 1
-    assert users[0].id == 2
-    assert users[0].username == "bob"
+    page = await get_available_users(session=session_mock, user=current_user)
+    assert len(page.items) == 1
+    assert page.items[0].id == 2
+    assert page.items[0].username == "bob"
+    assert page.total == 1
+    assert page.offset == 0
+
+
+@pytest.mark.asyncio
+async def test_get_available_users_reports_the_asked_page():
+    current_user = UserModel(id=1, username="alice")
+
+    session_mock = AsyncMock(spec=AsyncSession)
+    result_mock = MagicMock()
+    result_mock.scalars.return_value.all.return_value = []
+    session_mock.execute.return_value = result_mock
+    session_mock.scalar.return_value = 120
+
+    page = await get_available_users(
+        limit=25, offset=100, session=session_mock, user=current_user
+    )
+    assert page.items == []
+    assert page.total == 120
+    assert page.limit == 25
+    assert page.offset == 100
 
 
 @pytest.mark.asyncio

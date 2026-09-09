@@ -1,7 +1,8 @@
 import logging
+from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import delete, select
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -18,11 +19,17 @@ from backend.schemas.card_share_schema import (
     SharedCardsResponseSchema,
     SharedWithMeItemSchema,
     ShareUserSchema,
+    ShareUsersPageSchema,
     UpdateCardShareRequestSchema,
 )
 
 router = APIRouter(prefix="/cards/share", tags=["card-share"])
 logger = logging.getLogger(__name__)
+
+# The directory grows with the number of accounts, and the whole of it used to
+# come back in one response. These bound a page; the caller walks the rest.
+USERS_DEFAULT_LIMIT = 50
+USERS_MAX_LIMIT = 200
 
 
 async def _get_cards_shared_by_user(
@@ -157,20 +164,32 @@ async def get_shared_cards(
     )
 
 
-@router.get("/users", response_model=list[ShareUserSchema])
+@router.get("/users", response_model=ShareUsersPageSchema)
 async def get_available_users(
+    limit: Annotated[int, Query(ge=1, le=USERS_MAX_LIMIT)] = USERS_DEFAULT_LIMIT,
+    offset: Annotated[int, Query(ge=0)] = 0,
     session: AsyncSession = Depends(get_async_session),
     user: UserModel = Depends(is_user),
 ):
-    """Retrieve other active users for sharing cards."""
+    """Retrieve one page of the other users a card can be shared with."""
+    total = await session.scalar(
+        select(func.count()).select_from(UserModel).where(UserModel.id != user.id)
+    )
     stmt = (
         select(UserModel)
         .where(UserModel.id != user.id)
         .order_by(UserModel.username.asc())
+        .offset(offset)
+        .limit(limit)
     )
     result = await session.execute(stmt)
     users = result.scalars().all()
-    return [ShareUserSchema(id=u.id, username=u.username) for u in users]
+    return ShareUsersPageSchema(
+        items=[ShareUserSchema(id=u.id, username=u.username) for u in users],
+        total=total or 0,
+        limit=limit,
+        offset=offset,
+    )
 
 
 @router.get("/with-me", response_model=list[SharedWithMeItemSchema])
