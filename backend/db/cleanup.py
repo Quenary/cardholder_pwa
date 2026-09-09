@@ -18,9 +18,17 @@ async def cleanup():
     and schedules this process with infinite loop and sleep.
     """
     while True:
-        async with _async_session_maker() as session:
-            logging.info("Cardholder-pwa cleanup db")
-            await _cleanup(session)
+        try:
+            async with _async_session_maker() as session:
+                logging.info("Cardholder-pwa cleanup db")
+                await _cleanup(session)
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            # A locked database or a dropped connection must cost one round,
+            # not the task: it is never restarted, so an escaping exception
+            # would stop cleaning up for the life of the process.
+            logging.exception("Cardholder-pwa cleanup db failed")
         await asyncio.sleep(Config.DB_CLEANUP_INTERVAL_MIN * 60)
 
 
