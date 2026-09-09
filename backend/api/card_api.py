@@ -68,16 +68,7 @@ async def update_card(
     session: AsyncSession = Depends(get_async_session),
     user: UserModel = Depends(is_user),
 ):
-    stmt = (
-        select(CardModel)
-        .where(CardModel.id == card_id, CardModel.user_id == user.id)
-        .limit(1)
-    )
-    result = await session.execute(stmt)
-    card = result.scalar_one_or_none()
-
-    if not card:
-        raise HTTPException(status_code=404, detail="Card not found")
+    card = await _get_own_card(card_id, session, user)
     for key, value in updated.model_dump(exclude_unset=True).items():
         if getattr(card, key) != value:
             setattr(card, key, value)
@@ -92,15 +83,7 @@ async def delete_card(
     session: AsyncSession = Depends(get_async_session),
     user: UserModel = Depends(is_user),
 ):
-    stmt = (
-        select(CardModel)
-        .where(CardModel.id == card_id, CardModel.user_id == user.id)
-        .limit(1)
-    )
-    result = await session.execute(stmt)
-    card = result.scalar_one_or_none()
-    if not card:
-        raise HTTPException(status_code=404, detail="Card not found")
+    card = await _get_own_card(card_id, session, user)
     orphan_logo = card.logo_file
     await session.delete(card)
     await session.commit()
@@ -117,15 +100,7 @@ async def patch_card(
     session: AsyncSession = Depends(get_async_session),
     user: UserModel = Depends(is_user),
 ):
-    stmt = (
-        select(CardModel)
-        .where(CardModel.id == card_id, CardModel.user_id == user.id)
-        .limit(1)
-    )
-    result = await session.execute(stmt)
-    card = result.scalar_one_or_none()
-    if not card:
-        raise HTTPException(status_code=404, detail="Card not found")
+    card = await _get_own_card(card_id, session, user)
     for key, value in body.model_dump(exclude_unset=True).items():
         if getattr(card, key) != value:
             setattr(card, key, value)
