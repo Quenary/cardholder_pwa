@@ -1,6 +1,10 @@
 # Cardholder PWA is a self-hosted app for your loyalty and discount cards
 
 - 🇬🇧 [English](/README.md)
+- 🇩🇪 [Deutsch](/docs/de/README.md)
+- 🇪🇸 [Español](/docs/es/README.md)
+- 🇫🇷 [Français](/docs/fr/README.md)
+- 🇮🇹 [Italiano](/docs/it/README.md)
 - 🇷🇺 [Русский](/docs/ru/README.md)
 
 <p align="center">
