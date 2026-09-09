@@ -1,0 +1,219 @@
+{
+  "GENERAL": {
+    "TITLE": "Cardholder",
+    "CONNECTION": "Verbindung wird hergestellt",
+    "YES": "Ja",
+    "NO": "Nein",
+    "SAVE": "Speichern",
+    "CLOSE": "Schließen",
+    "CANCEL": "Abbrechen",
+    "UNKNOWN_ERROR": "Unbekannter Fehler",
+    "REQUEST_ERROR": "Fehler bei der Anfrage",
+    "UNSAVED_WARN": "Nicht gespeicherte Daten gehen verloren",
+    "CONFIRM": "Bestätigen",
+    "DELETE_WARN": "Löschen bestätigen",
+    "DELETE": "Löschen"
+  },
+  "UPDATE": {
+    "TITLE": "Aktualisierung",
+    "SUBTITLE": "Eine neue Version der Anwendung ist verfügbar. Laden Sie die Seite neu, um zu aktualisieren.",
+    "RELOAD": "Neu laden"
+  },
+  "NAV": {
+    "AUTH": "Anmeldung",
+    "REGISTER": "Registrierung",
+    "PASSWORD_RECOVERY": "Passwort zurücksetzen",
+    "CARD": "Karten",
+    "SHARED_CARDS": "Geteilte Karten",
+    "USER": "Benutzer",
+    "ADMIN": "Administration",
+    "ABOUT": "Über",
+    "EXIT": "Beenden"
+  },
+  "AUTH": {
+    "WELCOME": "Willkommen",
+    "USERNAME": "Benutzername",
+    "PASSWORD": "Passwort",
+    "SIGNIN": "Anmelden",
+    "SIGNUP": "Noch kein Konto?",
+    "PASSWORD_RECOVERY": "Passwort zurücksetzen",
+    "REGISTRATION_DISABLED": "Die Registrierung ist in den Anwendungseinstellungen deaktiviert",
+    "SMTP_DISABLED": "SMTP ist in den Umgebungsvariablen deaktiviert"
+  },
+  "REGISTER": {
+    "NEW_ACCOUNT": "Neues Konto",
+    "SIGNUP": "Registrieren",
+    "SIGNIN": "Sie haben bereits ein Konto?",
+    "SUCCESS": "Konto erstellt!"
+  },
+  "PASSWORD_RECOVERY": {
+    "TITLE": "Passwort zurücksetzen",
+    "EMAIL": "E-Mail",
+    "CODE": "Code",
+    "PASSWORD": "Passwort",
+    "CONFIRM_PASSWORD": "Passwort bestätigen",
+    "HAVE_CODE": "Sie haben den Code?",
+    "SENT": "Falls der Benutzer existiert, wird eine Anleitung per E-Mail verschickt.",
+    "SUCCESS": "Passwort erfolgreich zurückgesetzt"
+  },
+  "CARDS": {
+    "SEARCH": "Suchen",
+    "SEARCH_PLACEHOLDER": "Name",
+    "CARD": {
+      "CODE": "Code",
+      "CODE_TYPE": "Codetyp",
+      "NAME": "Name",
+      "DESCRIPTION": "Beschreibung",
+      "COLOR": "Farbe",
+      "LOGO": "Logo",
+      "LOGO_HINT": "PNG, JPEG, WebP, GIF oder SVG. Das Bild wird verkleinert und neu kodiert.",
+      "LOGO_SAVE_FIRST": "Speichern Sie die Karte, bevor Sie ein Logo hinzufügen.",
+      "LOGO_UPLOAD": "Bild auswählen",
+      "LOGO_REMOVE": "Entfernen",
+      "IS_FAVORITE": "Favorit",
+      "USED_AT": "Verwendet am",
+      "CREATED_AT": "Erstellt am",
+      "UPDATED_AT": "Geändert am",
+      "CODE_FORMAT_WARN": "Die Anwendung verwendet jetzt andere Namen für Codetypen. Speichern Sie die Karte mit dem neuen Codetyp.",
+      "SCAN": {
+        "SELECT_SOURCE": "Quelle auswählen",
+        "FROM_FILE": "Aus Datei hinzufügen",
+        "FILE_NO_CODE": "In diesem Bild wurde kein Code gefunden.",
+        "TORCH": "Licht",
+        "DENIED_TITLE": "Kamerazugriff ist deaktiviert",
+        "DENIED_HINT": "Erlauben Sie den Kamerazugriff für diese Website in den Browsereinstellungen und versuchen Sie es erneut. Sie können die Karte auch von einem Foto hinzufügen.",
+        "UNAVAILABLE_TITLE": "Keine Kamera verfügbar",
+        "UNAVAILABLE_HINT": "Es wurde keine Kamera gefunden, oder eine andere Anwendung verwendet sie. Sie können die Karte stattdessen von einem Foto hinzufügen.",
+        "RETRY": "Erneut versuchen",
+        "CAMERA": "Kamera",
+        "CAMERA_BACK": "Rückkamera",
+        "CAMERA_FRONT": "Frontkamera"
+      },
+      "SUCCESS": {
+        "SAVE": "Karte gespeichert",
+        "DELETE": "Karte gelöscht"
+      }
+    },
+    "VIEWER": {
+      "INVERT": "Farben umkehren"
+    },
+    "SHARED_WITH_YOU": "Mit Ihnen geteilt"
+  },
+  "USER": {
+    "USERNAME": "Benutzername",
+    "EMAIL": "E-Mail",
+    "CHANGE_PASSWORD": "Passwort ändern",
+    "CURRENT_PASSWORD": "Aktuelles Passwort",
+    "PASSWORD": "Passwort",
+    "CONFIRM_PASSWORD": "Passwort bestätigen",
+    "PASSWORDS_MISMATCH": "Die Passwörter stimmen nicht überein",
+    "PASSWORD_HINTS": [
+      "Mindestens 8 Zeichen",
+      "Groß- und Kleinbuchstaben",
+      "Zahlen"
+    ],
+    "DELETE_WARN": "Möchten Sie den Benutzer und alle zugehörigen Daten endgültig löschen?",
+    "SUCCESS": {
+      "UPDATE": "Benutzerdaten aktualisiert",
+      "DELETE": "Benutzer gelöscht"
+    }
+  },
+  "ADMIN": {
+    "HEALTH": "Anwendungsstatus",
+    "SMTP_STATUS": "SMTP-Status",
+    "SMTP_TEST": "Testen",
+    "SMTP_TEST_SUCCESS": "E-Mail gesendet",
+    "SETTINGS": {
+      "TITLE": "Einstellungen",
+      "KEY": "Schlüssel",
+      "VALUE": "Wert",
+      "UPDATED_AT": "Änderungsdatum",
+      "KEYS": {
+        "ALLOW_REGISTRATION": "Registrierung erlauben"
+      }
+    },
+    "USERS": {
+      "TITLE": "Benutzer",
+      "ID": "ID",
+      "USERNAME": "Benutzername",
+      "EMAIL": "E-Mail",
+      "ROLE": "Rolle",
+      "CREATED_AT": "Erstellungsdatum",
+      "UPDATED_AT": "Änderungsdatum",
+      "ROLES": {
+        "OWNER": "Eigentümer",
+        "ADMIN": "Administrator",
+        "MEMBER": "Mitglied"
+      },
+      "CHANGE_ROLE": {
+        "TO_ADMIN": "Zum Administrator machen",
+        "TO_MEMBER": "Zum Mitglied machen",
+        "CONFIRM": "Rollenwechsel",
+        "CONFIRM_SUBTITLE": "Rollenwechsel des Benutzers bestätigen zu: {{role}}"
+      }
+    }
+  },
+  "ABOUT": {
+    "HOMEPAGE": "Startseite",
+    "IMAGE_VERSION": "Version des Docker-Images",
+    "EXAMPLES": "Beispiele unterstützter Codes",
+    "CHANGELOG": "Änderungsprotokoll"
+  },
+  "SORT_FILTER": {
+    "TITLE": "Sortieren und Filtern",
+    "SORT_BY": "Sortieren nach",
+    "SORT_DIR": "Richtung",
+    "SORT_DIRS": {
+      "ASC": "Aufsteigend",
+      "DESC": "Absteigend"
+    },
+    "FILTER_BY": "Filtern nach",
+    "CRITERIA": "Kriterium",
+    "VALUE": "Wert",
+    "ADD_FILTER": "Filter hinzufügen",
+    "BOOL_LABEL": {
+      "TRUE": "Ja",
+      "FALSE": "Nein"
+    },
+    "CRITERIAS": {
+      "LIKE": "Enthält",
+      "EQUALS": "Gleich",
+      "NOT_EQUALS": "Ungleich",
+      "NULL": "Ist leer",
+      "NOT_NULL": "Ist nicht leer",
+      "GREATER": "Größer als",
+      "LESS": "Kleiner als",
+      "GREATER_OR_EQUALS": "Größer oder gleich",
+      "LESS_OR_EQUALS": "Kleiner oder gleich"
+    }
+  },
+  "SHARED_CARDS": {
+    "TITLE": "Geteilte Karten",
+    "ACTION_SHARE_SINGLE": "Teilen",
+    "ACTION_SHARE_ALL": "Alle Karten teilen",
+    "SECTION_YOU_SHARE": "Von Ihnen geteilt",
+    "SECTION_SHARED_WITH_YOU": "Mit Ihnen geteilt",
+    "EMPTY_YOU_SHARE": "Sie haben noch keine Karten geteilt",
+    "EMPTY_SHARED_WITH_YOU": "Es wurden noch keine Karten mit Ihnen geteilt",
+    "SHARED_BY": "Geteilt von",
+    "DIALOG": {
+      "TITLE_ADD": "Karte teilen",
+      "TITLE_EDIT": "Freigabe bearbeiten",
+      "TITLE_SHARE_ALL": "Alle Karten teilen",
+      "SELECT_CARD": "Karte auswählen",
+      "CARD_REQUIRED": "Es muss eine Karte ausgewählt werden",
+      "SELECT_USERS": "Benutzer auswählen",
+      "USERS_REQUIRED": "Es muss mindestens ein Benutzer ausgewählt werden",
+      "SHARE_ALL_HINT": "Achtung: Alle bestehenden Freigaben für Ihre Karten werden durch den Zugriff der ausgewählten Benutzer ersetzt.",
+      "NO_USERS": "Keine Benutzer zum Teilen verfügbar"
+    },
+    "CONFIRM_DELETE_OWN": {
+      "TITLE": "Karte nicht mehr teilen?",
+      "SUBTITLE": "Alle Benutzer verlieren den Zugriff auf diese Karte."
+    },
+    "CONFIRM_DELETE_SHARED": {
+      "TITLE": "Geteilte Karte entfernen?",
+      "SUBTITLE": "Die Karte erscheint dann nicht mehr in Ihrer Liste."
+    }
+  }
+}
