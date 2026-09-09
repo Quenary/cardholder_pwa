@@ -90,6 +90,59 @@ async def _get_cards_shared_with_user(
     ]
 
 
+async def _replace_shares(
+    card_id: int,
+    user_ids: list[int],
+    session: AsyncSession,
+    user: UserModel,
+) -> SharedCardItemSchema:
+    """Set the exact list of users a card of the caller is shared with.
+
+    The shares that card already has are dropped first, so the given list
+    becomes the whole truth. Ids that match no account, and the caller's own,
+    are ignored rather than refused.
+    """
+    stmt = (
+        select(CardModel)
+        .where(CardModel.id == card_id, CardModel.user_id == user.id)
+        .limit(1)
+    )
+    result = await session.execute(stmt)
+    card = result.scalar_one_or_none()
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found")
+
+    target_user_ids = [uid for uid in set(user_ids) if uid != user.id]
+
+    await session.execute(
+        delete(CardShareModel).where(
+            CardShareModel.card_id == card.id,
+            CardShareModel.owner_id == user.id,
+        )
+    )
+
+    shared_users: list[ShareUserSchema] = []
+    if target_user_ids:
+        users_stmt = select(UserModel).where(UserModel.id.in_(target_user_ids))
+        users_res = await session.execute(users_stmt)
+        valid_users = users_res.scalars().all()
+        for u in valid_users:
+            session.add(
+                CardShareModel(
+                    card_id=card.id,
+                    owner_id=user.id,
+                    shared_with_user_id=u.id,
+                )
+            )
+            shared_users.append(ShareUserSchema(id=u.id, username=u.username))
+
+    await session.commit()
+    await session.refresh(card)
+    return SharedCardItemSchema(
+        card=CardSchema.model_validate(card), shared_with_users=shared_users
+    )
+
+
 @router.get("", response_model=SharedCardsResponseSchema)
 async def get_shared_cards(
     session: AsyncSession = Depends(get_async_session),
@@ -136,45 +189,7 @@ async def share_card(
     user: UserModel = Depends(is_user),
 ):
     """Share a single card with selected users (replaces previous shares for this card)."""
-    stmt = (
-        select(CardModel)
-        .where(CardModel.id == body.card_id, CardModel.user_id == user.id)
-        .limit(1)
-    )
-    result = await session.execute(stmt)
-    card = result.scalar_one_or_none()
-    if not card:
-        raise HTTPException(status_code=404, detail="Card not found")
-
-    target_user_ids = [uid for uid in set(body.user_ids) if uid != user.id]
-
-    await session.execute(
-        delete(CardShareModel).where(
-            CardShareModel.card_id == card.id,
-            CardShareModel.owner_id == user.id,
-        )
-    )
-
-    shared_users: list[ShareUserSchema] = []
-    if target_user_ids:
-        users_stmt = select(UserModel).where(UserModel.id.in_(target_user_ids))
-        users_res = await session.execute(users_stmt)
-        valid_users = users_res.scalars().all()
-        for u in valid_users:
-            session.add(
-                CardShareModel(
-                    card_id=card.id,
-                    owner_id=user.id,
-                    shared_with_user_id=u.id,
-                )
-            )
-            shared_users.append(ShareUserSchema(id=u.id, username=u.username))
-
-    await session.commit()
-    await session.refresh(card)
-    return SharedCardItemSchema(
-        card=CardSchema.model_validate(card), shared_with_users=shared_users
-    )
+    return await _replace_shares(body.card_id, body.user_ids, session, user)
 
 
 @router.put("/{card_id}", response_model=SharedCardItemSchema)
@@ -185,45 +200,7 @@ async def update_card_share(
     user: UserModel = Depends(is_user),
 ):
     """Update user shares for a specific card."""
-    stmt = (
-        select(CardModel)
-        .where(CardModel.id == card_id, CardModel.user_id == user.id)
-        .limit(1)
-    )
-    result = await session.execute(stmt)
-    card = result.scalar_one_or_none()
-    if not card:
-        raise HTTPException(status_code=404, detail="Card not found")
-
-    target_user_ids = [uid for uid in set(body.user_ids) if uid != user.id]
-
-    await session.execute(
-        delete(CardShareModel).where(
-            CardShareModel.card_id == card.id,
-            CardShareModel.owner_id == user.id,
-        )
-    )
-
-    shared_users: list[ShareUserSchema] = []
-    if target_user_ids:
-        users_stmt = select(UserModel).where(UserModel.id.in_(target_user_ids))
-        users_res = await session.execute(users_stmt)
-        valid_users = users_res.scalars().all()
-        for u in valid_users:
-            session.add(
-                CardShareModel(
-                    card_id=card.id,
-                    owner_id=user.id,
-                    shared_with_user_id=u.id,
-                )
-            )
-            shared_users.append(ShareUserSchema(id=u.id, username=u.username))
-
-    await session.commit()
-    await session.refresh(card)
-    return SharedCardItemSchema(
-        card=CardSchema.model_validate(card), shared_with_users=shared_users
-    )
+    return await _replace_shares(card_id, body.user_ids, session, user)
 
 
 @router.post("/all")
