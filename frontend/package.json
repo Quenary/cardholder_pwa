@@ -71,7 +71,7 @@
     "@angular/cli": "^22.1.0",
     "@angular/compiler-cli": "^22.1.0",
     "@eslint/js": "^10.0.1",
-    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/coverage-v8": "^5.0.0",
     "angular-eslint": "22.0.0",
     "canvas": "^3.2.3",
     "eslint": "^10.3.0",
