@@ -1,6 +1,67 @@
 # CHANGELOG
 
 
+## v1.13.0 (2026-09-10)
+
+### Bug Fixes
+
+- **backend**: Delete the logo files of a deleted account
+  ([`8693d9b`](https://github.com/Quenary/cardholder_pwa/commit/8693d9bf500457f483ab34a29d78b2d430e4ed3a))
+
+- **backend**: Keep the cleanup task running after an error
+  ([`311f66f`](https://github.com/Quenary/cardholder_pwa/commit/311f66f34257da7dcce8fa685f2fd5412e3fc993))
+
+- **backend**: Require the current password to change a username
+  ([`9830702`](https://github.com/Quenary/cardholder_pwa/commit/983070263a37390d5a76f99b1fef151c953ebd89))
+
+- **frontend**: Clear cached account data on logout
+  ([`9b48f47`](https://github.com/Quenary/cardholder_pwa/commit/9b48f47abff2e9e7236302abee11e3be6aa0d2ae))
+
+- **frontend**: Retry a 401 with the token another request just fetched
+  ([`6cb934d`](https://github.com/Quenary/cardholder_pwa/commit/6cb934d8b628f225c84185e3aebb842dfc20488f))
+
+- **i18n**: Translate the card sharing strings into french
+  ([`7081419`](https://github.com/Quenary/cardholder_pwa/commit/7081419229215ecaaddfae11e27d90bf2fba7dec))
+
+### Build System
+
+- Stop copying env files into the image
+  ([`5563ad3`](https://github.com/Quenary/cardholder_pwa/commit/5563ad39c91cbd3ec438ff04d621737a211e3c8f))
+
+- Watch dependencies with dependabot
+  ([`a854059`](https://github.com/Quenary/cardholder_pwa/commit/a854059f85504d16dd3576ac42d83bbcd3a814e3))
+
+### Documentation
+
+- Fix the language links in the readme
+  ([`e810e6e`](https://github.com/Quenary/cardholder_pwa/commit/e810e6e4284c91ad078999d416d02cec73d4aab4))
+
+- Translate the readme into french, spanish, german and italian
+  ([`9473d25`](https://github.com/Quenary/cardholder_pwa/commit/9473d25985047c6053e215a80a55038e1df2ec1c))
+
+### Features
+
+- **backend**: Bound the length of card fields
+  ([`b7efd06`](https://github.com/Quenary/cardholder_pwa/commit/b7efd0672a382b3fb9fe200172399282569ab407))
+
+- **backend**: Paginate the share user directory
+  ([`ddfccda`](https://github.com/Quenary/cardholder_pwa/commit/ddfccda63b7b9d8ae819d990654a2f8b36395600))
+
+- **i18n**: Add spanish, german and italian
+  ([`d3fc773`](https://github.com/Quenary/cardholder_pwa/commit/d3fc773da885649a71b731c26462892ffee70c10))
+
+### Performance Improvements
+
+- **db**: Index cards.user_id and drop the primary key indexes
+  ([`2e93dd7`](https://github.com/Quenary/cardholder_pwa/commit/2e93dd72064ceeea9c139fde8d6a07bd877a5c37))
+
+- **db**: Put sqlite in WAL mode
+  ([`03479ac`](https://github.com/Quenary/cardholder_pwa/commit/03479ace5de2ff3a3c00cbf33091fe33486b3cc7))
+
+- **nginx**: Compress assets and cache hashed files
+  ([`78c1990`](https://github.com/Quenary/cardholder_pwa/commit/78c1990e37f464242ead81cd1f6493ad7056f997))
+
+
 ## v1.12.0 (2026-09-03)
 
 ### Features
