@@ -163,6 +163,8 @@ export const EBarcodeFormat: { [K in keyof typeof BarcodeFormat & string]: K } =
     PDF_417: 'PDF_417',
     /** QR Code 2D barcode format. */
     QR_CODE: 'QR_CODE',
+    /** Micro QR Code 2D barcode format. */
+    MICRO_QR_CODE: 'MICRO_QR_CODE',
     /** RSS 14 */
     RSS_14: 'RSS_14',
     /** RSS EXPANDED */
@@ -188,6 +190,7 @@ export const ZxingToBwipMap: Record<
   MAXICODE: 'maxicode',
   PDF_417: 'pdf417',
   QR_CODE: 'qrcode',
+  MICRO_QR_CODE: 'microqrcode',
   // 1D barcodes
   CODABAR: 'rationalizedCodabar',
   CODE_39: 'code39',

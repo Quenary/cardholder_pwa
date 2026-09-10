@@ -4,8 +4,4 @@
  * It is used to sorting and filtering.
  */
 export type PrimitiveStringType =
-  | 'boolean'
-  | 'string'
-  | 'number'
-  | 'date'
-  | 'bigint';
+  'boolean' | 'string' | 'number' | 'date' | 'bigint';
