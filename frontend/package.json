@@ -64,7 +64,7 @@
     "@bwip-js/browser": "^4.7.0",
     "@ericblade/quagga2": "^1.12.1",
     "@ngrx/effects": "^21.1.1",
-    "@ngrx/store": "^21.1.1",
+    "@ngrx/store": "^22.0.0",
     "@ngrx/store-devtools": "^21.1.1",
     "@ngx-translate/core": "^18.0.0",
     "@ngx-translate/http-loader": "^18.0.0",
