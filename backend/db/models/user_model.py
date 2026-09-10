@@ -30,9 +30,7 @@ if TYPE_CHECKING:
 
 class UserModel(BaseModel):
     __tablename__ = "users"
-    id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, index=True, nullable=False
-    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False)
     username: Mapped[str] = mapped_column(
         String, unique=True, index=True, nullable=False
     )

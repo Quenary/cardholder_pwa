@@ -281,3 +281,51 @@ async def test_user_should_not_change_email_without_current_password() -> None:
 
     assert exc_info.value.status_code == 400
     assert current_user.email == "user_email@example.com"
+
+
+@pytest.mark.asyncio
+async def test_user_should_not_change_username_without_current_password() -> None:
+    user = _get_user_update(
+        {
+            "username": "new_user_name",
+            "email": "user_email@example.com",
+        }
+    )
+    current_user = _get_current_user()
+
+    session_mock = AsyncMock(spec=AsyncSession)
+
+    with patch(
+        "backend.api.user_api.is_creds_taken",
+        new_callable=AsyncMock,
+    ) as is_creds_taken_mock:
+        is_creds_taken_mock.return_value = False
+
+        with pytest.raises(HTTPException) as exc_info:
+            await update_user(user, session_mock, current_user)
+
+    assert exc_info.value.status_code == 400
+    assert current_user.username == "user_name"
+
+
+@pytest.mark.asyncio
+async def test_user_should_change_username_with_current_password() -> None:
+    user = _get_user_update(
+        {
+            "username": "new_user_name",
+            "email": "user_email@example.com",
+            "current_password": CURRENT_PASSWORD,
+        }
+    )
+    current_user = _get_current_user()
+
+    session_mock = AsyncMock(spec=AsyncSession)
+
+    with patch(
+        "backend.api.user_api.is_creds_taken",
+        new_callable=AsyncMock,
+    ) as is_creds_taken_mock:
+        is_creds_taken_mock.return_value = False
+        result = await update_user(user, session_mock, current_user)
+
+    assert result.username == "new_user_name"

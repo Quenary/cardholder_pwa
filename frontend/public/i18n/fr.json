@@ -24,6 +24,7 @@
     "REGISTER": "Inscription",
     "PASSWORD_RECOVERY": "Récupération du mot de passe",
     "CARD": "Cartes",
+    "SHARED_CARDS": "Cartes partagées",
     "USER": "Utilisateur",
     "ADMIN": "Panneau d'administration",
     "ABOUT": "À propos",
@@ -95,7 +96,8 @@
     },
     "VIEWER": {
       "INVERT": "Inverser les couleurs"
-    }
+    },
+    "SHARED_WITH_YOU": "Partagées avec vous"
   },
   "USER": {
     "USERNAME": "Nom d'utilisateur",
@@ -183,6 +185,35 @@
       "LESS": "Inférieur à",
       "GREATER_OR_EQUALS": "Supérieur ou égal à",
       "LESS_OR_EQUALS": "Inférieur ou égal à"
+    }
+  },
+  "SHARED_CARDS": {
+    "TITLE": "Cartes partagées",
+    "ACTION_SHARE_SINGLE": "Partager",
+    "ACTION_SHARE_ALL": "Partager toutes les cartes",
+    "SECTION_YOU_SHARE": "Vous partagez",
+    "SECTION_SHARED_WITH_YOU": "Partagées avec vous",
+    "EMPTY_YOU_SHARE": "Vous n'avez encore partagé aucune carte",
+    "EMPTY_SHARED_WITH_YOU": "Aucune carte ne vous a encore été partagée",
+    "SHARED_BY": "Partagée par",
+    "DIALOG": {
+      "TITLE_ADD": "Partager la carte",
+      "TITLE_EDIT": "Modifier les accès",
+      "TITLE_SHARE_ALL": "Partager toutes les cartes",
+      "SELECT_CARD": "Sélectionner une carte",
+      "CARD_REQUIRED": "La sélection d'une carte est obligatoire",
+      "SELECT_USERS": "Sélectionner des utilisateurs",
+      "USERS_REQUIRED": "Au moins un utilisateur doit être sélectionné",
+      "SHARE_ALL_HINT": "Attention : toutes les règles de partage existantes de vos cartes seront remplacées par un accès pour les utilisateurs sélectionnés.",
+      "NO_USERS": "Aucun utilisateur disponible pour le partage"
+    },
+    "CONFIRM_DELETE_OWN": {
+      "TITLE": "Arrêter de partager cette carte ?",
+      "SUBTITLE": "Tous les utilisateurs perdront l'accès à cette carte."
+    },
+    "CONFIRM_DELETE_SHARED": {
+      "TITLE": "Retirer cette carte partagée ?",
+      "SUBTITLE": "La carte n'apparaîtra plus dans votre liste."
     }
   }
 }

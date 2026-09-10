@@ -17,6 +17,7 @@ import { SnackService } from 'src/app/core/services/snack.service';
 import { selectAuthTokenResponse } from './auth.selectors';
 import { Store } from '@ngrx/store';
 import { UserActions } from '../../user/state/user.actions';
+import { clearApiCache } from 'src/app/shared/functions/clear-api-cache.function';
 
 @Injectable()
 export class AuthEffects {
@@ -130,6 +131,9 @@ export class AuthEffects {
    */
   private onLogout() {
     localStorage.removeItem(ELocalStorageKey.TOKEN_RESPONSE);
+    localStorage.removeItem(ELocalStorageKey.USER);
+    // Not awaited: leaving the account must not wait on the cache.
+    void clearApiCache();
     this.router.navigate(['/auth']);
   }
 }

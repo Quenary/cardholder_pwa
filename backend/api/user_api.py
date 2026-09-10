@@ -69,13 +69,14 @@ async def update_user(
     if creds_taken:
         raise HTTPException(400, detail="Username or email is already taken")
     email_changed = data.email != current_user.email
-    if data.password or email_changed:
+    username_changed = data.username != current_user.username
+    if data.password or email_changed or username_changed:
         if not data.current_password or not verify_password(
             data.current_password, current_user.hashed_password
         ):
             raise HTTPException(400, detail="Current password is incorrect")
 
-    if data.username != current_user.username:
+    if username_changed:
         current_user.username = data.username
     if email_changed:
         current_user.email = data.email

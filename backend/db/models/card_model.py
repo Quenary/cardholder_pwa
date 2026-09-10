@@ -15,9 +15,7 @@ if TYPE_CHECKING:
 
 class CardModel(BaseModel):
     __tablename__ = "cards"
-    id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, index=True, nullable=False
-    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False)
     code: Mapped[str] = mapped_column(String, nullable=False)
     code_type: Mapped[str] = mapped_column(String, nullable=False)
     name: Mapped[str] = mapped_column(String, nullable=False)
@@ -31,7 +29,7 @@ class CardModel(BaseModel):
     )
     used_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id"), nullable=False
+        Integer, ForeignKey("users.id"), index=True, nullable=False
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=text("CURRENT_TIMESTAMP"), default=now, nullable=False

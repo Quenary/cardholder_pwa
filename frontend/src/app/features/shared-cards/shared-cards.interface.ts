@@ -5,6 +5,13 @@ export interface IShareUser {
   username: string;
 }
 
+export interface IShareUsersPage {
+  items: IShareUser[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
 export interface ISharedCardItem {
   card: ICard;
   shared_with_users: IShareUser[];

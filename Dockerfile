@@ -41,8 +41,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Environment
-COPY .env* /app/
+# Version, read back by GET /api/public/version
 RUN echo "$VERSION" > /app/version
 
 # Dir for sqlite and other files

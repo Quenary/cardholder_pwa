@@ -1,8 +1,12 @@
 
 # Cardholder PWA это приложение для хранения ваших скидочных и бонусных карт
 
-- 🇬🇧 [English](/readme.md)  
-- 🇷🇺 [Русский](/docs/ru/readme.md)
+- 🇬🇧 [English](/README.md)
+- 🇩🇪 [Deutsch](/docs/de/README.md)
+- 🇪🇸 [Español](/docs/es/README.md)
+- 🇫🇷 [Français](/docs/fr/README.md)
+- 🇮🇹 [Italiano](/docs/it/README.md)
+- 🇷🇺 [Русский](/docs/ru/README.md)
 
 <p align="center">
   <img src="../../resources/login.jpg" width="30%" />

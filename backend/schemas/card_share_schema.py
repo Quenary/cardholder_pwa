@@ -10,6 +10,15 @@ class ShareUserSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class ShareUsersPageSchema(BaseModel):
+    """One page of the accounts a card can be shared with."""
+
+    items: list[ShareUserSchema]
+    total: int
+    limit: int
+    offset: int
+
+
 class SharedCardItemSchema(BaseModel):
     card: CardSchema
     shared_with_users: list[ShareUserSchema]

@@ -7,7 +7,7 @@ import {
   ISharedCardItem,
   ISharedCardsResponse,
   ISharedWithMeItem,
-  IShareUser,
+  IShareUsersPage,
   IUpdateCardShareRequest,
 } from '../shared-cards.interface';
 
@@ -21,8 +21,13 @@ export class CardShareApiService extends BaseApiService<'cards/share'> {
     return this.httpClient.get<ISharedCardsResponse>(`${this.basePath}`);
   }
 
-  getAvailableUsers(): Observable<IShareUser[]> {
-    return this.httpClient.get<IShareUser[]>(`${this.basePath}/users`);
+  getAvailableUsers(
+    limit: number,
+    offset: number,
+  ): Observable<IShareUsersPage> {
+    return this.httpClient.get<IShareUsersPage>(`${this.basePath}/users`, {
+      params: { limit, offset },
+    });
   }
 
   getCardsSharedWithMe(): Observable<ISharedWithMeItem[]> {
