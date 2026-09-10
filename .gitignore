@@ -1,4 +1,6 @@
 **/cardholder_pwa.db
+**/cardholder_pwa.db-shm
+**/cardholder_pwa.db-wal
 .logos
 
 # Logs
