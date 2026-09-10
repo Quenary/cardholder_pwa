@@ -370,8 +370,7 @@ export class CardScannerComponent implements OnDestroy {
 
   private supportsContinuousFocus(track: MediaStreamTrack): boolean {
     const capabilities = track?.getCapabilities?.() as
-      | { focusMode?: string[] }
-      | undefined;
+      { focusMode?: string[] } | undefined;
     return !!capabilities?.focusMode?.includes(CONTINUOUS_FOCUS);
   }
 
@@ -677,8 +676,7 @@ export class CardScannerComponent implements OnDestroy {
    */
   private readTorchCapability(): void {
     const capabilities = this.getVideoTrack()?.getCapabilities?.() as
-      | { torch?: boolean }
-      | undefined;
+      { torch?: boolean } | undefined;
     this.hasTorch.set(!!capabilities?.torch);
     this.isTorchOn.set(false);
   }
