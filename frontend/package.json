@@ -79,7 +79,7 @@
     "lint-staged": "^17.0.8",
     "prettier": "^3.8.4",
     "typescript": "~6.0.0",
-    "typescript-eslint": "8.60.1",
+    "typescript-eslint": "8.70.0",
     "vitest": "^4.1.11"
   }
 }
