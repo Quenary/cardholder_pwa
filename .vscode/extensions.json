@@ -3,6 +3,9 @@
     "charliermarsh.ruff",
     "esbenp.prettier-vscode",
     "detachhead.basedpyright",
-    "angular.ng-template"
+    "matangover.mypy",
+    "ms-python.python",
+    "Angular.ng-template",
+    "dbaeumer.vscode-eslint"
   ]
 }
