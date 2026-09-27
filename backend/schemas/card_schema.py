@@ -31,12 +31,24 @@ class CardBaseSchema(BaseModel):
         return v
 
 
+def _reject_null(v: object) -> object:
+    """Refuse an explicit null for a column that cannot hold one.
+
+    Field validators only run on values that were actually sent, so leaving a
+    field out is still fine. Sending it as null used to reach the database and
+    come back as a 500 from the NOT NULL constraint.
+    """
+    if v is None:
+        raise ValueError("This field cannot be null")
+    return v
+
+
 class CardCreateSchema(CardBaseSchema):
     pass
 
 
 class CardUpdateSchema(CardBaseSchema):
-    pass
+    _is_favorite_not_null = field_validator("is_favorite")(_reject_null)
 
 
 class CardPatchSchema(BaseModel):
@@ -47,6 +59,10 @@ class CardPatchSchema(BaseModel):
     color: str | None = None
     is_favorite: bool | None = None
     used_at: datetime | None = None
+
+    _not_null = field_validator("code", "code_type", "name", "is_favorite")(
+        _reject_null
+    )
 
     @field_validator("used_at")
     @classmethod
