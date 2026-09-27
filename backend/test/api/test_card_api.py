@@ -1,7 +1,9 @@
+from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi import HTTPException, UploadFile
+from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.api.card_api import (
@@ -15,8 +17,11 @@ from backend.api.card_api import (
     update_card,
     upload_card_logo,
 )
+from backend.app import app
+from backend.core.auth_core import is_user
 from backend.db.models.card_model import CardModel
 from backend.db.models.user_model import UserModel
+from backend.db.session import get_async_session
 from backend.schemas.card_schema import (
     CardCreateSchema,
     CardPatchSchema,
@@ -203,3 +208,31 @@ async def test_delete_card_logo_clears_the_reference() -> None:
 
     assert result.logo_file is None
     delete_logo_mock.assert_called_once_with("abc.webp")
+
+
+def test_patch_card_answers_with_the_public_card_shape() -> None:
+    """PATCH used to have no response_model, so FastAPI serialised the ORM row
+    as-is: the internal logo file name and the owner id went out, and
+    has_logo, which every other card endpoint sends, did not."""
+    card = _card(logo_file="abc.webp")
+    card.is_favorite = False
+    card.used_at = None
+    card.created_at = card.updated_at = datetime(2026, 1, 1)
+    session = _session(scalar_one_or_none=card)
+
+    async def _get_session():
+        yield session
+
+    app.dependency_overrides[get_async_session] = _get_session
+    app.dependency_overrides[is_user] = _user
+    try:
+        response = TestClient(app).patch("/cards/10", json={"is_favorite": True})
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["is_favorite"] is True
+    assert body["has_logo"] is True
+    assert "logo_file" not in body
+    assert "user_id" not in body
