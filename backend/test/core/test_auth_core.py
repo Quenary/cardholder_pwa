@@ -66,3 +66,24 @@ def test_password_validator_accepts_exactly_72_bytes() -> None:
     )
 
     assert verify_password(password, get_password_hash(schema.password))
+
+
+@pytest.mark.parametrize("password", ["Aa1", "Aa1xxxx"])
+def test_password_validator_refuses_fewer_than_8_characters(password: str) -> None:
+    # The frontend asked for 8 characters, but the API took anything that had
+    # an upper case letter, a lower case letter and a digit.
+    with pytest.raises(ValidationError):
+        UserCreateSchema(
+            username="user_name",
+            email="user@example.com",
+            password=password,
+            confirm_password=password,
+        )
+
+
+def test_password_validator_accepts_8_characters() -> None:
+    schema = PasswordRecoverySubmitSchema(
+        code="c", password="Aa1xxxxx", confirm_password="Aa1xxxxx"
+    )
+
+    assert schema.password == "Aa1xxxxx"
