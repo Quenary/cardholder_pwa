@@ -135,3 +135,21 @@ def test_disabled_smtp_refuses_to_send():
             EmailSender.send_email("to@example.org", "Subject", "Body")
     finally:
         Config.SMTP_DISABLED = False
+
+
+def test_password_reset_email_escapes_the_link_in_the_html_part():
+    # Without PUBLIC_URL the link is built from the Host header, which the
+    # client controls: it must not be able to break out of the href.
+    hostile = 'https://evil.example"><img src=x onerror=alert(1)>/reset?code=A&b=1'
+    with patch("smtplib.SMTP", _RecordingSMTP):
+        EmailSender.send_password_reset_email("to@example.org", "A", hostile)
+
+    parts = {
+        p.get_content_type(): p for p in _last_sent().walk() if not p.is_multipart()
+    }
+    html = parts["text/html"].get_payload(decode=True).decode()
+    assert "<img" not in html
+    assert "&quot;&gt;&lt;img src=x onerror=alert(1)&gt;" in html
+    assert "code=A&amp;b=1" in html
+    # The plain-text part is not markup and keeps the link verbatim.
+    assert hostile in parts["text/plain"].get_payload(decode=True).decode()

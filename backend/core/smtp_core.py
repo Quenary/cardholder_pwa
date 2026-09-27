@@ -1,3 +1,4 @@
+import html as html_lib
 import logging
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -95,6 +96,13 @@ class EmailSender:
 
         subject = "Password Reset Request"
 
+        # Escaped for the HTML part: without PUBLIC_URL the link is built
+        # from the request's Host header, which the client chooses, so it
+        # could otherwise close the href attribute and inject markup into a
+        # mail sent from this server.
+        safe_code = html_lib.escape(code)
+        safe_url = html_lib.escape(reset_url) if reset_url else None
+
         body = "Hello from your Cardholder PWA App!\nYou have requested to reset your password.\n"
         html = (
             "<p>Hello from your Cardholder PWA App!<br>"
@@ -108,15 +116,15 @@ class EmailSender:
             )
             html += (
                 "<p>Please click the button below to do so:</p>"
-                f'<p><a href="{reset_url}" '
+                f'<p><a href="{safe_url}" '
                 'style="display:inline-block;padding:10px 18px;background:#0066cc;'
                 'color:#ffffff;text-decoration:none;border-radius:4px;">'
                 "Reset Password</a></p>"
-                f"<p>Or enter this code on the recovery page: <code>{code}</code></p>"
+                f"<p>Or enter this code on the recovery page: <code>{safe_code}</code></p>"
             )
         else:
             body += f"\nYour verification code is: {code}\n"
-            html += f"<p>Your verification code is: <code>{code}</code></p>"
+            html += f"<p>Your verification code is: <code>{safe_code}</code></p>"
 
         body += "\nIf you did not request this, please ignore this email.\n"
         html += "<p>If you did not request this, please ignore this email.</p>"
