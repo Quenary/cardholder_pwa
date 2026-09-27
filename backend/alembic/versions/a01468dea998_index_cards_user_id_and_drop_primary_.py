@@ -32,7 +32,9 @@ def upgrade() -> None:
 def downgrade() -> None:
     """Downgrade schema."""
     op.create_index(op.f("ix_users_id"), "users", ["id"], unique=False)
-    op.create_index(op.f("ix_refresh_tokens_id"), "refresh_tokens", ["id"], unique=False)
+    op.create_index(
+        op.f("ix_refresh_tokens_id"), "refresh_tokens", ["id"], unique=False
+    )
     op.create_index(
         op.f("ix_password_recovery_codes_id"),
         "password_recovery_codes",
