@@ -12,6 +12,7 @@ from backend.core.auth_core import (
     is_user,
 )
 from backend.db.models.refresh_token_model import RefreshTokenModel
+from backend.db.models.user_model import UserModel
 from backend.db.session import get_async_session
 from backend.helpers.delay_to_minimum import delay_to_minimum
 from backend.helpers.now import now
@@ -87,12 +88,15 @@ async def refresh_token(
 async def logout(
     form: RevokeRequestSchema,
     session: AsyncSession = Depends(get_async_session),
-    _=Depends(is_user),
+    current_user: UserModel = Depends(is_user),
 ):
+    # Scoped to the caller: logging out must not be a way to end somebody
+    # else's session with a refresh token that is not one's own.
     stmt = (
         select(RefreshTokenModel)
         .where(
             RefreshTokenModel.token == form.refresh_token,
+            RefreshTokenModel.user_id == current_user.id,
             RefreshTokenModel.revoked.is_(False),
         )
         .limit(1)
