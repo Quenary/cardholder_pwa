@@ -21,9 +21,17 @@ from backend.schemas.auth_schema import TokenResponseSchema
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
+# bcrypt only ever looks at the first 72 bytes of a password. Up to 4.x the
+# library cut longer input silently; from 5.0 it raises ValueError instead.
+BCRYPT_MAX_PASSWORD_BYTES = 72
+
 
 def verify_password(plain: str, hashed: str) -> bool:
-    plain_bytes = plain.encode("utf-8")
+    # Cut to what bcrypt considers, rather than letting 5.x raise: a login
+    # with a long password would otherwise be a 500, and an account whose
+    # long password was hashed by an older bcrypt (which truncated it) could
+    # no longer log in at all. The hash was built from these same 72 bytes.
+    plain_bytes = plain.encode("utf-8")[:BCRYPT_MAX_PASSWORD_BYTES]
     hashed_bytes = hashed.encode("utf-8")
     return bcrypt.checkpw(plain_bytes, hashed_bytes)
 
