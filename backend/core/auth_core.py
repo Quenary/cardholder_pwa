@@ -116,12 +116,17 @@ async def is_user(
             Config.JWT_SECRET_KEY,
             algorithms=[Config.JWT_ALGORITHM],
         )
-        username: str = cast(str, payload.get("sub"))
-        if not username:
+        subject = cast(str | None, payload.get("sub"))
+        # The subject is the user id: a username can be renamed, and a new
+        # account taking the old name would otherwise accept the previous
+        # owner's tokens until they expire. Tokens issued before that, with
+        # a username here, are refused and get replaced by a refresh.
+        if not subject or not subject.isascii() or not subject.isdigit():
             raise credentials_exception
+        user_id = int(subject)
     except JWTError:
         raise credentials_exception from None
-    stmt = select(UserModel).where(UserModel.username == username).limit(1)
+    stmt = select(UserModel).where(UserModel.id == user_id).limit(1)
     result = await session.execute(stmt)
     user = result.scalar_one_or_none()
     if not user:

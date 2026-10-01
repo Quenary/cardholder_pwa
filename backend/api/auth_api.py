@@ -39,7 +39,7 @@ async def login(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token, access_exp = create_access_token({"sub": user.username})
+    access_token, access_exp = create_access_token({"sub": str(user.id)})
     refresh_token = await create_refresh_token(
         user.id,
         session,
@@ -74,7 +74,7 @@ async def refresh_token(
     await session.commit()
 
     user = db_token.user
-    access_token, access_exp = create_access_token({"sub": user.username})
+    access_token, access_exp = create_access_token({"sub": str(user.id)})
     new_refresh = await create_refresh_token(
         user.id,
         session,
