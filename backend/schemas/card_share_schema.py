@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
+from backend.enums.card_share_status_enum import ECardShareStatus
 from backend.schemas.card_schema import CardSchema
 
 
@@ -19,14 +20,21 @@ class ShareUsersPageSchema(BaseModel):
     offset: int
 
 
+class ShareRecipientSchema(ShareUserSchema):
+    """A recipient of a card, with what they decided about it."""
+
+    status: ECardShareStatus
+
+
 class SharedCardItemSchema(BaseModel):
     card: CardSchema
-    shared_with_users: list[ShareUserSchema]
+    shared_with_users: list[ShareRecipientSchema]
 
 
 class SharedWithMeItemSchema(BaseModel):
     card: CardSchema
     owner: ShareUserSchema
+    status: ECardShareStatus
 
 
 class SharedCardsResponseSchema(BaseModel):
