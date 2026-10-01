@@ -1,6 +1,43 @@
 # CHANGELOG
 
 
+## v1.13.1 (2026-10-01)
+
+### Bug Fixes
+
+- **backend**: Answer PATCH /cards/{id} with the public card schema
+  ([`dec2443`](https://github.com/Quenary/cardholder_pwa/commit/dec24436cd234545743e4663794e3eb36a0d9382))
+
+- **backend**: Enforce the 8-character password minimum in the API
+  ([`aa69143`](https://github.com/Quenary/cardholder_pwa/commit/aa69143013c58ec1bc15ba90224046fd274bbe9f))
+
+- **backend**: Escape the reset link and code in the HTML password email
+  ([`7193978`](https://github.com/Quenary/cardholder_pwa/commit/7193978d23b91f3a4f50efd80c637b44e825a520))
+
+- **backend**: Only let /logout revoke the caller's own refresh token
+  ([`7f61bb2`](https://github.com/Quenary/cardholder_pwa/commit/7f61bb29f96bcc5d5d46c498a4aa3ca3d23a08e9))
+
+- **backend**: Refuse null for required card fields instead of failing with a 500
+  ([`abb3a56`](https://github.com/Quenary/cardholder_pwa/commit/abb3a5689cb96ccba998a78b6777aebd2bea8e37))
+
+- **backend**: Revoke pending recovery codes when the password or email changes
+  ([`e079d01`](https://github.com/Quenary/cardholder_pwa/commit/e079d01a6515459b829259b98e9fdf959ac1a9e5))
+
+- **backend**: Stop bcrypt 5 turning passwords over 72 bytes into a 500
+  ([`0408e5d`](https://github.com/Quenary/cardholder_pwa/commit/0408e5da3e0f5316723dfc6328c216b2ff7ff83f))
+
+### Build System
+
+- **deps**: Bump the actions group with 2 updates
+  ([`692957b`](https://github.com/Quenary/cardholder_pwa/commit/692957bd3a7a205df104f1b2538cd05d9f5f8b7c))
+
+- **deps**: Bump the backend group with 2 updates
+  ([`8114d18`](https://github.com/Quenary/cardholder_pwa/commit/8114d18a6b4f5e4204be7f7bde8fa42cc7685ef1))
+
+- **deps**: Bump the backend group with 9 updates
+  ([`5cd9971`](https://github.com/Quenary/cardholder_pwa/commit/5cd9971e26169af77b1cdbf63ac1123ed7073f0d))
+
+
 ## v1.13.0 (2026-09-10)
 
 ### Bug Fixes
