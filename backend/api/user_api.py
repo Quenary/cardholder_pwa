@@ -10,6 +10,9 @@ from backend.core.auth_core import (
     verify_password,
 )
 from backend.core.user_core import delete_user as _delete_user
+from backend.db.models.password_recovery_code_model import (
+    PasswordRecoveryCodeModel,
+)
 from backend.db.models.refresh_token_model import RefreshTokenModel
 from backend.db.models.user_model import UserModel
 from backend.db.session import get_async_session
@@ -91,6 +94,18 @@ async def update_user(
         await session.execute(
             update(RefreshTokenModel)
             .where(RefreshTokenModel.user_id == current_user.id)
+            .values(revoked=True)
+        )
+        await session.commit()
+
+    if data.password or email_changed:
+        # A recovery code still pending would otherwise reset the password
+        # the user has just chosen, and after an email change it sits in a
+        # mailbox that is no longer theirs, possibly the very reason for the
+        # change. Same rule as a completed recovery, which revokes them all.
+        await session.execute(
+            update(PasswordRecoveryCodeModel)
+            .where(PasswordRecoveryCodeModel.user_id == current_user.id)
             .values(revoked=True)
         )
         await session.commit()

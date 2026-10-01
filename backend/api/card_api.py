@@ -93,7 +93,7 @@ async def delete_card(
     return {"detail": "Card deleted"}
 
 
-@router.patch("/cards/{card_id}")
+@router.patch("/cards/{card_id}", response_model=CardSchema)
 async def patch_card(
     card_id: int,
     body: CardPatchSchema,

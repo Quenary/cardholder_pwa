@@ -7,6 +7,7 @@ from backend.schemas.card_schema import (
     NAME_MAX_LENGTH,
     CardCreateSchema,
     CardPatchSchema,
+    CardUpdateSchema,
 )
 
 
@@ -49,3 +50,28 @@ def test_patch_rejects_an_oversized_field() -> None:
 
 def test_patch_still_accepts_an_empty_payload() -> None:
     assert CardPatchSchema().model_dump(exclude_unset=True) == {}
+
+
+@pytest.mark.parametrize("field", ["code", "code_type", "name", "is_favorite"])
+def test_patch_rejects_null_for_a_required_column(field: str) -> None:
+    # These columns are NOT NULL: a null used to get through to the database
+    # and come back as a 500.
+    with pytest.raises(ValidationError):
+        CardPatchSchema(**{field: None})
+
+
+@pytest.mark.parametrize("field", ["description", "color", "used_at"])
+def test_patch_still_accepts_null_for_a_nullable_column(field: str) -> None:
+    assert CardPatchSchema(**{field: None}).model_dump(exclude_unset=True) == {
+        field: None
+    }
+
+
+def test_update_rejects_a_null_favorite_flag() -> None:
+    with pytest.raises(ValidationError):
+        CardUpdateSchema(**_payload(is_favorite=None))
+
+
+def test_update_and_create_still_accept_a_missing_favorite_flag() -> None:
+    assert CardUpdateSchema(**_payload()).is_favorite is None
+    assert CardCreateSchema(**_payload(is_favorite=None)).is_favorite is None

@@ -329,3 +329,58 @@ async def test_user_should_change_username_with_current_password() -> None:
         result = await update_user(user, session_mock, current_user)
 
     assert result.username == "new_user_name"
+
+
+async def _update_statements(payload: dict) -> list[str]:
+    user = _get_user_update(payload)
+    session_mock = AsyncMock(spec=AsyncSession)
+    with patch(
+        "backend.api.user_api.is_creds_taken",
+        new_callable=AsyncMock,
+        return_value=False,
+    ):
+        await update_user(user, session_mock, _get_current_user())
+    return [str(call.args[0]) for call in session_mock.execute.mock_calls if call.args]
+
+
+@pytest.mark.asyncio
+async def test_user_should_revoke_recovery_codes_on_password_change() -> None:
+    statements = await _update_statements(
+        {
+            "username": "user_name",
+            "email": "user_email@example.com",
+            "current_password": CURRENT_PASSWORD,
+            "password": "123456qQ",
+            "confirm_password": "123456qQ",
+        }
+    )
+
+    assert any("UPDATE password_recovery_codes" in stmt for stmt in statements)
+
+
+@pytest.mark.asyncio
+async def test_user_should_revoke_recovery_codes_on_email_change() -> None:
+    statements = await _update_statements(
+        {
+            "username": "user_name",
+            "email": "new_email@example.com",
+            "current_password": CURRENT_PASSWORD,
+        }
+    )
+
+    assert any("UPDATE password_recovery_codes" in stmt for stmt in statements)
+    # The password did not change: the sessions stay.
+    assert not any("UPDATE refresh_token" in stmt for stmt in statements)
+
+
+@pytest.mark.asyncio
+async def test_user_should_keep_recovery_codes_on_username_change() -> None:
+    statements = await _update_statements(
+        {
+            "username": "new_user_name",
+            "email": "user_email@example.com",
+            "current_password": CURRENT_PASSWORD,
+        }
+    )
+
+    assert not any("UPDATE password_recovery_codes" in stmt for stmt in statements)
