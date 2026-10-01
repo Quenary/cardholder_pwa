@@ -1,0 +1,114 @@
+import { ELocalStorageKey } from 'src/app/app.consts';
+import { ITokenResponse } from 'src/app/entities/auth/auth-interface';
+import { refreshTokensOnce } from './refresh-tokens-once.function';
+
+const tokens = (n: number): ITokenResponse => ({
+  access_token: `access-${n}`,
+  token_type: 'bearer',
+  expires_in: 300,
+  refresh_token: `refresh-${n}`,
+});
+
+const store = (value: ITokenResponse | null) => {
+  if (value) {
+    localStorage.setItem(
+      ELocalStorageKey.TOKEN_RESPONSE,
+      JSON.stringify(value),
+    );
+  } else {
+    localStorage.removeItem(ELocalStorageKey.TOKEN_RESPONSE);
+  }
+};
+
+describe('refreshTokensOnce', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    store(null);
+  });
+
+  const withLocks = () => {
+    // Runs one callback at a time, in order, like the real thing does.
+    let queue: Promise<unknown> = Promise.resolve();
+    const request = vi.fn(
+      (_name: string, callback: () => Promise<ITokenResponse>) => {
+        const next = queue.then(callback);
+        queue = next.catch(() => undefined);
+        return next;
+      },
+    );
+    vi.stubGlobal('navigator', { locks: { request } });
+    return request;
+  };
+
+  it('asks the backend when the stored tokens are still the stale ones', async () => {
+    withLocks();
+    store(tokens(1));
+    const refresh = vi.fn().mockResolvedValue(tokens(2));
+
+    const result = await refreshTokensOnce('refresh-1', refresh);
+
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(result).toEqual(tokens(2));
+  });
+
+  it('takes the tokens another tab already stored instead of asking again', async () => {
+    withLocks();
+    store(tokens(2));
+    const refresh = vi.fn();
+
+    const result = await refreshTokensOnce('refresh-1', refresh);
+
+    expect(refresh).not.toHaveBeenCalled();
+    expect(result).toEqual(tokens(2));
+  });
+
+  it('spends the refresh token once when two callers race', async () => {
+    const request = withLocks();
+    store(tokens(1));
+    const refresh = vi.fn().mockImplementation(async () => {
+      store(tokens(2));
+      return tokens(2);
+    });
+
+    const [first, second] = await Promise.all([
+      refreshTokensOnce('refresh-1', refresh),
+      refreshTokensOnce('refresh-1', refresh),
+    ]);
+
+    expect(request).toHaveBeenCalledWith(
+      'cardholder-token-refresh',
+      expect.any(Function),
+    );
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(first).toEqual(tokens(2));
+    expect(second).toEqual(tokens(2));
+  });
+
+  it('still refreshes where Web Locks are not available', async () => {
+    vi.stubGlobal('navigator', {});
+    store(tokens(1));
+    const refresh = vi.fn().mockResolvedValue(tokens(2));
+
+    expect(await refreshTokensOnce('refresh-1', refresh)).toEqual(tokens(2));
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
+
+  it('still looks at storage where Web Locks are not available', async () => {
+    vi.stubGlobal('navigator', {});
+    store(tokens(2));
+    const refresh = vi.fn();
+
+    expect(await refreshTokensOnce('refresh-1', refresh)).toEqual(tokens(2));
+    expect(refresh).not.toHaveBeenCalled();
+  });
+
+  it('lets a failed refresh through to the caller', async () => {
+    withLocks();
+    store(tokens(1));
+    const error = new Error('401');
+
+    await expect(
+      refreshTokensOnce('refresh-1', () => Promise.reject(error)),
+    ).rejects.toBe(error);
+  });
+});
