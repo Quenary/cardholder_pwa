@@ -8,6 +8,7 @@ import {
   ISharedCardsResponse,
   ISharedWithMeItem,
   IShareUsersPage,
+  TShareStatus,
   IUpdateCardShareRequest,
 } from '../shared-cards.interface';
 
@@ -30,8 +31,31 @@ export class CardShareApiService extends BaseApiService<'cards/share'> {
     });
   }
 
-  getCardsSharedWithMe(): Observable<ISharedWithMeItem[]> {
-    return this.httpClient.get<ISharedWithMeItem[]>(`${this.basePath}/with-me`);
+  /**
+   * The cards shared with the caller. Only the accepted ones, which are the
+   * ones that belong in the list of cards, unless another status is asked for.
+   */
+  getCardsSharedWithMe(
+    status: TShareStatus = 'accepted',
+  ): Observable<ISharedWithMeItem[]> {
+    return this.httpClient.get<ISharedWithMeItem[]>(
+      `${this.basePath}/with-me`,
+      { params: { status } },
+    );
+  }
+
+  acceptCardSharedWithMe(cardId: number): Observable<{ detail: string }> {
+    return this.httpClient.post<{ detail: string }>(
+      `${this.basePath}/with-me/${cardId}/accept`,
+      {},
+    );
+  }
+
+  declineCardSharedWithMe(cardId: number): Observable<{ detail: string }> {
+    return this.httpClient.post<{ detail: string }>(
+      `${this.basePath}/with-me/${cardId}/decline`,
+      {},
+    );
   }
 
   shareCard(body: IShareCardRequest): Observable<ISharedCardItem> {

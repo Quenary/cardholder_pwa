@@ -196,6 +196,15 @@
     "EMPTY_YOU_SHARE": "Todavía no has compartido ninguna tarjeta",
     "EMPTY_SHARED_WITH_YOU": "Todavía no te han compartido ninguna tarjeta",
     "SHARED_BY": "Compartida por",
+    "SECTION_PENDING": "Esperando tu respuesta",
+    "SECTION_DECLINED": "Rechazadas",
+    "ACTION_ACCEPT": "Aceptar",
+    "ACTION_DECLINE": "Rechazar",
+    "STATUS": {
+      "PENDING": "pendiente",
+      "ACCEPTED": "aceptada",
+      "DECLINED": "rechazada"
+    },
     "DIALOG": {
       "TITLE_ADD": "Compartir tarjeta",
       "TITLE_EDIT": "Editar acceso compartido",

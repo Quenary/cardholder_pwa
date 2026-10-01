@@ -196,6 +196,15 @@
     "EMPTY_YOU_SHARE": "You have not shared any cards yet",
     "EMPTY_SHARED_WITH_YOU": "No cards shared with you yet",
     "SHARED_BY": "Shared by",
+    "SECTION_PENDING": "Waiting for your answer",
+    "SECTION_DECLINED": "Declined",
+    "ACTION_ACCEPT": "Accept",
+    "ACTION_DECLINE": "Decline",
+    "STATUS": {
+      "PENDING": "waiting",
+      "ACCEPTED": "accepted",
+      "DECLINED": "declined"
+    },
     "DIALOG": {
       "TITLE_ADD": "Share card",
       "TITLE_EDIT": "Edit share access",

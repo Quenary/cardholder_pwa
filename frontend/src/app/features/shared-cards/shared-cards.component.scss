@@ -132,6 +132,16 @@
               width: 14px;
               height: 14px;
             }
+
+            &.user-chip-declined {
+              text-decoration: line-through;
+              opacity: 0.7;
+
+              .user-status {
+                text-decoration: none;
+                display: inline-block;
+              }
+            }
           }
         }
 
@@ -158,6 +168,10 @@
 
         .delete-btn {
           color: var(--mat-sys-error, #ba1a1a);
+        }
+
+        .accept-btn {
+          color: var(--mat-sys-primary);
         }
       }
     }

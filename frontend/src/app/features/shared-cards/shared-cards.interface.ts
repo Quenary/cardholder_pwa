@@ -5,6 +5,16 @@ export interface IShareUser {
   username: string;
 }
 
+/**
+ * What the recipient decided about a share. A share is pending until they
+ * answer, and only an accepted one is in their list of cards.
+ */
+export type TShareStatus = 'pending' | 'accepted' | 'declined';
+
+export interface IShareRecipient extends IShareUser {
+  status: TShareStatus;
+}
+
 export interface IShareUsersPage {
   items: IShareUser[];
   total: number;
@@ -14,12 +24,13 @@ export interface IShareUsersPage {
 
 export interface ISharedCardItem {
   card: ICard;
-  shared_with_users: IShareUser[];
+  shared_with_users: IShareRecipient[];
 }
 
 export interface ISharedWithMeItem {
   card: ICard;
   owner: IShareUser;
+  status: TShareStatus;
 }
 
 export interface ISharedCardsResponse {

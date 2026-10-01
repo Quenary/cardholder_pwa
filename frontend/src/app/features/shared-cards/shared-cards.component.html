@@ -21,6 +21,57 @@
       <mat-spinner diameter="40"></mat-spinner>
     </div>
   } @else {
+    <!-- SECTION: PENDING -->
+    @if (pending().length > 0) {
+      <div class="shared-cards-section pending-section">
+        <h3 class="section-title">
+          <mat-icon>mark_email_unread</mat-icon>
+          <span>{{ 'SHARED_CARDS.SECTION_PENDING' | translate }}</span>
+          <span class="count-badge">({{ pending().length }})</span>
+        </h3>
+
+        <div class="shared-cards-list">
+          @for (item of pending(); track item.card.id) {
+            <div class="shared-card-item">
+              <app-card-preview
+                class="mini-preview-container"
+                [card]="item.card"
+                size="mini">
+              </app-card-preview>
+
+              <div class="card-info">
+                <span class="card-name">{{ item.card.name }}</span>
+                <div class="owner-info">
+                  <mat-icon class="owner-icon">person_outline</mat-icon>
+                  <span class="owner-text">
+                    {{ 'SHARED_CARDS.SHARED_BY' | translate }}:
+                    <strong>{{ item.owner.username }}</strong>
+                  </span>
+                </div>
+              </div>
+
+              <div class="card-actions">
+                <button
+                  mat-icon-button
+                  class="accept-btn"
+                  [attr.aria-label]="'SHARED_CARDS.ACTION_ACCEPT' | translate"
+                  (click)="respond(item, 'accepted')">
+                  <mat-icon>check</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  class="delete-btn"
+                  [attr.aria-label]="'SHARED_CARDS.ACTION_DECLINE' | translate"
+                  (click)="respond(item, 'declined')">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
     <!-- SECTION: YOU SHARE -->
     <div class="shared-cards-section">
       <h3 class="section-title">
@@ -47,9 +98,23 @@
                 <span class="card-name">{{ item.card.name }}</span>
                 <div class="users-chips">
                   @for (user of item.shared_with_users; track user.id) {
-                    <span class="user-chip">
-                      <mat-icon class="user-icon">person</mat-icon>
+                    <span
+                      class="user-chip"
+                      [class.user-chip-pending]="user.status === 'pending'"
+                      [class.user-chip-declined]="user.status === 'declined'">
+                      <mat-icon class="user-icon">{{
+                        user.status === 'pending'
+                          ? 'schedule'
+                          : user.status === 'declined'
+                            ? 'block'
+                            : 'person'
+                      }}</mat-icon>
                       {{ user.username }}
+                      @if (user.status !== 'accepted') {
+                        <span class="user-status">
+                          ({{ statusLabels[user.status] | translate }})
+                        </span>
+                      }
                     </span>
                   }
                 </div>
@@ -123,5 +188,49 @@
         </div>
       }
     </div>
+
+    <!-- SECTION: DECLINED -->
+    @if (declined().length > 0) {
+      <div class="shared-cards-section declined-section">
+        <h3 class="section-title">
+          <mat-icon>block</mat-icon>
+          <span>{{ 'SHARED_CARDS.SECTION_DECLINED' | translate }}</span>
+          <span class="count-badge">({{ declined().length }})</span>
+        </h3>
+
+        <div class="shared-cards-list">
+          @for (item of declined(); track item.card.id) {
+            <div class="shared-card-item">
+              <app-card-preview
+                class="mini-preview-container"
+                [card]="item.card"
+                size="mini">
+              </app-card-preview>
+
+              <div class="card-info">
+                <span class="card-name">{{ item.card.name }}</span>
+                <div class="owner-info">
+                  <mat-icon class="owner-icon">person_outline</mat-icon>
+                  <span class="owner-text">
+                    {{ 'SHARED_CARDS.SHARED_BY' | translate }}:
+                    <strong>{{ item.owner.username }}</strong>
+                  </span>
+                </div>
+              </div>
+
+              <div class="card-actions">
+                <button
+                  mat-icon-button
+                  class="accept-btn"
+                  [attr.aria-label]="'SHARED_CARDS.ACTION_ACCEPT' | translate"
+                  (click)="respond(item, 'accepted')">
+                  <mat-icon>check</mat-icon>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
   }
 </section>
