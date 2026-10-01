@@ -27,3 +27,10 @@ def password_validator(value: str) -> str:
     if not re.search(r"\d", value):
         raise ValueError("The password must contain at least one number.")
     return value
+
+
+def username_validator(value: str) -> str:
+    """Validate username string"""
+    if not value.strip():
+        raise ValueError("The username must not be empty.")
+    return value

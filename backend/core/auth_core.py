@@ -6,7 +6,7 @@ import bcrypt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.config import Config
@@ -116,12 +116,17 @@ async def is_user(
             Config.JWT_SECRET_KEY,
             algorithms=[Config.JWT_ALGORITHM],
         )
-        username: str = cast(str, payload.get("sub"))
-        if not username:
+        subject = cast(str | None, payload.get("sub"))
+        # The subject is the user id: a username can be renamed, and a new
+        # account taking the old name would otherwise accept the previous
+        # owner's tokens until they expire. Tokens issued before that, with
+        # a username here, are refused and get replaced by a refresh.
+        if not subject or not subject.isascii() or not subject.isdigit():
             raise credentials_exception
+        user_id = int(subject)
     except JWTError:
         raise credentials_exception from None
-    stmt = select(UserModel).where(UserModel.username == username).limit(1)
+    stmt = select(UserModel).where(UserModel.id == user_id).limit(1)
     result = await session.execute(stmt)
     user = result.scalar_one_or_none()
     if not user:
@@ -184,14 +189,15 @@ async def is_creds_taken(
 ):
     """
     Check if user credentials already taken by
-    another user.
+    another user. The comparison ignores case, so "Alice" and "alice" are
+    the same name, and so are "A@x.org" and "a@x.org".
     """
     stmt = (
         select(UserModel)
         .where(
             or_(
-                UserModel.username == username,
-                UserModel.email == email,
+                func.lower(UserModel.username) == username.lower(),
+                func.lower(UserModel.email) == email.lower(),
             ),
             UserModel.id != user_id,
         )

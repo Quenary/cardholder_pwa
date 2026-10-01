@@ -1,9 +1,10 @@
 import asyncio
+import logging
 import secrets
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy import desc, select, update
+from sqlalchemy import desc, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -24,6 +25,8 @@ from backend.schemas.password_recovery_schema import (
 )
 
 router = APIRouter(tags=["password recovery"], prefix="/recovery")
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def build_reset_url(request: Request, code: str) -> str | None:
@@ -55,7 +58,11 @@ async def code(
     body: PasswordRecoveryCodeRequestSchema,
     session: AsyncSession = Depends(get_async_session),
 ):
-    stmt = select(UserModel).where(UserModel.email == body.email).limit(1)
+    stmt = (
+        select(UserModel)
+        .where(func.lower(UserModel.email) == body.email.lower())
+        .limit(1)
+    )
     result = await session.execute(stmt)
 
     user = result.scalar_one_or_none()
@@ -81,12 +88,20 @@ async def code(
 
         reset_url = build_reset_url(request, code)
 
-        await asyncio.to_thread(
-            EmailSender.send_password_reset_email,
-            body.email,
-            code,
-            reset_url,
-        )
+        try:
+            await asyncio.to_thread(
+                EmailSender.send_password_reset_email,
+                body.email,
+                code,
+                reset_url,
+            )
+        except Exception:
+            # The answer must not depend on whether the email is known: an
+            # error here, which only a registered address can reach, would
+            # tell anyone asking which emails have an account. The sender
+            # already logged the cause. No code is kept, since nobody got it.
+            _LOGGER.warning("Password recovery email could not be sent")
+            return {}
 
         db_code = PasswordRecoveryCodeModel(
             code=code, expires_at=expires_at, user_id=user.id

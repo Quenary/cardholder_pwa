@@ -384,3 +384,19 @@ async def test_user_should_keep_recovery_codes_on_username_change() -> None:
     )
 
     assert not any("UPDATE password_recovery_codes" in stmt for stmt in statements)
+
+
+@pytest.mark.parametrize("username", ["", "   ", "\t\n"])
+def test_username_must_not_be_blank(username: str) -> None:
+    with pytest.raises(ValueError, match="must not be empty"):
+        _get_user_create({**_CREATE, "username": username})
+    with pytest.raises(ValueError, match="must not be empty"):
+        _get_user_update({"username": username, "email": "user_email@example.com"})
+
+
+_CREATE = {
+    "username": "user_name",
+    "email": "user_email@example.com",
+    "password": "123456qQ",
+    "confirm_password": "123456qQ",
+}

@@ -11,7 +11,7 @@ from pydantic import (
 
 from backend.enums.user_role_enum import EUserRole
 
-from .validators import password_validator
+from .validators import password_validator, username_validator
 
 
 class UserCreateSchema(BaseModel):
@@ -21,6 +21,11 @@ class UserCreateSchema(BaseModel):
     email: EmailStr
     password: str
     confirm_password: str
+
+    @field_validator("username")
+    @classmethod
+    def validate_username(cls, v: str) -> str:
+        return username_validator(v)
 
     @field_validator("password", "confirm_password")
     @classmethod
@@ -47,6 +52,11 @@ class UserUpdateSchema(BaseModel):
     current_password: str | None = None
     password: str | None = None
     confirm_password: str | None = None
+
+    @field_validator("username")
+    @classmethod
+    def validate_username(cls, v: str) -> str:
+        return username_validator(v)
 
     @field_validator("password", "confirm_password")
     @classmethod
