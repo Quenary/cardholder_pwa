@@ -4,7 +4,12 @@ import { AuthActions } from './auth.actions';
 import { AuthApiService } from 'src/app/entities/auth/auth-api.service';
 import {
   catchError,
+  defer,
+  filter,
   finalize,
+  firstValueFrom,
+  fromEvent,
+  from,
   map,
   of,
   switchMap,
@@ -17,6 +22,8 @@ import { SnackService } from 'src/app/core/services/snack.service';
 import { selectAuthTokenResponse } from './auth.selectors';
 import { Store } from '@ngrx/store';
 import { UserActions } from '../../user/state/user.actions';
+import { ITokenResponse } from 'src/app/entities/auth/auth-interface';
+import { refreshTokensOnce } from 'src/app/shared/functions/refresh-tokens-once.function';
 import { clearApiCache } from 'src/app/shared/functions/clear-api-cache.function';
 
 @Injectable()
@@ -46,7 +53,15 @@ export class AuthEffects {
     this.actions$.pipe(
       ofType(AuthActions.refreshToken),
       switchMap((action) =>
-        this.authApiService.tokenRefresh(action.refreshToken).pipe(
+        defer(() =>
+          from(
+            refreshTokensOnce(action.refreshToken, () =>
+              firstValueFrom(
+                this.authApiService.tokenRefresh(action.refreshToken),
+              ),
+            ),
+          ),
+        ).pipe(
           map((tokenResponse) =>
             AuthActions.refreshTokenSuccess({ tokenResponse }),
           ),
@@ -56,6 +71,33 @@ export class AuthEffects {
           }),
         ),
       ),
+    ),
+  );
+
+  /**
+   * Another tab refreshed: take its tokens, since the refresh token this tab
+   * holds has been rotated and is no longer good. Only a tab that is logged
+   * in follows, and only to newer tokens, never to a logout.
+   */
+  syncTokens$ = createEffect(() =>
+    fromEvent<StorageEvent>(window, 'storage').pipe(
+      filter(
+        (event) =>
+          event.storageArea === localStorage &&
+          event.key === ELocalStorageKey.TOKEN_RESPONSE &&
+          !!event.newValue,
+      ),
+      withLatestFrom(this.store.select(selectAuthTokenResponse)),
+      filter(([_, current]) => !!current),
+      map(([event]) => {
+        try {
+          return JSON.parse(event.newValue) as ITokenResponse;
+        } catch {
+          return null;
+        }
+      }),
+      filter((tokenResponse) => !!tokenResponse?.access_token),
+      map((tokenResponse) => AuthActions.tokensSynced({ tokenResponse })),
     ),
   );
 

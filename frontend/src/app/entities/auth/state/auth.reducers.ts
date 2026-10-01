@@ -48,6 +48,10 @@ export const authReducer = createReducer(
       isLoading: false,
     }),
   ),
+  on(AuthActions.tokensSynced, (state, payload) => ({
+    ...state,
+    tokenResponse: payload.tokenResponse,
+  })),
   on(AuthActions.logoutSilent, () => ({
     ...initialState,
     init: true,

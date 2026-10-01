@@ -15,6 +15,10 @@ export const AuthActions = createActionGroup({
     'refresh token': props<{ refreshToken: string }>(),
     'refresh token success': props<{ tokenResponse: ITokenResponse }>(),
     'refresh token error': props<{ error: HttpErrorResponse }>(),
+    /**
+     * Tokens written by another tab, picked up from the storage event
+     */
+    'tokens synced': props<{ tokenResponse: ITokenResponse }>(),
     logout: emptyProps(),
     'logout success': emptyProps(),
     'logout error': props<{ error: HttpErrorResponse }>(),
