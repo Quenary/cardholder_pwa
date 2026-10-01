@@ -4,7 +4,7 @@ import secrets
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy import desc, select, update
+from sqlalchemy import desc, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -58,7 +58,11 @@ async def code(
     body: PasswordRecoveryCodeRequestSchema,
     session: AsyncSession = Depends(get_async_session),
 ):
-    stmt = select(UserModel).where(UserModel.email == body.email).limit(1)
+    stmt = (
+        select(UserModel)
+        .where(func.lower(UserModel.email) == body.email.lower())
+        .limit(1)
+    )
     result = await session.execute(stmt)
 
     user = result.scalar_one_or_none()

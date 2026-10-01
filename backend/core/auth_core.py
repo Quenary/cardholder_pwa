@@ -6,7 +6,7 @@ import bcrypt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.config import Config
@@ -184,14 +184,15 @@ async def is_creds_taken(
 ):
     """
     Check if user credentials already taken by
-    another user.
+    another user. The comparison ignores case, so "Alice" and "alice" are
+    the same name, and so are "A@x.org" and "a@x.org".
     """
     stmt = (
         select(UserModel)
         .where(
             or_(
-                UserModel.username == username,
-                UserModel.email == email,
+                func.lower(UserModel.username) == username.lower(),
+                func.lower(UserModel.email) == email.lower(),
             ),
             UserModel.id != user_id,
         )
