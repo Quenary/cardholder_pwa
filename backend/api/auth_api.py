@@ -1,6 +1,8 @@
+from typing import cast
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy import select
+from sqlalchemy import CursorResult, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -70,8 +72,22 @@ async def refresh_token(
     if not db_token:
         raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
 
-    db_token.revoked = True
+    # Claim the token with a conditional update rather than setting the flag on
+    # the row read above: that read and this write are two steps, and two
+    # refreshes arriving with the same token would both get through between
+    # them, each receiving a new pair. Only the one whose update still finds
+    # the token unrevoked goes on.
+    claim = await session.execute(
+        update(RefreshTokenModel)
+        .where(
+            RefreshTokenModel.id == db_token.id,
+            RefreshTokenModel.revoked.is_(False),
+        )
+        .values(revoked=True)
+    )
     await session.commit()
+    if cast(CursorResult, claim).rowcount != 1:
+        raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
 
     user = db_token.user
     access_token, access_exp = create_access_token({"sub": user.username})
