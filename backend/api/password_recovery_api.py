@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import secrets
 from datetime import timedelta
 
@@ -24,6 +25,8 @@ from backend.schemas.password_recovery_schema import (
 )
 
 router = APIRouter(tags=["password recovery"], prefix="/recovery")
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def build_reset_url(request: Request, code: str) -> str | None:
@@ -81,12 +84,20 @@ async def code(
 
         reset_url = build_reset_url(request, code)
 
-        await asyncio.to_thread(
-            EmailSender.send_password_reset_email,
-            body.email,
-            code,
-            reset_url,
-        )
+        try:
+            await asyncio.to_thread(
+                EmailSender.send_password_reset_email,
+                body.email,
+                code,
+                reset_url,
+            )
+        except Exception:
+            # The answer must not depend on whether the email is known: an
+            # error here, which only a registered address can reach, would
+            # tell anyone asking which emails have an account. The sender
+            # already logged the cause. No code is kept, since nobody got it.
+            _LOGGER.warning("Password recovery email could not be sent")
+            return {}
 
         db_code = PasswordRecoveryCodeModel(
             code=code, expires_at=expires_at, user_id=user.id

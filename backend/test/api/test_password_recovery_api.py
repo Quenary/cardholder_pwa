@@ -72,3 +72,48 @@ def test_public_url_trailing_slash_does_not_produce_a_double_slash(
     url = build_reset_url(_request("irrelevant"), "CODE5")
 
     assert "//password-recovery" not in url.split("://", 1)[1]
+
+
+def _code_session(user):
+    from unittest.mock import AsyncMock, MagicMock
+
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    session = AsyncMock(spec=AsyncSession)
+    session.add = MagicMock()
+    # First lookup finds the user (or not), the second finds no recent code.
+    session.execute.side_effect = [
+        MagicMock(scalar_one_or_none=MagicMock(return_value=user)),
+        MagicMock(scalar_one_or_none=MagicMock(return_value=None)),
+    ]
+    return session
+
+
+@pytest.mark.asyncio
+async def test_code_answers_the_same_when_the_email_cannot_be_sent():
+    """An error from the mail server only a known address can reach would let
+    anyone test which emails have an account."""
+    from unittest.mock import MagicMock, patch
+
+    from fastapi import HTTPException
+
+    from backend.api.password_recovery_api import code
+    from backend.schemas.password_recovery_schema import (
+        PasswordRecoveryCodeRequestSchema,
+    )
+
+    body = PasswordRecoveryCodeRequestSchema(email="a@example.com")
+    request = _request("example.org")
+
+    unknown = await code(request, body, _code_session(None))
+
+    known_session = _code_session(MagicMock(id=1))
+    with patch(
+        "backend.api.password_recovery_api.EmailSender.send_password_reset_email",
+        side_effect=HTTPException(500, "Failed to send email"),
+    ):
+        known = await code(request, body, known_session)
+
+    assert known == unknown == {}
+    # Nobody received the code, so none is kept.
+    known_session.add.assert_not_called()
