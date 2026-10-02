@@ -97,40 +97,46 @@ describe('SortFilterDialogComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display forms from data', () => {
-    fixture.detectChanges();
+  describe('template', () => {
+    it('renders forms from dialog data', () => {
+      fixture.detectChanges();
 
-    const formsElements = template.querySelectorAll('form');
-    expect(formsElements.length).toEqual(3);
+      const formsElements = template.querySelectorAll('form');
+      expect(formsElements.length).toEqual(3);
+    });
   });
 
-  it('should add filter', () => {
-    fixture.detectChanges();
+  describe('addFilter', () => {
+    it('appends a filter form', () => {
+      fixture.detectChanges();
 
-    const addFiterButton: HTMLButtonElement = template.querySelector(
-      'mat-dialog-content > button',
-    );
-    expect(addFiterButton).toBeTruthy();
+      const addFiterButton: HTMLButtonElement = template.querySelector(
+        'mat-dialog-content > button',
+      );
+      expect(addFiterButton).toBeTruthy();
 
-    addFiterButton.click();
-    fixture.detectChanges();
+      addFiterButton.click();
+      fixture.detectChanges();
 
-    const formsElements = template.querySelectorAll('form');
-    expect(formsElements.length).toEqual(4);
+      const formsElements = template.querySelectorAll('form');
+      expect(formsElements.length).toEqual(4);
+    });
   });
 
-  it('should remove filter', () => {
-    fixture.detectChanges();
+  describe('removeFilter', () => {
+    it('removes a filter form', () => {
+      fixture.detectChanges();
 
-    const filterFormRemoveButton: HTMLElement = template.querySelector(
-      'mat-dialog-content form[name="filter-form"] [name="filter-form-remove-button"]',
-    );
-    expect(filterFormRemoveButton).toBeTruthy();
+      const filterFormRemoveButton: HTMLElement = template.querySelector(
+        'mat-dialog-content form[name="filter-form"] [name="filter-form-remove-button"]',
+      );
+      expect(filterFormRemoveButton).toBeTruthy();
 
-    filterFormRemoveButton.click();
-    fixture.detectChanges();
+      filterFormRemoveButton.click();
+      fixture.detectChanges();
 
-    const formsElements = template.querySelectorAll('form');
-    expect(formsElements.length).toEqual(2);
+      const formsElements = template.querySelectorAll('form');
+      expect(formsElements.length).toEqual(2);
+    });
   });
 });

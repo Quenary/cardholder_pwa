@@ -28,20 +28,24 @@ describe('isOnlineGuard', () => {
     );
   }
 
-  it('should allow online', async () => {
-    const result = await firstValueFrom(runGuard());
+  describe('when online', () => {
+    it('allows navigation', async () => {
+      const result = await firstValueFrom(runGuard());
 
-    expect(result).toBe(true);
+      expect(result).toBe(true);
+    });
   });
 
-  it('should reject not online', async () => {
-    storeMock.setState({
-      app: {
-        isOnline: false,
-      },
-    });
-    const result = await firstValueFrom(runGuard());
+  describe('when offline', () => {
+    it('blocks navigation', async () => {
+      storeMock.setState({
+        app: {
+          isOnline: false,
+        },
+      });
+      const result = await firstValueFrom(runGuard());
 
-    expect(result).toBe(false);
+      expect(result).toBe(false);
+    });
   });
 });

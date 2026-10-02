@@ -78,7 +78,7 @@ PWA: `provideServiceWorker` in `app.config.ts`. Offline behavior is read-only; r
 
 Unit tests run on Vitest through `@angular/build:unit-test` (jsdom). Setup is `src/testing/setup-file.ts`.
 
-Colocate `*.spec.ts` with the unit. Use `TestBed`, `provideTranslateService()` when the template translates, and `testAppState` / store overrides when the component reads NgRx. Shared doubles belong in `src/testing/`.
+Colocate `*.spec.ts` with the unit. Use `TestBed`, `provideTranslateService()` when the template translates, and `testAppState` / store overrides when the component reads NgRx. Shared doubles belong in `src/testing/helpers/` (re-exported from `src/testing`); add a factory there when the same mock appears in more than one spec.
 
 Group related `it` blocks in a nested `describe` named after the subject (a selector, an effect, a method). Each condition of that subject is its own `it`. Keep the `it` title short: the `describe` name is already the prefix. Leave a single unrelated test, such as creation, at the top level.
 

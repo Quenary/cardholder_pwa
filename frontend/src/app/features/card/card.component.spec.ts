@@ -17,7 +17,6 @@ describe('CardComponent', () => {
 
   let storeMock: MockStore;
   let initialState: ITestAppState;
-  // The component listens to the action stream to refresh the logo preview.
   let actions$: Subject<Action>;
 
   beforeEach(async () => {
@@ -46,51 +45,53 @@ describe('CardComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should save valid card', () => {
-    fixture = TestBed.createComponent(CardComponent);
-    component = fixture.componentInstance;
-    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
-    fixture.detectChanges();
+  describe('onSubmit', () => {
+    it('dispatches save for a valid form', () => {
+      fixture = TestBed.createComponent(CardComponent);
+      component = fixture.componentInstance;
+      const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
+      fixture.detectChanges();
 
-    component['form'].patchValue({
-      code: '12345678',
-      code_type: 'ean8',
-      name: 'newcard',
+      component['form'].patchValue({
+        code: '12345678',
+        code_type: 'ean8',
+        name: 'newcard',
+      });
+      component['onSubmit']();
+
+      expect(dispatchSpy).toHaveBeenCalledWith(CardsActions.saveCard());
     });
-    component['onSubmit']();
 
-    expect(dispatchSpy).toHaveBeenCalledWith(CardsActions.saveCard());
-  });
+    it('does not dispatch for an invalid form', () => {
+      fixture = TestBed.createComponent(CardComponent);
+      component = fixture.componentInstance;
+      const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
+      fixture.detectChanges();
 
-  it('should not save invalid card', () => {
-    fixture = TestBed.createComponent(CardComponent);
-    component = fixture.componentInstance;
-    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
-    fixture.detectChanges();
+      component['form'].patchValue({
+        code: '12345678',
+        code_type: null,
+        name: 'newcard',
+      });
+      component['onSubmit']();
 
-    component['form'].patchValue({
-      code: '12345678',
-      code_type: null,
-      name: 'newcard',
+      component['form'].patchValue({
+        code: null,
+        code_type: 'ean8',
+        name: 'newcard',
+      });
+      component['onSubmit']();
+
+      component['form'].patchValue({
+        code: '12345678',
+        code_type: 'ean8',
+        name: null,
+      });
+      component['onSubmit']();
+
+      expect(dispatchSpy).not.toHaveBeenCalledWith(
+        expect.objectContaining({ type: CardsActions.update.type }),
+      );
     });
-    component['onSubmit']();
-
-    component['form'].patchValue({
-      code: null,
-      code_type: 'ean8',
-      name: 'newcard',
-    });
-    component['onSubmit']();
-
-    component['form'].patchValue({
-      code: '12345678',
-      code_type: 'ean8',
-      name: null,
-    });
-    component['onSubmit']();
-
-    expect(dispatchSpy).not.toHaveBeenCalledWith(
-      expect.objectContaining({ type: CardsActions.update.type }),
-    );
   });
 });

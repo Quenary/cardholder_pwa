@@ -35,26 +35,28 @@ describe('AuthComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should sign-in', () => {
-    fixture = TestBed.createComponent(AuthComponent);
-    component = fixture.componentInstance;
-    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
-    fixture.detectChanges();
+  describe('onSubmit', () => {
+    it('dispatches token action', () => {
+      fixture = TestBed.createComponent(AuthComponent);
+      component = fixture.componentInstance;
+      const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
+      fixture.detectChanges();
 
-    const formData = {
-      username: 'somelogin',
-      password: 'somepassword',
-    };
-    component['form'].patchValue(formData);
-    component['onSubmit']();
-    expect(dispatchSpy).toHaveBeenCalledTimes(1);
-    expect(dispatchSpy).toHaveBeenCalledWith(
-      AuthActions.token({
-        body: {
-          ...formData,
-          grant_type: 'password',
-        },
-      }),
-    );
+      const formData = {
+        username: 'somelogin',
+        password: 'somepassword',
+      };
+      component['form'].patchValue(formData);
+      component['onSubmit']();
+      expect(dispatchSpy).toHaveBeenCalledTimes(1);
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        AuthActions.token({
+          body: {
+            ...formData,
+            grant_type: 'password',
+          },
+        }),
+      );
+    });
   });
 });

@@ -2,8 +2,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
-import { createMatDialogRefMock } from 'src/testing';
+import {
+  createCardShareApiServiceMock,
+  createMatDialogRefMock,
+} from 'src/testing';
 import { CardShareApiService } from '../services/card-share-api.service';
+import { Mocked } from 'vitest';
 import {
   IShareCardDialogData,
   ShareCardDialogComponent,
@@ -13,6 +17,7 @@ describe('ShareCardDialogComponent', () => {
   let component: ShareCardDialogComponent;
   let fixture: ComponentFixture<ShareCardDialogComponent>;
   let matDialogRefMock: ReturnType<typeof createMatDialogRefMock>;
+  let cardShareApiMock: Mocked<CardShareApiService>;
 
   const mockUsers = [
     { id: 1, username: 'alice' },
@@ -28,6 +33,16 @@ describe('ShareCardDialogComponent', () => {
 
   beforeEach(async () => {
     matDialogRefMock = createMatDialogRefMock();
+    cardShareApiMock = createCardShareApiServiceMock({
+      getAvailableUsers: vi.fn((limit: number, offset: number) =>
+        of({
+          items: mockUsers.slice(offset, offset + limit),
+          total: mockUsers.length,
+          limit,
+          offset,
+        }),
+      ),
+    });
 
     await TestBed.configureTestingModule({
       imports: [ShareCardDialogComponent],
@@ -37,15 +52,7 @@ describe('ShareCardDialogComponent', () => {
         provideTranslateService(),
         {
           provide: CardShareApiService,
-          useValue: {
-            getAvailableUsers: (limit: number, offset: number) =>
-              of({
-                items: mockUsers.slice(offset, offset + limit),
-                total: mockUsers.length,
-                limit,
-                offset,
-              }),
-          },
+          useValue: cardShareApiMock,
         },
       ],
     }).compileComponents();
@@ -70,7 +77,7 @@ describe('ShareCardDialogComponent', () => {
       });
     });
 
-    it('should create and initialize empty invalid form', () => {
+    it('starts with an empty invalid form', () => {
       expect(component).toBeTruthy();
       expect(component['form'].valid).toBe(false);
       expect(
@@ -81,23 +88,25 @@ describe('ShareCardDialogComponent', () => {
       ).toBeTruthy();
     });
 
-    it('should not close dialog if form is invalid upon submit', () => {
-      component['submit']();
-      expect(matDialogRefMock.close).not.toHaveBeenCalled();
-      expect(component['form'].touched).toBe(true);
-    });
-
-    it('should close dialog with cardId and userIds on valid submit', () => {
-      component['form'].patchValue({
-        cardId: 10,
-        userIds: [1, 2],
+    describe('submit', () => {
+      it('does not close when invalid', () => {
+        component['submit']();
+        expect(matDialogRefMock.close).not.toHaveBeenCalled();
+        expect(component['form'].touched).toBe(true);
       });
-      expect(component['form'].valid).toBe(true);
 
-      component['submit']();
-      expect(matDialogRefMock.close).toHaveBeenCalledWith({
-        cardId: 10,
-        userIds: [1, 2],
+      it('closes with cardId and userIds when valid', () => {
+        component['form'].patchValue({
+          cardId: 10,
+          userIds: [1, 2],
+        });
+        expect(component['form'].valid).toBe(true);
+
+        component['submit']();
+        expect(matDialogRefMock.close).toHaveBeenCalledWith({
+          cardId: 10,
+          userIds: [1, 2],
+        });
       });
     });
   });
@@ -120,19 +129,21 @@ describe('ShareCardDialogComponent', () => {
       });
     });
 
-    it('should initialize with provided card id and user ids', () => {
+    it('prefills card and users', () => {
       expect(component['form'].value.cardId).toBe(42);
       expect(component['form'].value.userIds).toEqual([1]);
       expect(component['form'].valid).toBe(true);
     });
 
-    it('should submit with existing card id even if cardId is not in form', () => {
-      component['form'].patchValue({ userIds: [2] });
-      component['submit']();
+    describe('submit', () => {
+      it('keeps the existing card id', () => {
+        component['form'].patchValue({ userIds: [2] });
+        component['submit']();
 
-      expect(matDialogRefMock.close).toHaveBeenCalledWith({
-        cardId: 42,
-        userIds: [2],
+        expect(matDialogRefMock.close).toHaveBeenCalledWith({
+          cardId: 42,
+          userIds: [2],
+        });
       });
     });
   });
@@ -144,76 +155,78 @@ describe('ShareCardDialogComponent', () => {
       });
     });
 
-    it('should not require cardId but require userIds', () => {
+    it('requires only userIds', () => {
       expect(component['form'].controls.cardId.errors).toBeNull();
       expect(
         component['form'].controls.userIds.errors?.['required'],
       ).toBeTruthy();
     });
 
-    it('should submit with userIds and undefined cardId', () => {
-      component['form'].patchValue({ userIds: [1, 2] });
-      component['submit']();
+    describe('submit', () => {
+      it('closes without cardId', () => {
+        component['form'].patchValue({ userIds: [1, 2] });
+        component['submit']();
 
-      expect(matDialogRefMock.close).toHaveBeenCalledWith({
-        cardId: undefined,
-        userIds: [1, 2],
+        expect(matDialogRefMock.close).toHaveBeenCalledWith({
+          cardId: undefined,
+          userIds: [1, 2],
+        });
       });
     });
   });
 
-  describe('Cancel action', () => {
-    it('should close dialog without payload on cancel', () => {
+  describe('cancel', () => {
+    it('closes without payload', () => {
       createComponent({ mode: 'SHARE_ALL' });
       component['cancel']();
       expect(matDialogRefMock.close).toHaveBeenCalledWith();
     });
   });
 
-  describe('Available users resource', () => {
-    it('should load available users from service', async () => {
+  describe('availableUsers', () => {
+    it('loads from the service', async () => {
       createComponent({ mode: 'ADD_SINGLE' });
       await fixture.whenStable();
       expect(component['availableUsers']()).toEqual(mockUsers);
     });
   });
-});
 
-describe('ShareCardDialogComponent user paging', () => {
-  it('walks every page of the directory', async () => {
-    const many = Array.from({ length: 120 }, (_, i) => ({
-      id: i + 1,
-      username: `user${i + 1}`,
-    }));
-    const calls: number[] = [];
+  describe('user paging', () => {
+    it('walks every page', async () => {
+      const many = Array.from({ length: 120 }, (_, i) => ({
+        id: i + 1,
+        username: `user${i + 1}`,
+      }));
+      const calls: number[] = [];
 
-    await TestBed.configureTestingModule({
-      imports: [ShareCardDialogComponent],
-      providers: [
-        { provide: MatDialogRef, useValue: createMatDialogRefMock() },
-        { provide: MAT_DIALOG_DATA, useValue: { mode: 'ADD_SINGLE' } },
-        provideTranslateService(),
-        {
-          provide: CardShareApiService,
-          useValue: {
-            getAvailableUsers: (limit: number, offset: number) => {
-              calls.push(offset);
-              return of({
-                items: many.slice(offset, offset + limit),
-                total: many.length,
-                limit,
-                offset,
-              });
-            },
+      await TestBed.configureTestingModule({
+        imports: [ShareCardDialogComponent],
+        providers: [
+          { provide: MatDialogRef, useValue: createMatDialogRefMock() },
+          { provide: MAT_DIALOG_DATA, useValue: { mode: 'ADD_SINGLE' } },
+          provideTranslateService(),
+          {
+            provide: CardShareApiService,
+            useValue: createCardShareApiServiceMock({
+              getAvailableUsers: vi.fn((limit: number, offset: number) => {
+                calls.push(offset);
+                return of({
+                  items: many.slice(offset, offset + limit),
+                  total: many.length,
+                  limit,
+                  offset,
+                });
+              }),
+            }),
           },
-        },
-      ],
-    }).compileComponents();
+        ],
+      }).compileComponents();
 
-    const fixture = TestBed.createComponent(ShareCardDialogComponent);
-    fixture.detectChanges();
-    await fixture.whenStable();
+      const pagingFixture = TestBed.createComponent(ShareCardDialogComponent);
+      pagingFixture.detectChanges();
+      await pagingFixture.whenStable();
 
-    expect(calls).toEqual([0, 50, 100]);
+      expect(calls).toEqual([0, 50, 100]);
+    });
   });
 });

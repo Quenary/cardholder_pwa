@@ -30,30 +30,34 @@ describe('adminGuard', () => {
     );
   }
 
-  it('should allow admin', async () => {
-    storeMock.setState({
-      user: {
-        info: {
-          role_code: EUserRole.ADMIN,
+  describe('when user is admin', () => {
+    it('allows navigation', async () => {
+      storeMock.setState({
+        user: {
+          info: {
+            role_code: EUserRole.ADMIN,
+          },
         },
-      },
+      });
+
+      const result = await firstValueFrom(runGuard());
+
+      expect(result).toBe(true);
     });
-
-    const result = await firstValueFrom(runGuard());
-
-    expect(result).toBe(true);
   });
 
-  it('should reject not admin', async () => {
-    storeMock.setState({
-      user: {
-        info: {
-          role_code: EUserRole.MEMBER,
+  describe('when user is not admin', () => {
+    it('blocks navigation', async () => {
+      storeMock.setState({
+        user: {
+          info: {
+            role_code: EUserRole.MEMBER,
+          },
         },
-      },
-    });
-    const result = await firstValueFrom(runGuard());
+      });
+      const result = await firstValueFrom(runGuard());
 
-    expect(result).toBe(false);
+      expect(result).toBe(false);
+    });
   });
 });
