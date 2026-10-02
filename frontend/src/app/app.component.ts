@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { MatBadge } from '@angular/material/badge';
 import {
   MatSidenavContainer,
   MatSidenav,
@@ -21,11 +22,13 @@ import { selectAppIsOffline } from './state/app.selectors';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { selectUserIsAdmin } from './entities/user/state/user.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { PendingSharesService } from './features/shared-cards/services/pending-shares.service';
 
 interface INavItem {
   name: string;
   icon: string;
   link?: string;
+  badge?: number;
   onClick?: () => unknown;
 }
 
@@ -46,6 +49,7 @@ interface INavItem {
     RouterLinkActive,
     MatIconButton,
     MatProgressSpinner,
+    MatBadge,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -53,12 +57,14 @@ interface INavItem {
 export class AppComponent {
   private readonly store = inject(Store);
   private readonly translateService = inject(TranslateService);
+  private readonly pendingShares = inject(PendingSharesService);
 
   protected readonly isOffline = this.store.selectSignal(selectAppIsOffline);
 
   protected readonly links = computed<INavItem[]>(() => {
     const isAdmin = this.isAdmin();
     const navTranslations = this.navTranslations();
+    const pending = this.pendingShares.count();
     return [
       {
         name: navTranslations.CARD,
@@ -69,6 +75,7 @@ export class AppComponent {
         name: navTranslations.SHARED_CARDS,
         icon: 'group',
         link: '/cards/shared',
+        badge: pending,
       },
       {
         name: navTranslations.USER,

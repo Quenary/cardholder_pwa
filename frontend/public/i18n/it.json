@@ -196,6 +196,15 @@
     "EMPTY_YOU_SHARE": "Non hai ancora condiviso nessuna carta",
     "EMPTY_SHARED_WITH_YOU": "Nessuna carta è stata ancora condivisa con te",
     "SHARED_BY": "Condivisa da",
+    "SECTION_PENDING": "In attesa della tua risposta",
+    "SECTION_DECLINED": "Rifiutate",
+    "ACTION_ACCEPT": "Accetta",
+    "ACTION_DECLINE": "Rifiuta",
+    "STATUS": {
+      "PENDING": "in attesa",
+      "ACCEPTED": "accettata",
+      "DECLINED": "rifiutata"
+    },
     "DIALOG": {
       "TITLE_ADD": "Condividi la carta",
       "TITLE_EDIT": "Modifica le condivisioni",

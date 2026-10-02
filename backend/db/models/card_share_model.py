@@ -2,8 +2,10 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, Integer, UniqueConstraint, text
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from backend.enums.card_share_status_enum import ECardShareStatus
 from backend.helpers.now import now
 
 from .base_model import BaseModel
@@ -34,6 +36,17 @@ class CardShareModel(BaseModel):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=text("CURRENT_TIMESTAMP"), default=now, nullable=False
     )
+    status: Mapped[ECardShareStatus] = mapped_column(
+        SQLEnum(
+            ECardShareStatus,
+            native_enum=False,
+            length=16,
+            values_callable=lambda e: [m.value for m in e],
+        ),
+        default=ECardShareStatus.PENDING,
+        nullable=False,
+    )
+    responded_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     card: Mapped["CardModel"] = relationship("CardModel", back_populates="shares")
     owner: Mapped["UserModel"] = relationship(

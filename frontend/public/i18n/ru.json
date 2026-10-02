@@ -196,6 +196,15 @@
     "EMPTY_YOU_SHARE": "Вы пока ни с кем не делились картами",
     "EMPTY_SHARED_WITH_YOU": "С вами пока никто не делился картами",
     "SHARED_BY": "От кого",
+    "SECTION_PENDING": "Ожидают вашего ответа",
+    "SECTION_DECLINED": "Отклонённые",
+    "ACTION_ACCEPT": "Принять",
+    "ACTION_DECLINE": "Отклонить",
+    "STATUS": {
+      "PENDING": "ожидает",
+      "ACCEPTED": "принято",
+      "DECLINED": "отклонено"
+    },
     "DIALOG": {
       "TITLE_ADD": "Поделиться картой",
       "TITLE_EDIT": "Редактировать доступ",

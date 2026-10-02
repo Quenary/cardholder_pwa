@@ -8,6 +8,8 @@ import { provideMockStore, MockStore } from '@ngrx/store/testing';
 import { provideRouter } from '@angular/router';
 import { ITestAppState, testAppState } from '../testing';
 import { provideTranslateService } from '@ngx-translate/core';
+import { of } from 'rxjs';
+import { CardShareApiService } from './features/shared-cards/services/card-share-api.service';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
@@ -24,6 +26,10 @@ describe('AppComponent', () => {
         provideMockStore({ initialState }),
         provideRouter([]),
         provideTranslateService(),
+        {
+          provide: CardShareApiService,
+          useValue: { getCardsSharedWithMeCount: () => of({ count: 0 }) },
+        },
       ],
       imports: [AppComponent],
     }).compileComponents();

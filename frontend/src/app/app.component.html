@@ -17,7 +17,13 @@
           [activated]="rla.isActive"
           (click)="item.onClick ? item.onClick() : null">
           <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-          <span>{{ item.name }}</span>
+          <span
+            [matBadge]="item.badge"
+            [matBadgeHidden]="!item.badge"
+            matBadgeOverlap="false"
+            matBadgeSize="small"
+            >{{ item.name }}</span
+          >
         </a>
       }
     </mat-nav-list>

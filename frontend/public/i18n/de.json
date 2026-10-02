@@ -196,6 +196,15 @@
     "EMPTY_YOU_SHARE": "Sie haben noch keine Karten geteilt",
     "EMPTY_SHARED_WITH_YOU": "Es wurden noch keine Karten mit Ihnen geteilt",
     "SHARED_BY": "Geteilt von",
+    "SECTION_PENDING": "Warten auf Ihre Antwort",
+    "SECTION_DECLINED": "Abgelehnt",
+    "ACTION_ACCEPT": "Annehmen",
+    "ACTION_DECLINE": "Ablehnen",
+    "STATUS": {
+      "PENDING": "ausstehend",
+      "ACCEPTED": "angenommen",
+      "DECLINED": "abgelehnt"
+    },
     "DIALOG": {
       "TITLE_ADD": "Karte teilen",
       "TITLE_EDIT": "Freigabe bearbeiten",

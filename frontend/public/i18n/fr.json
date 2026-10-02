@@ -196,6 +196,15 @@
     "EMPTY_YOU_SHARE": "Vous n'avez encore partagé aucune carte",
     "EMPTY_SHARED_WITH_YOU": "Aucune carte ne vous a encore été partagée",
     "SHARED_BY": "Partagée par",
+    "SECTION_PENDING": "En attente de votre réponse",
+    "SECTION_DECLINED": "Refusées",
+    "ACTION_ACCEPT": "Accepter",
+    "ACTION_DECLINE": "Refuser",
+    "STATUS": {
+      "PENDING": "en attente",
+      "ACCEPTED": "acceptée",
+      "DECLINED": "refusée"
+    },
     "DIALOG": {
       "TITLE_ADD": "Partager la carte",
       "TITLE_EDIT": "Modifier les accès",

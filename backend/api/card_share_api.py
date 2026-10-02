@@ -11,13 +11,17 @@ from backend.db.models.card_model import CardModel
 from backend.db.models.card_share_model import CardShareModel
 from backend.db.models.user_model import UserModel
 from backend.db.session import get_async_session
+from backend.enums.card_share_status_enum import ECardShareStatus
+from backend.helpers.now import now
 from backend.schemas.card_schema import CardSchema
 from backend.schemas.card_share_schema import (
     ShareAllCardsRequestSchema,
     ShareCardRequestSchema,
     SharedCardItemSchema,
     SharedCardsResponseSchema,
+    SharedWithMeCountSchema,
     SharedWithMeItemSchema,
+    ShareRecipientSchema,
     ShareUserSchema,
     ShareUsersPageSchema,
     UpdateCardShareRequestSchema,
@@ -58,9 +62,10 @@ async def _get_cards_shared_by_user(
             }
         if share.shared_with_user:
             cards_map[share.card_id]["shared_with_users"].append(
-                ShareUserSchema(
+                ShareRecipientSchema(
                     id=share.shared_with_user.id,
                     username=share.shared_with_user.username,
+                    status=share.status,
                 )
             )
 
@@ -74,15 +79,26 @@ async def _get_cards_shared_by_user(
 
 
 async def _get_cards_shared_with_user(
-    session: AsyncSession, user_id: int
+    session: AsyncSession,
+    user_id: int,
+    status: ECardShareStatus = ECardShareStatus.ACCEPTED,
 ) -> list[SharedWithMeItemSchema]:
+    """The shares the caller received, in one state of their decision.
+
+    Accepted by default, which is what belongs in the caller's card list.
+    This only picks what is listed: read access to a shared card is decided
+    by the card endpoints, and holds in every state.
+    """
     stmt = (
         select(CardShareModel)
         .options(
             joinedload(CardShareModel.card),
             joinedload(CardShareModel.owner),
         )
-        .where(CardShareModel.shared_with_user_id == user_id)
+        .where(
+            CardShareModel.shared_with_user_id == user_id,
+            CardShareModel.status == status,
+        )
         .order_by(CardShareModel.created_at.desc())
     )
     result = await session.execute(stmt)
@@ -91,10 +107,73 @@ async def _get_cards_shared_with_user(
         SharedWithMeItemSchema(
             card=CardSchema.model_validate(s.card),
             owner=ShareUserSchema(id=s.owner.id, username=s.owner.username),
+            status=s.status,
         )
         for s in shares
         if s.card and s.owner
     ]
+
+
+async def _count_cards_shared_with_user(
+    session: AsyncSession,
+    user_id: int,
+    status: ECardShareStatus = ECardShareStatus.ACCEPTED,
+) -> int:
+    """How many rows _get_cards_shared_with_user would return, without the join."""
+    total = await session.scalar(
+        select(func.count())
+        .select_from(CardShareModel)
+        .where(
+            CardShareModel.shared_with_user_id == user_id,
+            CardShareModel.status == status,
+        )
+    )
+    return total or 0
+
+
+async def _sync_shares(
+    session: AsyncSession,
+    owner_id: int,
+    card_ids: list[int],
+    user_ids: list[int],
+) -> None:
+    """Make the recipients of the given cards exactly `user_ids`, as a diff.
+
+    Rows for users that stay are kept as they are, so a recipient's decision
+    survives the owner editing the list. Rows for users that are no longer
+    listed are deleted, and a new recipient starts as pending. A declined
+    share is left declined rather than asked again.
+    """
+    if not card_ids:
+        return
+    existing_res = await session.execute(
+        select(CardShareModel).where(
+            CardShareModel.owner_id == owner_id,
+            CardShareModel.card_id.in_(card_ids),
+        )
+    )
+    existing = {
+        (share.card_id, share.shared_with_user_id)
+        for share in existing_res.scalars().all()
+    }
+    wanted = {(card_id, user_id) for card_id in card_ids for user_id in user_ids}
+
+    removal = delete(CardShareModel).where(
+        CardShareModel.owner_id == owner_id,
+        CardShareModel.card_id.in_(card_ids),
+    )
+    if user_ids:
+        removal = removal.where(CardShareModel.shared_with_user_id.not_in(user_ids))
+    await session.execute(removal)
+    for card_id, user_id in sorted(wanted - existing):
+        session.add(
+            CardShareModel(
+                card_id=card_id,
+                owner_id=owner_id,
+                shared_with_user_id=user_id,
+                status=ECardShareStatus.PENDING,
+            )
+        )
 
 
 async def _replace_shares(
@@ -105,9 +184,9 @@ async def _replace_shares(
 ) -> SharedCardItemSchema:
     """Set the exact list of users a card of the caller is shared with.
 
-    The shares that card already has are dropped first, so the given list
-    becomes the whole truth. Ids that match no account, and the caller's own,
-    are ignored rather than refused.
+    The given list becomes the whole truth, but as a diff: see _sync_shares.
+    Ids that match no account, and the caller's own, are ignored rather than
+    refused.
     """
     stmt = (
         select(CardModel)
@@ -120,33 +199,33 @@ async def _replace_shares(
         raise HTTPException(status_code=404, detail="Card not found")
 
     target_user_ids = [uid for uid in set(user_ids) if uid != user.id]
+    valid_users: list[UserModel] = []
+    if target_user_ids:
+        users_res = await session.execute(
+            select(UserModel).where(UserModel.id.in_(target_user_ids))
+        )
+        valid_users = list(users_res.scalars().all())
 
-    await session.execute(
-        delete(CardShareModel).where(
-            CardShareModel.card_id == card.id,
-            CardShareModel.owner_id == user.id,
+    await _sync_shares(session, user.id, [card.id], [u.id for u in valid_users])
+    await session.commit()
+
+    shares_res = await session.execute(
+        select(CardShareModel).where(
+            CardShareModel.owner_id == user.id, CardShareModel.card_id == card.id
         )
     )
-
-    shared_users: list[ShareUserSchema] = []
-    if target_user_ids:
-        users_stmt = select(UserModel).where(UserModel.id.in_(target_user_ids))
-        users_res = await session.execute(users_stmt)
-        valid_users = users_res.scalars().all()
-        for u in valid_users:
-            session.add(
-                CardShareModel(
-                    card_id=card.id,
-                    owner_id=user.id,
-                    shared_with_user_id=u.id,
-                )
-            )
-            shared_users.append(ShareUserSchema(id=u.id, username=u.username))
-
-    await session.commit()
+    status_by_user = {
+        share.shared_with_user_id: share.status for share in shares_res.scalars().all()
+    }
     await session.refresh(card)
     return SharedCardItemSchema(
-        card=CardSchema.model_validate(card), shared_with_users=shared_users
+        card=CardSchema.model_validate(card),
+        shared_with_users=[
+            ShareRecipientSchema(
+                id=u.id, username=u.username, status=status_by_user[u.id]
+            )
+            for u in valid_users
+        ],
     )
 
 
@@ -194,11 +273,27 @@ async def get_available_users(
 
 @router.get("/with-me", response_model=list[SharedWithMeItemSchema])
 async def get_cards_shared_with_me(
+    status: ECardShareStatus = ECardShareStatus.ACCEPTED,
     session: AsyncSession = Depends(get_async_session),
     user: UserModel = Depends(is_user),
 ):
-    """Retrieve only the cards shared with the caller (for the main cards view)."""
-    return await _get_cards_shared_with_user(session, user.id)
+    """Retrieve the cards shared with the caller (for the main cards view).
+
+    Only the accepted ones unless another `status` is asked for: pending to
+    decide on, declined to look at again.
+    """
+    return await _get_cards_shared_with_user(session, user.id, status)
+
+
+@router.get("/with-me/count", response_model=SharedWithMeCountSchema)
+async def get_cards_shared_with_me_count(
+    status: ECardShareStatus = ECardShareStatus.ACCEPTED,
+    session: AsyncSession = Depends(get_async_session),
+    user: UserModel = Depends(is_user),
+):
+    """How many cards are shared with the caller in this status, for a badge."""
+    count = await _count_cards_shared_with_user(session, user.id, status)
+    return SharedWithMeCountSchema(count=count)
 
 
 @router.post("", response_model=SharedCardItemSchema, status_code=201)
@@ -228,34 +323,79 @@ async def share_all_cards(
     session: AsyncSession = Depends(get_async_session),
     user: UserModel = Depends(is_user),
 ):
-    """Share all user cards with selected users (completely overwrites existing shares)."""
-    # Delete all previous shares created by this user
-    await session.execute(
-        delete(CardShareModel).where(CardShareModel.owner_id == user.id)
-    )
-
+    """Share all user cards with selected users (replaces existing shares, keeping the recipients' decisions)."""
     target_user_ids = [uid for uid in set(body.user_ids) if uid != user.id]
+    valid_uids: list[int] = []
     if target_user_ids:
-        cards_stmt = select(CardModel.id).where(CardModel.user_id == user.id)
-        cards_res = await session.execute(cards_stmt)
-        card_ids = cards_res.scalars().all()
+        users_res = await session.execute(
+            select(UserModel.id).where(UserModel.id.in_(target_user_ids))
+        )
+        valid_uids = list(users_res.scalars().all())
 
-        users_stmt = select(UserModel.id).where(UserModel.id.in_(target_user_ids))
-        users_res = await session.execute(users_stmt)
-        valid_uids = users_res.scalars().all()
+    cards_res = await session.execute(
+        select(CardModel.id).where(CardModel.user_id == user.id)
+    )
+    card_ids = list(cards_res.scalars().all())
 
-        for cid in card_ids:
-            for uid in valid_uids:
-                session.add(
-                    CardShareModel(
-                        card_id=cid,
-                        owner_id=user.id,
-                        shared_with_user_id=uid,
-                    )
-                )
-
+    await _sync_shares(session, user.id, card_ids, valid_uids)
     await session.commit()
     return {"detail": "All cards shared successfully"}
+
+
+async def _get_share_with_me(
+    session: AsyncSession, card_id: int, user: UserModel
+) -> CardShareModel:
+    result = await session.execute(
+        select(CardShareModel)
+        .where(
+            CardShareModel.card_id == card_id,
+            CardShareModel.shared_with_user_id == user.id,
+        )
+        .limit(1)
+    )
+    share = result.scalar_one_or_none()
+    if not share:
+        raise HTTPException(status_code=404, detail="Card share not found")
+    return share
+
+
+async def _respond(
+    session: AsyncSession,
+    card_id: int,
+    user: UserModel,
+    status: ECardShareStatus,
+) -> CardShareModel:
+    share = await _get_share_with_me(session, card_id, user)
+    share.status = status
+    share.responded_at = now()
+    await session.commit()
+    return share
+
+
+@router.post("/with-me/{card_id}/accept")
+async def accept_card_shared_with_me(
+    card_id: int,
+    session: AsyncSession = Depends(get_async_session),
+    user: UserModel = Depends(is_user),
+):
+    """Accept a card shared with the caller: it joins their cards.
+
+    Works from a pending share, and from a declined one the caller changed
+    their mind about.
+    """
+    await _respond(session, card_id, user, ECardShareStatus.ACCEPTED)
+    return {"detail": "Shared card accepted"}
+
+
+@router.post("/with-me/{card_id}/decline")
+async def decline_card_shared_with_me(
+    card_id: int,
+    session: AsyncSession = Depends(get_async_session),
+    user: UserModel = Depends(is_user),
+):
+    """Decline a card shared with the caller: it stays out of their cards."""
+    await _respond(session, card_id, user, ECardShareStatus.DECLINED)
+    return {"detail": "Shared card declined"}
 
 
 @router.delete("/with-me/{card_id}")
@@ -264,21 +404,12 @@ async def delete_card_shared_with_me(
     session: AsyncSession = Depends(get_async_session),
     user: UserModel = Depends(is_user),
 ):
-    """Remove a card share for the current user (stop receiving this shared card)."""
-    stmt = (
-        select(CardShareModel)
-        .where(
-            CardShareModel.card_id == card_id,
-            CardShareModel.shared_with_user_id == user.id,
-        )
-        .limit(1)
-    )
-    result = await session.execute(stmt)
-    share = result.scalar_one_or_none()
-    if not share:
-        raise HTTPException(status_code=404, detail="Card share not found")
-    await session.delete(share)
-    await session.commit()
+    """Remove a card share for the current user (stop receiving this shared card).
+
+    The share is declined rather than deleted. A deleted row would let the
+    owner share the card again straight away, and the removal would not hold.
+    """
+    await _respond(session, card_id, user, ECardShareStatus.DECLINED)
     return {"detail": "Shared card removed successfully"}
 
 
