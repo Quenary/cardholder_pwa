@@ -19,6 +19,7 @@ from backend.schemas.card_share_schema import (
     ShareCardRequestSchema,
     SharedCardItemSchema,
     SharedCardsResponseSchema,
+    SharedWithMeCountSchema,
     SharedWithMeItemSchema,
     ShareRecipientSchema,
     ShareUserSchema,
@@ -111,6 +112,23 @@ async def _get_cards_shared_with_user(
         for s in shares
         if s.card and s.owner
     ]
+
+
+async def _count_cards_shared_with_user(
+    session: AsyncSession,
+    user_id: int,
+    status: ECardShareStatus = ECardShareStatus.ACCEPTED,
+) -> int:
+    """How many rows _get_cards_shared_with_user would return, without the join."""
+    total = await session.scalar(
+        select(func.count())
+        .select_from(CardShareModel)
+        .where(
+            CardShareModel.shared_with_user_id == user_id,
+            CardShareModel.status == status,
+        )
+    )
+    return total or 0
 
 
 async def _sync_shares(
@@ -265,6 +283,17 @@ async def get_cards_shared_with_me(
     decide on, declined to look at again.
     """
     return await _get_cards_shared_with_user(session, user.id, status)
+
+
+@router.get("/with-me/count", response_model=SharedWithMeCountSchema)
+async def get_cards_shared_with_me_count(
+    status: ECardShareStatus = ECardShareStatus.ACCEPTED,
+    session: AsyncSession = Depends(get_async_session),
+    user: UserModel = Depends(is_user),
+):
+    """How many cards are shared with the caller in this status, for a badge."""
+    count = await _count_cards_shared_with_user(session, user.id, status)
+    return SharedWithMeCountSchema(count=count)
 
 
 @router.post("", response_model=SharedCardItemSchema, status_code=201)

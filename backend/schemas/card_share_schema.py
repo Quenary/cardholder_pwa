@@ -37,6 +37,12 @@ class SharedWithMeItemSchema(BaseModel):
     status: ECardShareStatus
 
 
+class SharedWithMeCountSchema(BaseModel):
+    """How many cards are shared with the caller in one status, for a badge."""
+
+    count: int
+
+
 class SharedCardsResponseSchema(BaseModel):
     you_share: list[SharedCardItemSchema]
     shared_with_you: list[SharedWithMeItemSchema]

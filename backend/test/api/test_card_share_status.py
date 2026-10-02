@@ -12,6 +12,7 @@ from backend.api.card_share_api import (
     decline_card_shared_with_me,
     delete_card_shared_with_me,
     get_cards_shared_with_me,
+    get_cards_shared_with_me_count,
     get_shared_cards,
     share_all_cards,
     share_card,
@@ -84,6 +85,8 @@ async def test_a_new_share_waits_for_the_recipient(db) -> None:
     assert [(i.card.id, i.owner.username, i.status) for i in pending] == [
         (1, "alice", PENDING)
     ]
+    assert (await get_cards_shared_with_me_count(PENDING, db, bob)).count == 1
+    assert (await get_cards_shared_with_me_count(ACCEPTED, db, bob)).count == 0
 
 
 @pytest.mark.asyncio
