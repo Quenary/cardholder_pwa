@@ -28,7 +28,7 @@ describe('AppComponent', () => {
         provideTranslateService(),
         {
           provide: CardShareApiService,
-          useValue: { getCardsSharedWithMe: () => of([]) },
+          useValue: { getCardsSharedWithMeCount: () => of({ count: 0 }) },
         },
       ],
       imports: [AppComponent],

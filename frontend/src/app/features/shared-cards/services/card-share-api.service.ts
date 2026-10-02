@@ -44,6 +44,19 @@ export class CardShareApiService extends BaseApiService<'cards/share'> {
     );
   }
 
+  /**
+   * Same as {@link getCardsSharedWithMe}, but just the count, for a badge
+   * that has no need for the full list.
+   */
+  getCardsSharedWithMeCount(
+    status: TShareStatus = 'accepted',
+  ): Observable<{ count: number }> {
+    return this.httpClient.get<{ count: number }>(
+      `${this.basePath}/with-me/count`,
+      { params: { status } },
+    );
+  }
+
   acceptCardSharedWithMe(cardId: number): Observable<{ detail: string }> {
     return this.httpClient.post<{ detail: string }>(
       `${this.basePath}/with-me/${cardId}/accept`,

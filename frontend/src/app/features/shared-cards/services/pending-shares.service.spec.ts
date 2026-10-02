@@ -1,55 +1,92 @@
+import { ApplicationRef, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { of, throwError } from 'rxjs';
+import { ITestAppState, testAppState } from 'src/testing';
 import { CardShareApiService } from './card-share-api.service';
 import { PendingSharesService } from './pending-shares.service';
-import { ISharedWithMeItem } from '../shared-cards.interface';
-
-const item = (id: number) => ({ card: { id } }) as ISharedWithMeItem;
 
 describe('PendingSharesService', () => {
-  let service: PendingSharesService;
-  const getCardsSharedWithMe = vi.fn();
+  let storeMock: MockStore;
+  let initialState: ITestAppState;
+  const getCardsSharedWithMeCount = vi.fn();
+
+  const create = async (): Promise<PendingSharesService> => {
+    const service = TestBed.inject(PendingSharesService);
+    await TestBed.inject(ApplicationRef).whenStable();
+    return service;
+  };
 
   beforeEach(() => {
-    getCardsSharedWithMe.mockReset();
+    getCardsSharedWithMeCount.mockReset();
+    getCardsSharedWithMeCount.mockReturnValue(of({ count: 0 }));
+    initialState = { ...testAppState };
     TestBed.configureTestingModule({
       providers: [
+        provideZonelessChangeDetection(),
+        provideMockStore({ initialState }),
         {
           provide: CardShareApiService,
-          useValue: { getCardsSharedWithMe },
+          useValue: { getCardsSharedWithMeCount },
         },
       ],
     });
-    service = TestBed.inject(PendingSharesService);
+    storeMock = TestBed.inject(MockStore);
   });
 
-  it('counts the shares waiting for an answer', () => {
-    getCardsSharedWithMe.mockReturnValue(of([item(1), item(2)]));
+  it('does not ask while logged out', async () => {
+    storeMock.setState({ ...initialState, auth: { init: true } });
 
-    service.refresh();
+    const service = await create();
 
-    expect(getCardsSharedWithMe).toHaveBeenCalledWith('pending');
+    expect(getCardsSharedWithMeCount).not.toHaveBeenCalled();
+    expect(service.count()).toBe(0);
+  });
+
+  it('counts the shares waiting for an answer once logged in', async () => {
+    getCardsSharedWithMeCount.mockReturnValue(of({ count: 2 }));
+
+    const service = await create();
+
+    expect(getCardsSharedWithMeCount).toHaveBeenCalledWith('pending');
     expect(service.count()).toBe(2);
   });
 
-  it('keeps the last count when the request fails', () => {
-    getCardsSharedWithMe.mockReturnValue(of([item(1)]));
-    service.refresh();
-    getCardsSharedWithMe.mockReturnValue(
+  it('shows no badge when the request fails', async () => {
+    getCardsSharedWithMeCount.mockReturnValue(
       throwError(() => new Error('offline')),
     );
 
-    service.refresh();
-
-    expect(service.count()).toBe(1);
-  });
-
-  it('can be cleared', () => {
-    getCardsSharedWithMe.mockReturnValue(of([item(1)]));
-    service.refresh();
-
-    service.clear();
+    const service = await create();
 
     expect(service.count()).toBe(0);
+  });
+
+  it('refresh() asks again', async () => {
+    getCardsSharedWithMeCount.mockReturnValue(of({ count: 1 }));
+    const service = await create();
+    expect(service.count()).toBe(1);
+
+    getCardsSharedWithMeCount.mockReturnValue(of({ count: 3 }));
+    service.refresh();
+    await TestBed.inject(ApplicationRef).whenStable();
+
+    expect(service.count()).toBe(3);
+  });
+
+  it('asks again when the tab regains focus', async () => {
+    getCardsSharedWithMeCount.mockReturnValue(of({ count: 1 }));
+    const service = await create();
+    expect(service.count()).toBe(1);
+
+    getCardsSharedWithMeCount.mockReturnValue(of({ count: 5 }));
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      configurable: true,
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+    await TestBed.inject(ApplicationRef).whenStable();
+
+    expect(service.count()).toBe(5);
   });
 });
