@@ -1,6 +1,45 @@
 # CHANGELOG
 
 
+## v1.14.0 (2026-10-02)
+
+### Bug Fixes
+
+- **backend**: Answer a recovery request the same whether or not the email is known
+  ([`81b834b`](https://github.com/Quenary/cardholder_pwa/commit/81b834b92e389829a2d818723ef1d8a1fe981ccb))
+
+- **backend**: Identify the caller by id rather than by username in the access token
+  ([`99198e7`](https://github.com/Quenary/cardholder_pwa/commit/99198e751a96a5a3b0d4e0c69d9a05f5d47675af))
+
+- **backend**: Refuse an empty username
+  ([`d433b81`](https://github.com/Quenary/cardholder_pwa/commit/d433b8164d21b5a7c9ad886fdbc19c0f5826e41c))
+
+- **backend**: Rotate a refresh token atomically
+  ([`d7c1335`](https://github.com/Quenary/cardholder_pwa/commit/d7c1335f194318598a1918b20738bbc391bfe4b1))
+
+- **backend**: Treat usernames and emails as the same whatever their case
+  ([`b8efa9d`](https://github.com/Quenary/cardholder_pwa/commit/b8efa9d53913b2b930fb4ddb9598846a94675839))
+
+- **frontend**: Refresh the tokens under a Web Lock, and share them between tabs
+  ([`7055415`](https://github.com/Quenary/cardholder_pwa/commit/7055415d9772ca64158835379ab4816e4c1a88b5))
+
+### Features
+
+- **backend**: Count the cards shared with the caller, for a badge
+  ([`ed3a1eb`](https://github.com/Quenary/cardholder_pwa/commit/ed3a1ebbb1e76fa63b262275f75276fa6a664af6))
+
+- **backend**: Let the recipient accept or decline a shared card
+  ([`8e13033`](https://github.com/Quenary/cardholder_pwa/commit/8e13033d721ac8e509229ee32a2d7b5b96b4f626))
+
+- **frontend**: Answer a shared card, and see how others answered
+  ([`c7a5af8`](https://github.com/Quenary/cardholder_pwa/commit/c7a5af82b64ec2d3a454661d5dbf6ff3973257b5))
+
+### Performance Improvements
+
+- **frontend**: Refresh the pending-shares badge less often, from the count
+  ([`f784a69`](https://github.com/Quenary/cardholder_pwa/commit/f784a6986116809f9f1a9734acb224065559402b))
+
+
 ## v1.13.1 (2026-10-01)
 
 ### Bug Fixes
