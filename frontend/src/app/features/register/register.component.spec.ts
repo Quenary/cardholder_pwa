@@ -46,60 +46,58 @@ describe('RegisterComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should create user', () => {
-    fixture = TestBed.createComponent(RegisterComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  describe('onSubmit', () => {
+    it('calls create when valid', () => {
+      fixture = TestBed.createComponent(RegisterComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
 
-    component['form'].patchValue({
-      username: 'user1',
-      email: 'testemail@google.com',
-      password: '123456Qq',
-      confirm_password: '123456Qq',
+      component['form'].patchValue({
+        username: 'user1',
+        email: 'testemail@google.com',
+        password: '123456Qq',
+        confirm_password: '123456Qq',
+      });
+      fixture.detectChanges();
+
+      component['onSubmit']();
+
+      expect(userApiServiceMock.create).toHaveBeenCalledTimes(1);
     });
-    fixture.detectChanges();
 
-    component['onSubmit']();
+    it('does not call create when invalid', () => {
+      fixture = TestBed.createComponent(RegisterComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
 
-    expect(userApiServiceMock.create).toHaveBeenCalledTimes(1);
-  });
+      component['form'].patchValue({});
+      component['onSubmit']();
 
-  it('should not create user on invalid form', () => {
-    fixture = TestBed.createComponent(RegisterComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+      component['form'].patchValue({
+        username: 'user1',
+        email: 'testemail@google.com',
+        password: '123456Qq',
+        confirm_password: '1234',
+      });
+      component['onSubmit']();
 
-    // empty form
-    component['form'].patchValue({});
-    component['onSubmit']();
+      component['form'].patchValue({
+        username: '1',
+        email: 'testemail@google.com',
+        password: '123456Qq',
+        confirm_password: '123456Qq',
+      });
+      component['onSubmit']();
 
-    // passwords does not match
-    component['form'].patchValue({
-      username: 'user1',
-      email: 'testemail@google.com',
-      password: '123456Qq',
-      confirm_password: '1234',
+      component['form'].patchValue({
+        username: 'user1',
+        email: 'invalidemail',
+        password: '123456Qq',
+        confirm_password: '123456Qq',
+      });
+      component['onSubmit']();
+
+      expect(userApiServiceMock.create).toHaveBeenCalledTimes(0);
     });
-    component['onSubmit']();
-
-    // invalid username
-    component['form'].patchValue({
-      username: '1',
-      email: 'testemail@google.com',
-      password: '123456Qq',
-      confirm_password: '123456Qq',
-    });
-    component['onSubmit']();
-
-    // invalid email
-    component['form'].patchValue({
-      username: 'user1',
-      email: 'invalidemail',
-      password: '123456Qq',
-      confirm_password: '123456Qq',
-    });
-    component['onSubmit']();
-
-    expect(userApiServiceMock.create).toHaveBeenCalledTimes(0);
   });
 });

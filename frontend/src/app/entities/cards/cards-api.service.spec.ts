@@ -21,20 +21,20 @@ describe('CardApiService', () => {
 
   afterEach(() => httpMock.verify());
 
-  it('should send a filename even when the File has none', async () => {
-    // Installed iOS PWAs often produce File objects with an empty name.
-    // FastAPI then 422s the multipart part unless filename= is present.
-    const file = new File([new Uint8Array([1, 2, 3])], '', {
-      type: 'image/jpeg',
-    });
-    const pending = firstValueFrom(service.uploadLogo(1, file));
-    const req = httpMock.expectOne('/api/cards/1/logo');
-    const body = req.request.body as FormData;
-    const uploaded = body.get('file') as File;
+  describe('uploadLogo', () => {
+    it('sends a filename when the File has none', async () => {
+      const file = new File([new Uint8Array([1, 2, 3])], '', {
+        type: 'image/jpeg',
+      });
+      const pending = firstValueFrom(service.uploadLogo(1, file));
+      const req = httpMock.expectOne('/api/cards/1/logo');
+      const body = req.request.body as FormData;
+      const uploaded = body.get('file') as File;
 
-    expect(uploaded).toBeInstanceOf(File);
-    expect(uploaded.name).toMatch(/^\d+\.jpg$/);
-    req.flush({ id: 1 });
-    await pending;
+      expect(uploaded).toBeInstanceOf(File);
+      expect(uploaded.name).toMatch(/^\d+\.jpg$/);
+      req.flush({ id: 1 });
+      await pending;
+    });
   });
 });

@@ -3,25 +3,13 @@
 from datetime import timedelta
 
 import pytest
-import pytest_asyncio
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from backend.api.auth_api import logout
-from backend.db.models import BaseModel, RefreshTokenModel, UserModel
+from backend.db.models import RefreshTokenModel, UserModel
 from backend.helpers.now import now
 from backend.schemas.auth_schema import RevokeRequestSchema
-
-
-@pytest_asyncio.fixture
-async def session(tmp_path):
-    engine = create_async_engine(f"sqlite+aiosqlite:///{tmp_path / 'test.db'}")
-    async with engine.begin() as conn:
-        await conn.run_sync(BaseModel.metadata.create_all)
-    maker = async_sessionmaker(bind=engine, expire_on_commit=False)
-    async with maker() as db:
-        yield db
-    await engine.dispose()
+from backend.testing import sqlite_db
 
 
 async def _seed(db) -> tuple[UserModel, UserModel]:
@@ -50,29 +38,29 @@ async def _revoked(db, token: str) -> bool:
 
 
 @pytest.mark.asyncio
-async def test_logout_revokes_the_callers_refresh_token(session) -> None:
-    alice, _ = await _seed(session)
+async def test_logout_revokes_the_callers_refresh_token(db) -> None:
+    alice, _ = await _seed(db)
 
     await logout(
         RevokeRequestSchema(refresh_token="alice-rt"),
-        session=session,
+        session=db,
         current_user=alice,
     )
 
-    assert await _revoked(session, "alice-rt") is True
+    assert await _revoked(db, "alice-rt") is True
 
 
 @pytest.mark.asyncio
-async def test_logout_leaves_someone_elses_refresh_token_alone(session) -> None:
-    alice, _ = await _seed(session)
+async def test_logout_leaves_someone_elses_refresh_token_alone(db) -> None:
+    alice, _ = await _seed(db)
 
     await logout(
         RevokeRequestSchema(refresh_token="bob-rt"),
-        session=session,
+        session=db,
         current_user=alice,
     )
 
-    assert await _revoked(session, "bob-rt") is False
+    assert await _revoked(db, "bob-rt") is False
 
 
 def _request():
@@ -82,17 +70,17 @@ def _request():
 
 
 @pytest.mark.asyncio
-async def test_refresh_rotates_the_token(session) -> None:
+async def test_refresh_rotates_the_token(db) -> None:
     from backend.api.auth_api import refresh_token
     from backend.schemas.auth_schema import RefreshRequestSchema
 
-    await _seed(session)
+    await _seed(db)
 
     fresh = await refresh_token(
-        _request(), RefreshRequestSchema(refresh_token="alice-rt"), session
+        _request(), RefreshRequestSchema(refresh_token="alice-rt"), db
     )
 
-    assert await _revoked(session, "alice-rt") is True
+    assert await _revoked(db, "alice-rt") is True
     assert fresh.refresh_token != "alice-rt"
 
 
@@ -109,34 +97,30 @@ async def test_two_refreshes_with_the_same_token_do_not_both_succeed(
     from backend.api.auth_api import refresh_token
     from backend.schemas.auth_schema import RefreshRequestSchema
 
-    engine = create_async_engine(f"sqlite+aiosqlite:///{tmp_path / 'race.db'}")
-    async with engine.begin() as conn:
-        await conn.run_sync(BaseModel.metadata.create_all)
-    maker = async_sessionmaker(bind=engine, expire_on_commit=False)
-    async with maker() as seed:
-        await _seed(seed)
+    async with sqlite_db(tmp_path / "race.db") as maker:
+        async with maker() as seed:
+            await _seed(seed)
 
-    barrier = asyncio.Barrier(2)
+        barrier = asyncio.Barrier(2)
 
-    async def attempt():
-        async with maker() as db:
-            original = db.execute
+        async def attempt():
+            async with maker() as db:
+                original = db.execute
 
-            async def execute(*args, **kwargs):
-                result = await original(*args, **kwargs)
-                if not getattr(db, "_met", False):
-                    # Both callers have read the token before either updates.
-                    db._met = True
-                    await barrier.wait()
-                return result
+                async def execute(*args, **kwargs):
+                    result = await original(*args, **kwargs)
+                    if not getattr(db, "_met", False):
+                        # Both callers have read the token before either updates.
+                        db._met = True
+                        await barrier.wait()
+                    return result
 
-            db.execute = execute  # type: ignore[method-assign]
-            return await refresh_token(
-                _request(), RefreshRequestSchema(refresh_token="alice-rt"), db
-            )
+                db.execute = execute  # type: ignore[method-assign]
+                return await refresh_token(
+                    _request(), RefreshRequestSchema(refresh_token="alice-rt"), db
+                )
 
-    results = await asyncio.gather(attempt(), attempt(), return_exceptions=True)
-    await engine.dispose()
+        results = await asyncio.gather(attempt(), attempt(), return_exceptions=True)
 
     failures = [r for r in results if isinstance(r, HTTPException)]
     assert len(failures) == 1

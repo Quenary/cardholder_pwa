@@ -55,7 +55,7 @@ describe('AuthEffects', () => {
   };
 
   describe('syncTokens$', () => {
-    it('takes the tokens another tab stored', () => {
+    it('syncs tokens from another tab', () => {
       setup();
 
       storageEvent({
@@ -68,7 +68,7 @@ describe('AuthEffects', () => {
       ]);
     });
 
-    it('does not follow another tab to a logout', () => {
+    it('ignores logout in another tab', () => {
       setup();
 
       storageEvent({ key: ELocalStorageKey.TOKEN_RESPONSE, newValue: null });
@@ -87,7 +87,7 @@ describe('AuthEffects', () => {
       expect(emitted).toEqual([]);
     });
 
-    it('ignores a value that is not tokens', () => {
+    it('ignores invalid token payloads', () => {
       setup();
 
       storageEvent({ key: ELocalStorageKey.TOKEN_RESPONSE, newValue: '{oops' });
@@ -96,7 +96,7 @@ describe('AuthEffects', () => {
       expect(emitted).toEqual([]);
     });
 
-    it('leaves a tab that is not logged in alone', () => {
+    it('ignores sync when this tab is logged out', () => {
       setup(null);
 
       storageEvent({

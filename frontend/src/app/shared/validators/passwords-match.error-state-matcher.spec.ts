@@ -23,34 +23,42 @@ describe('PasswordsMatchErrorStateMatcher', () => {
     );
   });
 
-  it('stays quiet while the passwords match', () => {
-    const control = form.controls['confirm_password'];
-    control.markAsTouched();
+  describe('isErrorState', () => {
+    it('is false when passwords match', () => {
+      const control = form.controls['confirm_password'];
+      control.markAsTouched();
 
-    expect(matcher.isErrorState(control, directive(false))).toBe(false);
-  });
+      expect(matcher.isErrorState(control, directive(false))).toBe(false);
+    });
 
-  it('stays quiet on a mismatch the user has not reached yet', () => {
-    form.controls['confirm_password'].setValue('other');
+    it('is false before the user touches confirmation', () => {
+      form.controls['confirm_password'].setValue('other');
 
-    expect(
-      matcher.isErrorState(form.controls['confirm_password'], directive(false)),
-    ).toBe(false);
-  });
+      expect(
+        matcher.isErrorState(
+          form.controls['confirm_password'],
+          directive(false),
+        ),
+      ).toBe(false);
+    });
 
-  it('reports a mismatch once the confirmation field has been touched', () => {
-    const control = form.controls['confirm_password'];
-    control.setValue('other');
-    control.markAsTouched();
+    it('is true after confirmation is touched', () => {
+      const control = form.controls['confirm_password'];
+      control.setValue('other');
+      control.markAsTouched();
 
-    expect(matcher.isErrorState(control, directive(false))).toBe(true);
-  });
+      expect(matcher.isErrorState(control, directive(false))).toBe(true);
+    });
 
-  it('reports a mismatch on submit, without any interaction', () => {
-    form.controls['confirm_password'].setValue('other');
+    it('is true on submit without interaction', () => {
+      form.controls['confirm_password'].setValue('other');
 
-    expect(
-      matcher.isErrorState(form.controls['confirm_password'], directive(true)),
-    ).toBe(true);
+      expect(
+        matcher.isErrorState(
+          form.controls['confirm_password'],
+          directive(true),
+        ),
+      ).toBe(true);
+    });
   });
 });

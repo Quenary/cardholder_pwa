@@ -5,11 +5,14 @@ a password reset email points to. Every case here exists because trusting
 the wrong input would let an attacker redirect that link.
 """
 
+from unittest.mock import MagicMock
+
 import pytest
 from starlette.requests import Request
 
 from backend.api.password_recovery_api import build_reset_url
 from backend.config import Config
+from backend.testing import mock_session
 
 
 def _request(host: str, scheme: str = "https") -> Request:
@@ -75,25 +78,20 @@ def test_public_url_trailing_slash_does_not_produce_a_double_slash(
 
 
 def _code_session(user):
-    from unittest.mock import AsyncMock, MagicMock
-
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    session = AsyncMock(spec=AsyncSession)
-    session.add = MagicMock()
     # First lookup finds the user (or not), the second finds no recent code.
-    session.execute.side_effect = [
-        MagicMock(scalar_one_or_none=MagicMock(return_value=user)),
-        MagicMock(scalar_one_or_none=MagicMock(return_value=None)),
-    ]
-    return session
+    return mock_session(
+        results=[
+            MagicMock(scalar_one_or_none=MagicMock(return_value=user)),
+            MagicMock(scalar_one_or_none=MagicMock(return_value=None)),
+        ]
+    )
 
 
 @pytest.mark.asyncio
 async def test_code_answers_the_same_when_the_email_cannot_be_sent():
     """An error from the mail server only a known address can reach would let
     anyone test which emails have an account."""
-    from unittest.mock import MagicMock, patch
+    from unittest.mock import patch
 
     from fastapi import HTTPException
 

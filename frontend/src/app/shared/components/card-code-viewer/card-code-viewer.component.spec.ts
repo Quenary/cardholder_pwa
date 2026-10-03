@@ -36,51 +36,55 @@ describe('CardCodeViewerComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should draw code', () => {
-    fixture = TestBed.createComponent(CardCodeViewerComponent);
-    component = fixture.componentInstance;
-    component.card.set({
-      code: '0123456789012',
-      code_type: 'ean13',
-    });
-    const canvasElement: HTMLCanvasElement =
-      fixture.nativeElement.querySelector('.canvas');
-    fixture.detectChanges();
+  describe('card input', () => {
+    it('draws a valid code', () => {
+      fixture = TestBed.createComponent(CardCodeViewerComponent);
+      component = fixture.componentInstance;
+      component.card.set({
+        code: '0123456789012',
+        code_type: 'ean13',
+      });
+      const canvasElement: HTMLCanvasElement =
+        fixture.nativeElement.querySelector('.canvas');
+      fixture.detectChanges();
 
-    expect(canvasElement).toBeTruthy();
-    expect(console.error).toHaveBeenCalledTimes(0);
+      expect(canvasElement).toBeTruthy();
+      expect(console.error).toHaveBeenCalledTimes(0);
+    });
+
+    it('logs on invalid code', () => {
+      fixture = TestBed.createComponent(CardCodeViewerComponent);
+      component = fixture.componentInstance;
+      component.card.set({
+        code: 'badvalue',
+        code_type: 'ean13',
+      });
+      const canvasElement: HTMLCanvasElement =
+        fixture.nativeElement.querySelector('.canvas');
+      fixture.detectChanges();
+
+      expect(canvasElement).toBeTruthy();
+      expect(console.error).toHaveBeenCalledTimes(1);
+    });
   });
 
-  it('should not draw code', () => {
-    fixture = TestBed.createComponent(CardCodeViewerComponent);
-    component = fixture.componentInstance;
-    component.card.set({
-      code: 'badvalue',
-      code_type: 'ean13',
+  describe('canvas click', () => {
+    it('opens the dialog', () => {
+      fixture = TestBed.createComponent(CardCodeViewerComponent);
+      component = fixture.componentInstance;
+      component.card.set({
+        code: '0123456789012',
+        code_type: 'ean13',
+      });
+      const canvasElement: HTMLCanvasElement =
+        fixture.nativeElement.querySelector('.canvas');
+      fixture.detectChanges();
+
+      expect(canvasElement).toBeTruthy();
+      canvasElement.click();
+
+      expect(matDialogMock.open).toHaveBeenCalledTimes(1);
     });
-    const canvasElement: HTMLCanvasElement =
-      fixture.nativeElement.querySelector('.canvas');
-    fixture.detectChanges();
-
-    expect(canvasElement).toBeTruthy();
-    expect(console.error).toHaveBeenCalledTimes(1);
-  });
-
-  it('should open dialog', () => {
-    fixture = TestBed.createComponent(CardCodeViewerComponent);
-    component = fixture.componentInstance;
-    component.card.set({
-      code: '0123456789012',
-      code_type: 'ean13',
-    });
-    const canvasElement: HTMLCanvasElement =
-      fixture.nativeElement.querySelector('.canvas');
-    fixture.detectChanges();
-
-    expect(canvasElement).toBeTruthy();
-    canvasElement.click();
-
-    expect(matDialogMock.open).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -118,25 +122,27 @@ describe('CardCodeViewerDialogComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should preserve color inversion in local storage', () => {
-    const lsGetSpy = vi
-      .spyOn(Storage.prototype, 'getItemJson')
-      .mockReturnValue(true);
-    const lsSetSpy = vi.spyOn(Storage.prototype, 'setItemJson');
-    fixture = TestBed.createComponent(CardCodeViewerDialogComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  describe('toggleInvert', () => {
+    it('persists inversion in local storage', () => {
+      const lsGetSpy = vi
+        .spyOn(Storage.prototype, 'getItemJson')
+        .mockReturnValue(true);
+      const lsSetSpy = vi.spyOn(Storage.prototype, 'setItemJson');
+      fixture = TestBed.createComponent(CardCodeViewerDialogComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
 
-    expect(lsGetSpy).toHaveBeenCalledTimes(1);
-    expect(component['invert']()).toBe(true);
+      expect(lsGetSpy).toHaveBeenCalledTimes(1);
+      expect(component['invert']()).toBe(true);
 
-    component['toggleInvert']();
+      component['toggleInvert']();
 
-    expect(lsSetSpy).toHaveBeenCalledTimes(1);
-    expect(lsSetSpy).toHaveBeenCalledWith(
-      ELocalStorageKey.CODE_COLOR_INVERSION,
-      false,
-    );
-    expect(component['invert']()).toBe(false);
+      expect(lsSetSpy).toHaveBeenCalledTimes(1);
+      expect(lsSetSpy).toHaveBeenCalledWith(
+        ELocalStorageKey.CODE_COLOR_INVERSION,
+        false,
+      );
+      expect(component['invert']()).toBe(false);
+    });
   });
 });

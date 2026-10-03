@@ -6,9 +6,12 @@ import {
 import { AppComponent } from './app.component';
 import { provideMockStore, MockStore } from '@ngrx/store/testing';
 import { provideRouter } from '@angular/router';
-import { ITestAppState, testAppState } from '../testing';
+import {
+  createCardShareApiServiceMock,
+  ITestAppState,
+  testAppState,
+} from 'src/testing';
 import { provideTranslateService } from '@ngx-translate/core';
-import { of } from 'rxjs';
 import { CardShareApiService } from './features/shared-cards/services/card-share-api.service';
 
 describe('AppComponent', () => {
@@ -28,7 +31,7 @@ describe('AppComponent', () => {
         provideTranslateService(),
         {
           provide: CardShareApiService,
-          useValue: { getCardsSharedWithMeCount: () => of({ count: 0 }) },
+          useValue: createCardShareApiServiceMock(),
         },
       ],
       imports: [AppComponent],
@@ -37,42 +40,44 @@ describe('AppComponent', () => {
     storeMock = TestBed.inject(MockStore);
   });
 
-  it('should create the app', () => {
+  it('should create', () => {
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
-  it('should render unauthorized content', async () => {
-    storeMock.setState({
-      ...initialState,
-      auth: {
-        init: true,
-      },
+  describe('shell', () => {
+    it('shows outlet when logged out', async () => {
+      storeMock.setState({
+        ...initialState,
+        auth: {
+          init: true,
+        },
+      });
+      fixture = TestBed.createComponent(AppComponent);
+      component = fixture.componentInstance;
+      fixture.autoDetectChanges();
+      await fixture.whenStable();
+      expect(component['isAuthorized']()).toBeFalsy();
+      const deferBlocks = await fixture.getDeferBlocks();
+      expect(deferBlocks.length).toBe(0);
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(
+        compiled.querySelector('.sidenav-container-content-outlet'),
+      ).toBeTruthy();
     });
-    fixture = TestBed.createComponent(AppComponent);
-    component = fixture.componentInstance;
-    fixture.autoDetectChanges();
-    await fixture.whenStable();
-    expect(component['isAuthorized']()).toBeFalsy();
-    const deferBlocks = await fixture.getDeferBlocks();
-    expect(deferBlocks.length).toBe(0);
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(
-      compiled.querySelector('.sidenav-container-content-outlet'),
-    ).toBeTruthy();
-  });
 
-  it('should render authorized content (menu)', async () => {
-    fixture = TestBed.createComponent(AppComponent);
-    component = fixture.componentInstance;
-    fixture.autoDetectChanges();
-    await fixture.whenStable();
-    const deferBlocks = await fixture.getDeferBlocks();
-    expect(deferBlocks.length).toBe(1);
-    await deferBlocks[0].render(DeferBlockState.Complete);
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.mat-toolbar')).toBeTruthy();
+    it('shows toolbar when logged in', async () => {
+      fixture = TestBed.createComponent(AppComponent);
+      component = fixture.componentInstance;
+      fixture.autoDetectChanges();
+      await fixture.whenStable();
+      const deferBlocks = await fixture.getDeferBlocks();
+      expect(deferBlocks.length).toBe(1);
+      await deferBlocks[0].render(DeferBlockState.Complete);
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.querySelector('.mat-toolbar')).toBeTruthy();
+    });
   });
 });

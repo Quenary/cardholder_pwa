@@ -4,7 +4,6 @@ import pytest
 import pytest_asyncio
 from fastapi import HTTPException
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from backend.api.card_api import _get_accessible_card
 from backend.api.card_share_api import (
@@ -18,13 +17,14 @@ from backend.api.card_share_api import (
     share_card,
     update_card_share,
 )
-from backend.db.models import BaseModel, CardModel, CardShareModel, UserModel
+from backend.db.models import CardModel, CardShareModel, UserModel
 from backend.enums.card_share_status_enum import ECardShareStatus
 from backend.schemas.card_share_schema import (
     ShareAllCardsRequestSchema,
     ShareCardRequestSchema,
     UpdateCardShareRequestSchema,
 )
+from backend.testing import sqlite_db
 
 PENDING = ECardShareStatus.PENDING
 ACCEPTED = ECardShareStatus.ACCEPTED
@@ -33,25 +33,25 @@ DECLINED = ECardShareStatus.DECLINED
 
 @pytest_asyncio.fixture
 async def db(tmp_path):
-    engine = create_async_engine(f"sqlite+aiosqlite:///{tmp_path / 'test.db'}")
-    async with engine.begin() as conn:
-        await conn.run_sync(BaseModel.metadata.create_all)
-    maker = async_sessionmaker(bind=engine, expire_on_commit=False)
-    async with maker() as session:
-        for name in ("alice", "bob", "carol"):
-            session.add(
-                UserModel(
-                    username=name, email=f"{name}@example.com", hashed_password="x"
+    async with sqlite_db(tmp_path / "test.db") as maker:
+        async with maker() as session:
+            for name in ("alice", "bob", "carol"):
+                session.add(
+                    UserModel(
+                        username=name,
+                        email=f"{name}@example.com",
+                        hashed_password="x",
+                    )
                 )
-            )
-        await session.commit()
-        for code in ("1", "2"):
-            session.add(
-                CardModel(user_id=1, name=f"card {code}", code=code, code_type="ean13")
-            )
-        await session.commit()
-        yield session
-    await engine.dispose()
+            await session.commit()
+            for code in ("1", "2"):
+                session.add(
+                    CardModel(
+                        user_id=1, name=f"card {code}", code=code, code_type="ean13"
+                    )
+                )
+            await session.commit()
+            yield session
 
 
 async def _user(db, user_id: int) -> UserModel:

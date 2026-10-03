@@ -34,56 +34,62 @@ describe('ConfirmDialogComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display provided text content', () => {
-    const useValue: IConfirmDialogData = {
-      title: 'testtitle',
-      subtitle: 'testsubtitle',
-      cancelText: 'canceltext',
-      confirmText: 'confirmtext',
-    };
-    TestBed.overrideProvider(MAT_DIALOG_DATA, { useValue });
-    fixture = TestBed.createComponent(ConfirmDialogComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-    const template = fixture.nativeElement as HTMLElement;
-    expect(template.querySelector('h2').textContent).toEqual(useValue.title);
-    expect(
-      template.querySelector('mat-dialog-content>span').textContent,
-    ).toEqual(useValue.subtitle);
-    expect(
-      template
-        .querySelector('mat-dialog-actions>button:first-child')
-        .textContent.trim(),
-    ).toEqual(useValue.cancelText);
-    expect(
-      template
-        .querySelector('mat-dialog-actions>button:last-child')
-        .textContent.trim(),
-    ).toEqual(useValue.confirmText);
+  describe('template', () => {
+    it('shows injected copy', () => {
+      const useValue: IConfirmDialogData = {
+        title: 'testtitle',
+        subtitle: 'testsubtitle',
+        cancelText: 'canceltext',
+        confirmText: 'confirmtext',
+      };
+      TestBed.overrideProvider(MAT_DIALOG_DATA, { useValue });
+      fixture = TestBed.createComponent(ConfirmDialogComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+      const template = fixture.nativeElement as HTMLElement;
+      expect(template.querySelector('h2').textContent).toEqual(useValue.title);
+      expect(
+        template.querySelector('mat-dialog-content>span').textContent,
+      ).toEqual(useValue.subtitle);
+      expect(
+        template
+          .querySelector('mat-dialog-actions>button:first-child')
+          .textContent.trim(),
+      ).toEqual(useValue.cancelText);
+      expect(
+        template
+          .querySelector('mat-dialog-actions>button:last-child')
+          .textContent.trim(),
+      ).toEqual(useValue.confirmText);
+    });
   });
 
-  it('should enable confirm button with checkbox', () => {
-    const useValue: IConfirmDialogData = {
-      addCheckbox: true,
-      title: 'testtitle',
-      subtitle: 'testsubtitle',
-      cancelText: 'canceltext',
-      confirmText: 'confirmtext',
-    };
-    TestBed.overrideProvider(MAT_DIALOG_DATA, { useValue });
-    fixture = TestBed.createComponent(ConfirmDialogComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-    const template = fixture.nativeElement as HTMLElement;
-    const checkbox = template.querySelector('mat-dialog-content>mat-checkbox');
-    expect(checkbox).toBeTruthy();
-    expect(
-      template.querySelector('mat-dialog-actions>button:last-child:disabled'),
-    ).toBeTruthy();
-    component['confirmCheckbox'].set(true);
-    fixture.detectChanges();
-    expect(
-      template.querySelector('mat-dialog-actions>button:last-child:disabled'),
-    ).toBeFalsy();
+  describe('confirm checkbox', () => {
+    it('gates the confirm button', () => {
+      const useValue: IConfirmDialogData = {
+        addCheckbox: true,
+        title: 'testtitle',
+        subtitle: 'testsubtitle',
+        cancelText: 'canceltext',
+        confirmText: 'confirmtext',
+      };
+      TestBed.overrideProvider(MAT_DIALOG_DATA, { useValue });
+      fixture = TestBed.createComponent(ConfirmDialogComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+      const template = fixture.nativeElement as HTMLElement;
+      const checkbox = template.querySelector(
+        'mat-dialog-content>mat-checkbox',
+      );
+      expect(checkbox).toBeTruthy();
+      expect(
+        template.querySelector('mat-dialog-actions>button:last-child:disabled'),
+      ).toBeTruthy();
+      component['confirmCheckbox'].set(true);
+      fixture.detectChanges();
+      expect(
+        template.querySelector('mat-dialog-actions>button:last-child:disabled'),
+      ).toBeFalsy();
+    });
   });
 });

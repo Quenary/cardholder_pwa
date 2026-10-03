@@ -1,143 +1,38 @@
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 from fastapi import HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from pytest_mock import MockerFixture
 
 from backend.api.user_api import create_user, update_user
 from backend.core.auth_core import get_password_hash, verify_password
 from backend.db.models.user_model import UserModel
 from backend.enums.user_role_enum import EUserRole
-from backend.schemas.user_schema import (
-    UserCreateSchema,
-    UserUpdateSchema,
-)
-
-
-def _get_user_create(
-    payload: dict | None = None,
-) -> UserCreateSchema:
-    if not payload:
-        payload = {
-            "username": "user_name",
-            "email": "user_email@example.com",
-            "password": "123456qQ",
-            "confirm_password": "123456qQ",
-        }
-    return UserCreateSchema(**payload)
-
-
-def _get_user_update(
-    payload: dict | None = None,
-) -> UserUpdateSchema:
-    if not payload:
-        payload = {
-            "username": "user_name",
-            "email": "user_email@example.com",
-        }
-    return UserUpdateSchema(**payload)
-
-
-@pytest.mark.asyncio
-async def test_user_should_create_owner() -> None:
-    user = _get_user_create()
-
-    session_mock = AsyncMock(spec=AsyncSession)
-    session_mock.execute.return_value = MagicMock(
-        scalar_one_or_none=MagicMock(return_value=None)
-    )
-    session_mock.add.return_value = None
-
-    with patch(
-        "backend.api.user_api.is_creds_taken",
-        new_callable=AsyncMock,
-    ) as is_creds_taken_mock:
-        is_creds_taken_mock.return_value = False
-
-        result = await create_user(user, session_mock, True)
-        assert result.role_code == EUserRole.OWNER
-        assert session_mock.add.mock_calls[0].args[0].role_code == EUserRole.OWNER
-
-
-@pytest.mark.asyncio
-async def test_user_should_create_member() -> None:
-    user = _get_user_create()
-
-    session_mock = AsyncMock(spec=AsyncSession)
-    session_mock.execute.return_value = MagicMock(
-        scalar_one_or_none=MagicMock(return_value={})
-    )
-    session_mock.add.return_value = None
-
-    with patch(
-        "backend.api.user_api.is_creds_taken",
-        new_callable=AsyncMock,
-    ) as is_creds_taken_mock:
-        is_creds_taken_mock.return_value = False
-
-        result = await create_user(user, session_mock, True)
-        assert result.role_code != EUserRole.OWNER
-        assert session_mock.add.mock_calls[0].args[0].role_code != EUserRole.OWNER
-
-
-@pytest.mark.asyncio
-async def test_user_should_not_create_if_creds_taken() -> None:
-    user = _get_user_create()
-
-    session_mock = AsyncMock(spec=AsyncSession)
-
-    with patch(
-        "backend.api.user_api.is_creds_taken",
-        new_callable=AsyncMock,
-    ) as is_creds_taken_mock:
-        is_creds_taken_mock.return_value = True
-
-        with pytest.raises(HTTPException) as exc_info:
-            await create_user(user, session_mock, True)
-
-    assert exc_info.value.status_code == 400
-    assert exc_info.value.detail == "Username or email is already taken"
-
-
-@pytest.mark.asyncio
-async def test_user_should_not_update_if_creds_taken() -> None:
-    user = _get_user_update()
-    current_user: UserModel = UserModel(id=1)
-
-    session_mock = AsyncMock(spec=AsyncSession)
-
-    with patch(
-        "backend.api.user_api.is_creds_taken",
-        new_callable=AsyncMock,
-    ) as is_creds_taken_mock:
-        is_creds_taken_mock.return_value = True
-
-        with pytest.raises(HTTPException) as exc_info:
-            await update_user(user, session_mock, current_user)
-
-    assert exc_info.value.status_code == 400
-    assert exc_info.value.detail == "Username or email is already taken"
-
-
-@pytest.mark.asyncio
-async def test_user_should_update_with_no_password() -> None:
-    user = _get_user_update()
-    current_user = _get_current_user()
-
-    session_mock = AsyncMock(spec=AsyncSession)
-
-    with patch(
-        "backend.api.user_api.is_creds_taken",
-        new_callable=AsyncMock,
-    ) as is_creds_taken_mock:
-        is_creds_taken_mock.return_value = False
-        result = await update_user(user, session_mock, current_user)
-
-        assert result.username == user.username
-        assert result.email == user.email
-
+from backend.schemas.user_schema import UserCreateSchema, UserUpdateSchema
+from backend.testing import mock_session
 
 CURRENT_PASSWORD = "current1Q"
+_CREATE = {
+    "username": "user_name",
+    "email": "user_email@example.com",
+    "password": "123456qQ",
+    "confirm_password": "123456qQ",
+}
+_PROFILE = {"username": "user_name", "email": "user_email@example.com"}
+_NEW_PASSWORD = {
+    **_PROFILE,
+    "current_password": CURRENT_PASSWORD,
+    "password": "123456qQ",
+    "confirm_password": "123456qQ",
+}
+
+
+def _get_user_create(payload: dict | None = None) -> UserCreateSchema:
+    return UserCreateSchema(**(payload or _CREATE))
+
+
+def _get_user_update(payload: dict | None = None) -> UserUpdateSchema:
+    return UserUpdateSchema(**(payload or _PROFILE))
 
 
 def _get_current_user(email: str = "user_email@example.com") -> UserModel:
@@ -149,241 +44,203 @@ def _get_current_user(email: str = "user_email@example.com") -> UserModel:
     )
 
 
-@pytest.mark.asyncio
-async def test_user_should_update_with_password() -> None:
-    user = _get_user_update(
-        {
-            "username": "user_name",
-            "email": "user_email@example.com",
-            "current_password": CURRENT_PASSWORD,
-            "password": "123456qQ",
-            "confirm_password": "123456qQ",
-        }
-    )
-    current_user = _get_current_user()
-
-    session_mock = AsyncMock(spec=AsyncSession)
-
-    with patch(
+def _creds_free(mocker: MockerFixture) -> None:
+    mocker.patch(
         "backend.api.user_api.is_creds_taken",
         new_callable=AsyncMock,
-    ) as is_creds_taken_mock:
-        is_creds_taken_mock.return_value = False
-        result = await update_user(user, session_mock, current_user)
-
-        assert result.username == user.username
-        assert result.email == user.email
-        assert verify_password("123456qQ", result.hashed_password)
+        return_value=False,
+    )
 
 
 @pytest.mark.asyncio
-async def test_user_should_revoke_sessions_on_password_change() -> None:
-    user = _get_user_update(
-        {
-            "username": "user_name",
-            "email": "user_email@example.com",
-            "current_password": CURRENT_PASSWORD,
-            "password": "123456qQ",
-            "confirm_password": "123456qQ",
-        }
-    )
-    current_user = _get_current_user()
+@pytest.mark.parametrize(
+    ("existing", "owner"),
+    [(None, True), (UserModel(id=1), False)],
+)
+async def test_the_first_account_is_the_owner(
+    mocker: MockerFixture, existing, owner: bool
+) -> None:
+    session = mock_session(scalar_one_or_none=existing)
+    _creds_free(mocker)
 
-    session_mock = AsyncMock(spec=AsyncSession)
+    result = await create_user(_get_user_create(), session, True)
 
-    with patch(
-        "backend.api.user_api.is_creds_taken",
-        new_callable=AsyncMock,
-    ) as is_creds_taken_mock:
-        is_creds_taken_mock.return_value = False
-        await update_user(user, session_mock, current_user)
-
-    statements = [
-        str(call.args[0]) for call in session_mock.execute.mock_calls if call.args
-    ]
-    assert any("UPDATE refresh_token" in stmt for stmt in statements)
+    added = session.add.mock_calls[0].args[0]
+    assert (result.role_code == EUserRole.OWNER) is owner
+    assert (added.role_code == EUserRole.OWNER) is owner
 
 
 @pytest.mark.asyncio
-async def test_user_should_not_change_password_without_current_one() -> None:
-    user = _get_user_update(
-        {
-            "username": "user_name",
-            "email": "user_email@example.com",
-            "password": "123456qQ",
-            "confirm_password": "123456qQ",
-        }
-    )
-    current_user = _get_current_user()
-
-    session_mock = AsyncMock(spec=AsyncSession)
-
-    with patch(
+@pytest.mark.parametrize(
+    "call",
+    [
+        pytest.param(
+            lambda session: create_user(_get_user_create(), session, True),
+            id="create",
+        ),
+        pytest.param(
+            lambda session: update_user(
+                _get_user_update(), session, _get_current_user()
+            ),
+            id="update",
+        ),
+    ],
+)
+async def test_taken_credentials_are_refused(mocker: MockerFixture, call) -> None:
+    session = mock_session()
+    mocker.patch(
         "backend.api.user_api.is_creds_taken",
         new_callable=AsyncMock,
-    ) as is_creds_taken_mock:
-        is_creds_taken_mock.return_value = False
+        return_value=True,
+    )
 
-        with pytest.raises(HTTPException) as exc_info:
-            await update_user(user, session_mock, current_user)
+    with pytest.raises(HTTPException) as exc_info:
+        await call(session)
+
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.detail == "Username or email is already taken"
+
+
+@pytest.mark.asyncio
+async def test_profile_updates_without_a_password(mocker: MockerFixture) -> None:
+    user = _get_user_update()
+    _creds_free(mocker)
+
+    result = await update_user(user, mock_session(), _get_current_user())
+
+    assert result.username == user.username
+    assert result.email == user.email
+
+
+@pytest.mark.asyncio
+async def test_password_changes_when_the_current_one_matches(
+    mocker: MockerFixture,
+) -> None:
+    _creds_free(mocker)
+
+    result = await update_user(
+        _get_user_update(_NEW_PASSWORD), mock_session(), _get_current_user()
+    )
+
+    assert verify_password("123456qQ", result.hashed_password)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {**_PROFILE, "password": "123456qQ", "confirm_password": "123456qQ"},
+        {**_NEW_PASSWORD, "current_password": "wrong1Qq"},
+    ],
+    ids=["missing", "wrong"],
+)
+async def test_password_change_needs_the_current_password(
+    mocker: MockerFixture, payload: dict
+) -> None:
+    current_user = _get_current_user()
+    _creds_free(mocker)
+
+    with pytest.raises(HTTPException) as exc_info:
+        await update_user(_get_user_update(payload), mock_session(), current_user)
 
     assert exc_info.value.status_code == 400
     assert verify_password(CURRENT_PASSWORD, current_user.hashed_password)
 
 
 @pytest.mark.asyncio
-async def test_user_should_not_change_password_with_a_wrong_current_one() -> None:
-    user = _get_user_update(
-        {
-            "username": "user_name",
-            "email": "user_email@example.com",
-            "current_password": "wrong1Qq",
-            "password": "123456qQ",
-            "confirm_password": "123456qQ",
-        }
-    )
+@pytest.mark.parametrize(
+    ("field", "value", "previous"),
+    [
+        ("email", "new_email@example.com", "user_email@example.com"),
+        ("username", "new_user_name", "user_name"),
+    ],
+)
+async def test_identity_change_needs_the_current_password(
+    mocker: MockerFixture, field: str, value: str, previous: str
+) -> None:
     current_user = _get_current_user()
+    _creds_free(mocker)
 
-    session_mock = AsyncMock(spec=AsyncSession)
-
-    with patch(
-        "backend.api.user_api.is_creds_taken",
-        new_callable=AsyncMock,
-    ) as is_creds_taken_mock:
-        is_creds_taken_mock.return_value = False
-
-        with pytest.raises(HTTPException) as exc_info:
-            await update_user(user, session_mock, current_user)
+    with pytest.raises(HTTPException) as exc_info:
+        await update_user(
+            _get_user_update({**_PROFILE, field: value}),
+            mock_session(),
+            current_user,
+        )
 
     assert exc_info.value.status_code == 400
+    assert getattr(current_user, field) == previous
 
 
 @pytest.mark.asyncio
-async def test_user_should_not_change_email_without_current_password() -> None:
-    user = _get_user_update(
-        {
-            "username": "user_name",
-            "email": "new_email@example.com",
-        }
+async def test_username_changes_with_the_current_password(
+    mocker: MockerFixture,
+) -> None:
+    _creds_free(mocker)
+
+    result = await update_user(
+        _get_user_update(
+            {
+                **_PROFILE,
+                "username": "new_user_name",
+                "current_password": CURRENT_PASSWORD,
+            }
+        ),
+        mock_session(),
+        _get_current_user(),
     )
-    current_user = _get_current_user()
-
-    session_mock = AsyncMock(spec=AsyncSession)
-
-    with patch(
-        "backend.api.user_api.is_creds_taken",
-        new_callable=AsyncMock,
-    ) as is_creds_taken_mock:
-        is_creds_taken_mock.return_value = False
-
-        with pytest.raises(HTTPException) as exc_info:
-            await update_user(user, session_mock, current_user)
-
-    assert exc_info.value.status_code == 400
-    assert current_user.email == "user_email@example.com"
-
-
-@pytest.mark.asyncio
-async def test_user_should_not_change_username_without_current_password() -> None:
-    user = _get_user_update(
-        {
-            "username": "new_user_name",
-            "email": "user_email@example.com",
-        }
-    )
-    current_user = _get_current_user()
-
-    session_mock = AsyncMock(spec=AsyncSession)
-
-    with patch(
-        "backend.api.user_api.is_creds_taken",
-        new_callable=AsyncMock,
-    ) as is_creds_taken_mock:
-        is_creds_taken_mock.return_value = False
-
-        with pytest.raises(HTTPException) as exc_info:
-            await update_user(user, session_mock, current_user)
-
-    assert exc_info.value.status_code == 400
-    assert current_user.username == "user_name"
-
-
-@pytest.mark.asyncio
-async def test_user_should_change_username_with_current_password() -> None:
-    user = _get_user_update(
-        {
-            "username": "new_user_name",
-            "email": "user_email@example.com",
-            "current_password": CURRENT_PASSWORD,
-        }
-    )
-    current_user = _get_current_user()
-
-    session_mock = AsyncMock(spec=AsyncSession)
-
-    with patch(
-        "backend.api.user_api.is_creds_taken",
-        new_callable=AsyncMock,
-    ) as is_creds_taken_mock:
-        is_creds_taken_mock.return_value = False
-        result = await update_user(user, session_mock, current_user)
 
     assert result.username == "new_user_name"
 
 
-async def _update_statements(payload: dict) -> list[str]:
-    user = _get_user_update(payload)
-    session_mock = AsyncMock(spec=AsyncSession)
-    with patch(
-        "backend.api.user_api.is_creds_taken",
-        new_callable=AsyncMock,
-        return_value=False,
-    ):
-        await update_user(user, session_mock, _get_current_user())
-    return [str(call.args[0]) for call in session_mock.execute.mock_calls if call.args]
+async def _statements(mocker: MockerFixture, payload: dict) -> list[str]:
+    session = mock_session()
+    _creds_free(mocker)
+    await update_user(_get_user_update(payload), session, _get_current_user())
+    return [str(call.args[0]) for call in session.execute.mock_calls if call.args]
 
 
 @pytest.mark.asyncio
-async def test_user_should_revoke_recovery_codes_on_password_change() -> None:
-    statements = await _update_statements(
-        {
-            "username": "user_name",
-            "email": "user_email@example.com",
-            "current_password": CURRENT_PASSWORD,
-            "password": "123456qQ",
-            "confirm_password": "123456qQ",
-        }
+@pytest.mark.parametrize(
+    ("payload", "revokes_codes", "revokes_sessions"),
+    [
+        (_NEW_PASSWORD, True, True),
+        (
+            {
+                **_PROFILE,
+                "email": "new_email@example.com",
+                "current_password": CURRENT_PASSWORD,
+            },
+            True,
+            False,
+        ),
+        (
+            {
+                **_PROFILE,
+                "username": "new_user_name",
+                "current_password": CURRENT_PASSWORD,
+            },
+            False,
+            False,
+        ),
+    ],
+    ids=["password", "email", "username"],
+)
+async def test_recovery_codes_and_sessions_follow_the_change(
+    mocker: MockerFixture,
+    payload: dict,
+    revokes_codes: bool,
+    revokes_sessions: bool,
+) -> None:
+    statements = await _statements(mocker, payload)
+
+    assert (
+        any("UPDATE password_recovery_codes" in stmt for stmt in statements)
+        is revokes_codes
     )
-
-    assert any("UPDATE password_recovery_codes" in stmt for stmt in statements)
-
-
-@pytest.mark.asyncio
-async def test_user_should_revoke_recovery_codes_on_email_change() -> None:
-    statements = await _update_statements(
-        {
-            "username": "user_name",
-            "email": "new_email@example.com",
-            "current_password": CURRENT_PASSWORD,
-        }
+    assert (
+        any("UPDATE refresh_token" in stmt for stmt in statements) is revokes_sessions
     )
-
-    assert any("UPDATE password_recovery_codes" in stmt for stmt in statements)
-    # The password did not change: the sessions stay.
-    assert not any("UPDATE refresh_token" in stmt for stmt in statements)
-
-
-@pytest.mark.asyncio
-async def test_user_should_keep_recovery_codes_on_username_change() -> None:
-    statements = await _update_statements(
-        {
-            "username": "new_user_name",
-            "email": "user_email@example.com",
-            "current_password": CURRENT_PASSWORD,
-        }
-    )
-
-    assert not any("UPDATE password_recovery_codes" in stmt for stmt in statements)
 
 
 @pytest.mark.parametrize("username", ["", "   ", "\t\n"])
@@ -392,11 +249,3 @@ def test_username_must_not_be_blank(username: str) -> None:
         _get_user_create({**_CREATE, "username": username})
     with pytest.raises(ValueError, match="must not be empty"):
         _get_user_update({"username": username, "email": "user_email@example.com"})
-
-
-_CREATE = {
-    "username": "user_name",
-    "email": "user_email@example.com",
-    "password": "123456qQ",
-    "confirm_password": "123456qQ",
-}

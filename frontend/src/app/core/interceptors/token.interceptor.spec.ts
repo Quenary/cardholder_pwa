@@ -51,69 +51,74 @@ describe('getTokenInterceptor', () => {
     httpMock.verify();
   });
 
-  it('sends the access token', () => {
-    httpClient.get(URL).subscribe();
+  describe('outgoing request', () => {
+    it('adds the bearer token', () => {
+      httpClient.get(URL).subscribe();
 
-    const req = httpMock.expectOne(URL);
-    expect(req.request.headers.get('Authorization')).toBe(
-      'Bearer valid-access-token',
-    );
-    req.flush({});
+      const req = httpMock.expectOne(URL);
+      expect(req.request.headers.get('Authorization')).toBe(
+        'Bearer valid-access-token',
+      );
+      req.flush({});
+    });
   });
 
-  it('asks for a new token on 401 and retries with it', () => {
-    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
-    httpClient.get(URL).subscribe();
+  describe('401 response', () => {
+    it('dispatches refresh and retries', () => {
+      const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
+      httpClient.get(URL).subscribe();
 
-    httpMock
-      .expectOne(URL)
-      .flush(null, { status: 401, statusText: 'Unauthorized' });
+      httpMock
+        .expectOne(URL)
+        .flush(null, { status: 401, statusText: 'Unauthorized' });
 
-    expect(dispatchSpy).toHaveBeenCalledWith(
-      AuthActions.refreshToken({ refreshToken: 'valid-refresh-token' }),
-    );
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        AuthActions.refreshToken({ refreshToken: 'valid-refresh-token' }),
+      );
 
-    storeMock.setState(withAccessToken(initialState, 'refreshed-access-token'));
+      storeMock.setState(
+        withAccessToken(initialState, 'refreshed-access-token'),
+      );
 
-    const retry = httpMock.expectOne(URL);
-    expect(retry.request.headers.get('Authorization')).toBe(
-      'Bearer refreshed-access-token',
-    );
-    retry.flush({});
-  });
-
-  it('retries with the token another request already fetched', () => {
-    const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
-    httpClient.get(URL).subscribe();
-
-    const req = httpMock.expectOne(URL);
-    // A parallel request hit the same 401 first and refreshed the token
-    // while this one was still in flight.
-    storeMock.setState(withAccessToken(initialState, 'refreshed-access-token'));
-    req.flush(null, { status: 401, statusText: 'Unauthorized' });
-
-    const retry = httpMock.expectOne(URL);
-    expect(retry.request.headers.get('Authorization')).toBe(
-      'Bearer refreshed-access-token',
-    );
-    expect(dispatchSpy).not.toHaveBeenCalled();
-    retry.flush({});
-  });
-
-  it('gives back the original error when the refresh fails', () => {
-    let status: number | undefined;
-    httpClient.get(URL).subscribe({ error: (err) => (status = err.status) });
-
-    httpMock
-      .expectOne(URL)
-      .flush(null, { status: 401, statusText: 'Unauthorized' });
-
-    // The reducer clears the token response on a failed refresh.
-    storeMock.setState({
-      ...initialState,
-      auth: { ...initialState.auth, tokenResponse: null },
+      const retry = httpMock.expectOne(URL);
+      expect(retry.request.headers.get('Authorization')).toBe(
+        'Bearer refreshed-access-token',
+      );
+      retry.flush({});
     });
 
-    expect(status).toBe(401);
+    it('reuses a token another request already refreshed', () => {
+      const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
+      httpClient.get(URL).subscribe();
+
+      const req = httpMock.expectOne(URL);
+      storeMock.setState(
+        withAccessToken(initialState, 'refreshed-access-token'),
+      );
+      req.flush(null, { status: 401, statusText: 'Unauthorized' });
+
+      const retry = httpMock.expectOne(URL);
+      expect(retry.request.headers.get('Authorization')).toBe(
+        'Bearer refreshed-access-token',
+      );
+      expect(dispatchSpy).not.toHaveBeenCalled();
+      retry.flush({});
+    });
+
+    it('returns the error when refresh clears tokens', () => {
+      let status: number | undefined;
+      httpClient.get(URL).subscribe({ error: (err) => (status = err.status) });
+
+      httpMock
+        .expectOne(URL)
+        .flush(null, { status: 401, statusText: 'Unauthorized' });
+
+      storeMock.setState({
+        ...initialState,
+        auth: { ...initialState.auth, tokenResponse: null },
+      });
+
+      expect(status).toBe(401);
+    });
   });
 });

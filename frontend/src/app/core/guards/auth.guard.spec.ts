@@ -41,23 +41,27 @@ describe('authGuard', () => {
     );
   }
 
-  it('should allow authorized', async () => {
-    const result = await firstValueFrom(runGuard());
+  describe('when authorized', () => {
+    it('allows navigation', async () => {
+      const result = await firstValueFrom(runGuard());
 
-    expect(result).toBe(true);
-    expect(routerMock.navigate).not.toHaveBeenCalled();
+      expect(result).toBe(true);
+      expect(routerMock.navigate).not.toHaveBeenCalled();
+    });
   });
 
-  it('should reject and navigate to /auth unauthorized', async () => {
-    storeMock.setState({
-      auth: {
-        init: true,
-        tokenResponse: null,
-      },
-    });
-    const result = await firstValueFrom(runGuard());
+  describe('when unauthorized', () => {
+    it('redirects to /auth', async () => {
+      storeMock.setState({
+        auth: {
+          init: true,
+          tokenResponse: null,
+        },
+      });
+      const result = await firstValueFrom(runGuard());
 
-    expect(result).toBe(false);
-    expect(routerMock.navigate).toHaveBeenCalledWith(['/auth']);
+      expect(result).toBe(false);
+      expect(routerMock.navigate).toHaveBeenCalledWith(['/auth']);
+    });
   });
 });
