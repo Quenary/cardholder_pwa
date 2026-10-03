@@ -7,13 +7,11 @@ mocking the session would hide the difference.
 """
 
 import pytest
-import pytest_asyncio
 from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from backend.config import Config
 from backend.core.user_core import delete_user
-from backend.db.models import BaseModel, CardModel, CardShareModel, UserModel
+from backend.db.models import CardModel, CardShareModel, UserModel
 
 
 @pytest.fixture
@@ -27,17 +25,6 @@ def logo_dir(tmp_path, monkeypatch):
     directory.mkdir()
     monkeypatch.setattr(Config, "LOGO_DIR", str(directory))
     return directory
-
-
-@pytest_asyncio.fixture
-async def session(tmp_path):
-    engine = create_async_engine(f"sqlite+aiosqlite:///{tmp_path / 'test.db'}")
-    async with engine.begin() as conn:
-        await conn.run_sync(BaseModel.metadata.create_all)
-    maker = async_sessionmaker(bind=engine, expire_on_commit=False)
-    async with maker() as db:
-        yield db
-    await engine.dispose()
 
 
 async def _seed(db):
@@ -65,38 +52,36 @@ async def _seed(db):
 
 
 @pytest.mark.asyncio
-async def test_the_logo_files_of_a_deleted_account_are_removed(
-    session, logo_dir
-) -> None:
-    alice, _, _ = await _seed(session)
+async def test_the_logo_files_of_a_deleted_account_are_removed(db, logo_dir) -> None:
+    alice, _, _ = await _seed(db)
     stored = logo_dir / "alice-logo.webp"
     stored.write_bytes(b"not really an image, nothing reads it here")
 
-    await delete_user(session, alice)
+    await delete_user(db, alice)
 
     assert not stored.exists()
 
 
 @pytest.mark.asyncio
-async def test_deleting_the_recipient_removes_the_share(session, logo_dir) -> None:
-    _, bob, _ = await _seed(session)
+async def test_deleting_the_recipient_removes_the_share(db, logo_dir) -> None:
+    _, bob, _ = await _seed(db)
 
-    await delete_user(session, bob)
+    await delete_user(db, bob)
 
-    assert await session.scalar(select(func.count()).select_from(CardShareModel)) == 0
-
-
-@pytest.mark.asyncio
-async def test_deleting_the_owner_removes_the_share(session, logo_dir) -> None:
-    alice, _, _ = await _seed(session)
-
-    await delete_user(session, alice)
-
-    assert await session.scalar(select(func.count()).select_from(CardShareModel)) == 0
+    assert await db.scalar(select(func.count()).select_from(CardShareModel)) == 0
 
 
 @pytest.mark.asyncio
-async def test_the_next_account_inherits_nothing(session, logo_dir) -> None:
+async def test_deleting_the_owner_removes_the_share(db, logo_dir) -> None:
+    alice, _, _ = await _seed(db)
+
+    await delete_user(db, alice)
+
+    assert await db.scalar(select(func.count()).select_from(CardShareModel)) == 0
+
+
+@pytest.mark.asyncio
+async def test_the_next_account_inherits_nothing(db, logo_dir) -> None:
     """SQLite hands the freed row id to the next account.
 
     Nothing is left pointing at the deleted one, so the account that picks up
@@ -104,19 +89,19 @@ async def test_the_next_account_inherits_nothing(session, logo_dir) -> None:
     and the two share relationships cascade; it would not survive turning
     that into a bulk delete.
     """
-    _, bob, _ = await _seed(session)
+    _, bob, _ = await _seed(db)
     bob_id = bob.id
 
-    await delete_user(session, bob)
+    await delete_user(db, bob)
 
     mallory = UserModel(
         username="mallory", email="mallory@example.com", hashed_password="x"
     )
-    session.add(mallory)
-    await session.commit()
+    db.add(mallory)
+    await db.commit()
     assert mallory.id == bob_id, "expected the id to be reused"
 
-    visible = await session.execute(
+    visible = await db.execute(
         select(CardModel.name)
         .join(CardShareModel, CardShareModel.card_id == CardModel.id)
         .where(CardShareModel.shared_with_user_id == mallory.id)

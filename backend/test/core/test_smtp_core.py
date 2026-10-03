@@ -6,7 +6,6 @@ exact bytes that would go out.
 """
 
 from email.message import Message
-from unittest.mock import patch
 
 import pytest
 from fastapi import HTTPException
@@ -50,6 +49,7 @@ def smtp_config(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(Config, "SMTP_USERNAME", "", raising=False)
     monkeypatch.setattr(Config, "SMTP_PASSWORD", "", raising=False)
     monkeypatch.setattr(Config, "SMTP_TIMEOUT", 5, raising=False)
+    monkeypatch.setattr("smtplib.SMTP", _RecordingSMTP)
     _RecordingSMTP.sent = []
 
 
@@ -58,8 +58,7 @@ def _last_sent() -> Message:
 
 
 def test_from_header_is_bare_address_without_a_display_name():
-    with patch("smtplib.SMTP", _RecordingSMTP):
-        EmailSender.send_email("to@example.org", "Subject", "Body")
+    EmailSender.send_email("to@example.org", "Subject", "Body")
 
     assert _last_sent()["From"] == "noreply@example.org"
 
@@ -71,8 +70,7 @@ def test_from_header_carries_the_display_name_when_configured(
         Config, "SMTP_FROM_NAME", "Cardholder - Famille Bonnier", raising=False
     )
 
-    with patch("smtplib.SMTP", _RecordingSMTP):
-        EmailSender.send_email("to@example.org", "Subject", "Body")
+    EmailSender.send_email("to@example.org", "Subject", "Body")
 
     from_header = _last_sent()["From"]
     assert from_header == "Cardholder - Famille Bonnier <noreply@example.org>"
@@ -89,8 +87,7 @@ def test_message_id_domain_is_unaffected_by_the_display_name(
         Config, "SMTP_FROM_NAME", "Cardholder - Famille Bonnier", raising=False
     )
 
-    with patch("smtplib.SMTP", _RecordingSMTP):
-        EmailSender.send_email("to@example.org", "Subject", "Body")
+    EmailSender.send_email("to@example.org", "Subject", "Body")
 
     message_id = _last_sent()["Message-ID"]
     assert message_id.endswith("@example.org>")
@@ -98,10 +95,9 @@ def test_message_id_domain_is_unaffected_by_the_display_name(
 
 
 def test_password_reset_email_link_is_a_real_clickable_anchor():
-    with patch("smtplib.SMTP", _RecordingSMTP):
-        EmailSender.send_password_reset_email(
-            "to@example.org", "ABC123", "https://cards.example.org/reset?code=ABC123"
-        )
+    EmailSender.send_password_reset_email(
+        "to@example.org", "ABC123", "https://cards.example.org/reset?code=ABC123"
+    )
 
     msg = _last_sent()
     assert msg.is_multipart()
@@ -119,8 +115,7 @@ def test_password_reset_email_link_is_a_real_clickable_anchor():
 
 
 def test_password_reset_email_without_url_falls_back_to_a_code():
-    with patch("smtplib.SMTP", _RecordingSMTP):
-        EmailSender.send_password_reset_email("to@example.org", "ZZZ999", None)
+    EmailSender.send_password_reset_email("to@example.org", "ZZZ999", None)
 
     msg = _last_sent()
     parts = {p.get_content_type(): p for p in msg.walk() if not p.is_multipart()}
@@ -128,21 +123,18 @@ def test_password_reset_email_without_url_falls_back_to_a_code():
     assert "ZZZ999" in parts["text/html"].get_payload(decode=True).decode()
 
 
-def test_disabled_smtp_refuses_to_send():
-    Config.SMTP_DISABLED = True
-    try:
-        with pytest.raises(HTTPException):
-            EmailSender.send_email("to@example.org", "Subject", "Body")
-    finally:
-        Config.SMTP_DISABLED = False
+def test_disabled_smtp_refuses_to_send(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr(Config, "SMTP_DISABLED", True, raising=False)
+
+    with pytest.raises(HTTPException):
+        EmailSender.send_email("to@example.org", "Subject", "Body")
 
 
 def test_password_reset_email_escapes_the_link_in_the_html_part():
     # Without PUBLIC_URL the link is built from the Host header, which the
     # client controls: it must not be able to break out of the href.
     hostile = 'https://evil.example"><img src=x onerror=alert(1)>/reset?code=A&b=1'
-    with patch("smtplib.SMTP", _RecordingSMTP):
-        EmailSender.send_password_reset_email("to@example.org", "A", hostile)
+    EmailSender.send_password_reset_email("to@example.org", "A", hostile)
 
     parts = {
         p.get_content_type(): p for p in _last_sent().walk() if not p.is_multipart()

@@ -1,10 +1,10 @@
 from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from fastapi import HTTPException, UploadFile
 from fastapi.testclient import TestClient
-from sqlalchemy.ext.asyncio import AsyncSession
+from pytest_mock import MockerFixture
 
 from backend.api.card_api import (
     create_card,
@@ -27,6 +27,7 @@ from backend.schemas.card_schema import (
     CardPatchSchema,
     CardUpdateSchema,
 )
+from backend.testing import mock_session
 
 
 def _user() -> UserModel:
@@ -46,19 +47,10 @@ def _card(**overrides) -> CardModel:
     return CardModel(**values)
 
 
-def _session(scalar_one_or_none=None, all_=None) -> AsyncMock:
-    session = AsyncMock(spec=AsyncSession)
-    result = MagicMock()
-    result.scalar_one_or_none.return_value = scalar_one_or_none
-    result.scalars.return_value.all.return_value = all_ or []
-    session.execute.return_value = result
-    return session
-
-
 @pytest.mark.asyncio
 async def test_get_cards_returns_the_callers_cards() -> None:
     card = _card()
-    session = _session(all_=[card])
+    session = mock_session(all_=[card])
 
     cards = await get_cards(session=session, user=_user())
 
@@ -68,24 +60,14 @@ async def test_get_cards_returns_the_callers_cards() -> None:
 @pytest.mark.asyncio
 async def test_get_card_returns_an_accessible_card() -> None:
     card = _card()
-    session = _session(scalar_one_or_none=card)
+    session = mock_session(scalar_one_or_none=card)
 
     assert await get_card(10, session=session, user=_user()) is card
 
 
 @pytest.mark.asyncio
-async def test_get_card_hides_a_card_of_someone_else() -> None:
-    session = _session(scalar_one_or_none=None)
-
-    with pytest.raises(HTTPException) as exc_info:
-        await get_card(10, session=session, user=_user())
-
-    assert exc_info.value.status_code == 404
-
-
-@pytest.mark.asyncio
 async def test_create_card_belongs_to_the_caller() -> None:
-    session = _session()
+    session = mock_session()
     body = CardCreateSchema(code="123", code_type="ean13", name="Shop")
 
     card = await create_card(body, session=session, user=_user())
@@ -99,7 +81,7 @@ async def test_create_card_belongs_to_the_caller() -> None:
 @pytest.mark.asyncio
 async def test_update_card_applies_the_payload() -> None:
     card = _card()
-    session = _session(scalar_one_or_none=card)
+    session = mock_session(scalar_one_or_none=card)
     body = CardUpdateSchema(code="999", code_type="ean13", name="Renamed")
 
     result = await update_card(10, body, session=session, user=_user())
@@ -110,21 +92,9 @@ async def test_update_card_applies_the_payload() -> None:
 
 
 @pytest.mark.asyncio
-async def test_update_card_refuses_a_card_of_someone_else() -> None:
-    session = _session(scalar_one_or_none=None)
-    body = CardUpdateSchema(code="999", code_type="ean13", name="Renamed")
-
-    with pytest.raises(HTTPException) as exc_info:
-        await update_card(10, body, session=session, user=_user())
-
-    assert exc_info.value.status_code == 404
-    session.commit.assert_not_awaited()
-
-
-@pytest.mark.asyncio
 async def test_patch_card_only_touches_what_was_sent() -> None:
     card = _card(name="Shop", code="0123456789012")
-    session = _session(scalar_one_or_none=card)
+    session = mock_session(scalar_one_or_none=card)
 
     result = await patch_card(
         10, CardPatchSchema(name="Renamed"), session=session, user=_user()
@@ -135,32 +105,21 @@ async def test_patch_card_only_touches_what_was_sent() -> None:
 
 
 @pytest.mark.asyncio
-async def test_delete_card_drops_the_logo_after_the_row() -> None:
+async def test_delete_card_drops_the_logo_after_the_row(mocker: MockerFixture) -> None:
     card = _card(logo_file="abc.webp")
-    session = _session(scalar_one_or_none=card)
+    session = mock_session(scalar_one_or_none=card)
+    delete_logo_mock = mocker.patch("backend.api.card_api.delete_logo")
 
-    with patch("backend.api.card_api.delete_logo") as delete_logo_mock:
-        await delete_card(10, session=session, user=_user())
+    await delete_card(10, session=session, user=_user())
 
     session.delete.assert_awaited_once_with(card)
     delete_logo_mock.assert_called_once_with("abc.webp")
 
 
 @pytest.mark.asyncio
-async def test_delete_card_refuses_a_card_of_someone_else() -> None:
-    session = _session(scalar_one_or_none=None)
-
-    with pytest.raises(HTTPException) as exc_info:
-        await delete_card(10, session=session, user=_user())
-
-    assert exc_info.value.status_code == 404
-    session.delete.assert_not_awaited()
-
-
-@pytest.mark.asyncio
 async def test_upload_logo_refuses_an_oversized_file() -> None:
     card = _card()
-    session = _session(scalar_one_or_none=card)
+    session = mock_session(scalar_one_or_none=card)
     upload = MagicMock(spec=UploadFile)
     upload.read = AsyncMock(side_effect=[b"x" * (3 * 1024 * 1024), b""])
 
@@ -171,17 +130,15 @@ async def test_upload_logo_refuses_an_oversized_file() -> None:
 
 
 @pytest.mark.asyncio
-async def test_upload_logo_stores_the_returned_name() -> None:
+async def test_upload_logo_stores_the_returned_name(mocker: MockerFixture) -> None:
     card = _card(logo_file="old.webp")
-    session = _session(scalar_one_or_none=card)
+    session = mock_session(scalar_one_or_none=card)
     upload = MagicMock(spec=UploadFile)
     upload.read = AsyncMock(side_effect=[b"bytes", b""])
+    mocker.patch("backend.api.card_api.save_logo", return_value="new.webp")
+    delete_logo_mock = mocker.patch("backend.api.card_api.delete_logo")
 
-    with (
-        patch("backend.api.card_api.save_logo", return_value="new.webp"),
-        patch("backend.api.card_api.delete_logo") as delete_logo_mock,
-    ):
-        result = await upload_card_logo(10, upload, session=session, user=_user())
+    result = await upload_card_logo(10, upload, session=session, user=_user())
 
     assert result.logo_file == "new.webp"
     # The previous image only goes once the new name is committed.
@@ -190,7 +147,7 @@ async def test_upload_logo_stores_the_returned_name() -> None:
 
 @pytest.mark.asyncio
 async def test_get_card_logo_404_without_a_logo() -> None:
-    session = _session(scalar_one_or_none=_card(logo_file=None))
+    session = mock_session(scalar_one_or_none=_card(logo_file=None))
 
     with pytest.raises(HTTPException) as exc_info:
         await get_card_logo(10, session=session, user=_user())
@@ -199,15 +156,45 @@ async def test_get_card_logo_404_without_a_logo() -> None:
 
 
 @pytest.mark.asyncio
-async def test_delete_card_logo_clears_the_reference() -> None:
+async def test_delete_card_logo_clears_the_reference(mocker: MockerFixture) -> None:
     card = _card(logo_file="abc.webp")
-    session = _session(scalar_one_or_none=card)
+    session = mock_session(scalar_one_or_none=card)
+    delete_logo_mock = mocker.patch("backend.api.card_api.delete_logo")
 
-    with patch("backend.api.card_api.delete_logo") as delete_logo_mock:
-        result = await delete_card_logo(10, session=session, user=_user())
+    result = await delete_card_logo(10, session=session, user=_user())
 
     assert result.logo_file is None
     delete_logo_mock.assert_called_once_with("abc.webp")
+
+
+_UPDATE = CardUpdateSchema(code="999", code_type="ean13", name="Renamed")
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "call",
+    [
+        pytest.param(
+            lambda session: get_card(10, session=session, user=_user()), id="get"
+        ),
+        pytest.param(
+            lambda session: update_card(10, _UPDATE, session=session, user=_user()),
+            id="update",
+        ),
+        pytest.param(
+            lambda session: delete_card(10, session=session, user=_user()), id="delete"
+        ),
+    ],
+)
+async def test_a_card_of_someone_else_is_not_found(call) -> None:
+    session = mock_session()
+
+    with pytest.raises(HTTPException) as exc_info:
+        await call(session)
+
+    assert exc_info.value.status_code == 404
+    session.commit.assert_not_awaited()
+    session.delete.assert_not_awaited()
 
 
 def test_patch_card_answers_with_the_public_card_shape() -> None:
@@ -218,17 +205,14 @@ def test_patch_card_answers_with_the_public_card_shape() -> None:
     card.is_favorite = False
     card.used_at = None
     card.created_at = card.updated_at = datetime(2026, 1, 1)
-    session = _session(scalar_one_or_none=card)
+    session = mock_session(scalar_one_or_none=card)
 
     async def _get_session():
         yield session
 
     app.dependency_overrides[get_async_session] = _get_session
     app.dependency_overrides[is_user] = _user
-    try:
-        response = TestClient(app).patch("/cards/10", json={"is_favorite": True})
-    finally:
-        app.dependency_overrides.clear()
+    response = TestClient(app).patch("/cards/10", json={"is_favorite": True})
 
     assert response.status_code == 200
     body = response.json()

@@ -1,38 +1,30 @@
 """Tests for how accounts are identified: the token subject and the
 uniqueness of usernames and emails."""
 
-from collections.abc import AsyncIterator
-
 import pytest
 import pytest_asyncio
 from fastapi import HTTPException
 from jose import jwt
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.config import Config
 from backend.core.auth_core import create_access_token, is_creds_taken, is_user
-from backend.db.models.base_model import BaseModel
 from backend.db.models.user_model import UserModel
 from backend.db.models.user_role_model import UserRoleModel
 from backend.enums.user_role_enum import EUserRole
 
 
 @pytest_asyncio.fixture
-async def session() -> AsyncIterator[AsyncSession]:
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
-    async with engine.begin() as conn:
-        await conn.run_sync(BaseModel.metadata.create_all)
-    async with async_sessionmaker(engine, expire_on_commit=False)() as s:
-        for role in EUserRole:
-            s.add(UserRoleModel(code=role))
-        s.add(
-            UserModel(
-                id=1, username="Alice", email="Alice@Example.com", hashed_password="x"
-            )
+async def session(db: AsyncSession) -> AsyncSession:
+    for role in EUserRole:
+        db.add(UserRoleModel(code=role))
+    db.add(
+        UserModel(
+            id=1, username="Alice", email="Alice@Example.com", hashed_password="x"
         )
-        await s.commit()
-        yield s
-    await engine.dispose()
+    )
+    await db.commit()
+    return db
 
 
 @pytest.mark.asyncio

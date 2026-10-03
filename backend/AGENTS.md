@@ -62,13 +62,13 @@ JWT access tokens (`python-jose`) and refresh tokens in the DB. `OAuth2PasswordB
 
 Tests live under `backend/test/` as `test_*.py`, grouped by `api/`, `core/`, `db/`, `schemas/`, `helpers/`. Async tests use `@pytest.mark.asyncio`. Patch with `pytest-mock` (`mocker.patch`) and `AsyncMock`.
 
-Router tests often call handler functions directly with mocked sessions, or use `TestClient(app)` with `app.dependency_overrides` for `get_async_session` and `is_user`.
+Router tests often call handler functions directly with mocked sessions, or use `TestClient(app)` with `app.dependency_overrides` for `get_async_session` and `is_user`. `backend/test/conftest.py` restores overrides after each test and provides an empty SQLite `db` session.
 
 Run from the repo root: `python -m pytest` or `uv run pytest`, optionally with a path such as `backend/test/api/test_card_api.py`.
 
-- Local helpers and factories stay in the test file or a nearby module; keep duplication low with parametrize.
-- Do not add tests for trivial getters.
-- Match ruff and mypy.
+- Shared factories live in `backend/testing.py` (`mock_session`, `sqlite_db`). Fixtures live in `conftest.py`.
+- Parametrize near-duplicate cases. Do not add tests for trivial getters.
+- Type helpers where it stays simple. Match ruff and mypy.
 
 ## Style
 
