@@ -6,6 +6,7 @@ import pytest
 from sqlalchemy import select
 
 from backend.api.auth_api import logout
+from backend.core.auth_core import hash_refresh_token
 from backend.db.models import RefreshTokenModel, UserModel
 from backend.helpers.now import now
 from backend.schemas.auth_schema import RevokeRequestSchema
@@ -21,9 +22,15 @@ async def _seed(db) -> tuple[UserModel, UserModel]:
     db.add_all(
         [
             RefreshTokenModel(
-                token="alice-rt", user_id=alice.id, expires_at=expires_at
+                token=hash_refresh_token("alice-rt"),
+                user_id=alice.id,
+                expires_at=expires_at,
             ),
-            RefreshTokenModel(token="bob-rt", user_id=bob.id, expires_at=expires_at),
+            RefreshTokenModel(
+                token=hash_refresh_token("bob-rt"),
+                user_id=bob.id,
+                expires_at=expires_at,
+            ),
         ]
     )
     await db.commit()
@@ -32,7 +39,9 @@ async def _seed(db) -> tuple[UserModel, UserModel]:
 
 async def _revoked(db, token: str) -> bool:
     result = await db.execute(
-        select(RefreshTokenModel.revoked).where(RefreshTokenModel.token == token)
+        select(RefreshTokenModel.revoked).where(
+            RefreshTokenModel.token == hash_refresh_token(token)
+        )
     )
     return result.scalar_one()
 

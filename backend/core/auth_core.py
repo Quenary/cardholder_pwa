@@ -1,3 +1,4 @@
+import hashlib
 import secrets
 from datetime import datetime, timedelta
 from typing import cast
@@ -57,16 +58,24 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt, expire
 
 
+def hash_refresh_token(token: str) -> str:
+    """What refresh_tokens.token stores: a sha256, so a copy of the database
+    (a backup, a leaked volume) holds no session anyone can use. A fast hash
+    is enough for 256 random bits; there is nothing to brute-force."""
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
 async def create_refresh_token(
     user_id: int,
     session: AsyncSession,
     user_agent: str | None = None,
     ip: str | None = None,
-):
+) -> str:
+    """Stores a new refresh token (hashed) and returns it, in the clear."""
     token = secrets.token_urlsafe(32)
     expires_at = now() + timedelta(minutes=Config.REFRESH_TOKEN_LIFETIME_MIN)
     db_token = RefreshTokenModel(
-        token=token,
+        token=hash_refresh_token(token),
         user_id=user_id,
         expires_at=expires_at,
         user_agent=user_agent,
@@ -74,8 +83,7 @@ async def create_refresh_token(
     )
     session.add(db_token)
     await session.commit()
-    await session.refresh(db_token)
-    return db_token
+    return token
 
 
 async def authenticate_user(session: AsyncSession, username: str, password: str):
@@ -90,13 +98,13 @@ async def authenticate_user(session: AsyncSession, username: str, password: str)
 def build_token_response(
     access_token: str,
     access_exp: datetime,
-    refresh_token: RefreshTokenModel,
+    refresh_token: str,
 ):
     return TokenResponseSchema(
         access_token=access_token,
         token_type="bearer",
         expires_in=int((access_exp - now()).total_seconds()),
-        refresh_token=refresh_token.token,
+        refresh_token=refresh_token,
     )
 
 
