@@ -1,0 +1,228 @@
+{
+  "GENERAL": {
+    "TITLE": "Cardholder",
+    "CONNECTION": "Verbinden",
+    "YES": "Ja",
+    "NO": "Nee",
+    "SAVE": "Opslaan",
+    "CLOSE": "Sluiten",
+    "CANCEL": "Annuleren",
+    "UNKNOWN_ERROR": "Onbekende fout",
+    "REQUEST_ERROR": "Verzoek fout",
+    "UNSAVED_WARN": "Niet-opgeslagen gegevens gaan verloren",
+    "CONFIRM": "Bevestig",
+    "DELETE_WARN": "Verwijdering bevestigen",
+    "DELETE": "Verwijderen"
+  },
+  "UPDATE": {
+    "TITLE": "Update",
+    "SUBTITLE": "Er is een nieuwe versie van de applicatie beschikbaar. Je moet de pagina opnieuw laden om bij te werken.",
+    "RELOAD": "Vernieuwen"
+  },
+  "NAV": {
+    "AUTH": "Autorisatie",
+    "REGISTER": "Registratie",
+    "PASSWORD_RECOVERY": "Wachtwoordherstel",
+    "CARD": "Kaarten",
+    "SHARED_CARDS": "Gedeelde kaarten",
+    "USER": "Gebruiker",
+    "ADMIN": "Admin paneel",
+    "ABOUT": "Over",
+    "EXIT": "Sluiten"
+  },
+  "AUTH": {
+    "WELCOME": "Welkom",
+    "USERNAME": "Gebruikersnaam",
+    "PASSWORD": "Wachtwoord",
+    "SIGNIN": "Aanmelden",
+    "SIGNUP": "Heb je nog geen account?",
+    "PASSWORD_RECOVERY": "Wachtwoord herstel",
+    "REGISTRATION_DISABLED": "Registratie is uitgeschakeld in de applicatie-instellingen",
+    "SMTP_DISABLED": "SMTP is uitgeschakeld in de omgevingsvariabelen"
+  },
+  "REGISTER": {
+    "NEW_ACCOUNT": "Nieuwe gebruiker",
+    "SIGNUP": "Registreren",
+    "SIGNIN": "Heb je al een account?",
+    "SUCCESS": "Gebruiker aangemaakt!"
+  },
+  "PASSWORD_RECOVERY": {
+    "TITLE": "Wachtwoord herstel",
+    "EMAIL": "E-mail",
+    "CODE": "Code",
+    "PASSWORD": "Wachtwoord",
+    "CONFIRM_PASSWORD": "Wachtwoord bevestigen",
+    "HAVE_CODE": "Heb je de code?",
+    "SENT": "Als de gebruiker bestaat, worden er instructies naar het e-mailadres gestuurd.",
+    "SUCCESS": "Wachtwoordherstel voltooid"
+  },
+  "CARDS": {
+    "SEARCH": "Zoeken",
+    "SEARCH_PLACEHOLDER": "Naam",
+    "CARD": {
+      "CODE": "Code",
+      "CODE_TYPE": "Code type",
+      "NAME": "Naam",
+      "DESCRIPTION": "Beschrijving",
+      "COLOR": "Kleur",
+      "LOGO": "Logo",
+      "LOGO_HINT": "PNG, JPEG, WebP, GIF of SVG. De afbeelding wordt geschaald en opnieuw gecodeerd.",
+      "LOGO_SAVE_FIRST": "Sla eerst de kaart op om een ​​logo toe te voegen.",
+      "LOGO_UPLOAD": "Kies een afbeelding",
+      "LOGO_REMOVE": "Verwijderen",
+      "IS_FAVORITE": "Favoriet",
+      "USED_AT": "Gebruikt op",
+      "CREATED_AT": "Aangemaakt op",
+      "UPDATED_AT": "Bijgewerkt op",
+      "CODE_FORMAT_WARN": "De app gebruikt nu andere namen voor codetypen. Sla de kaart op met het nieuwe codetype.",
+      "SCAN": {
+        "SELECT_SOURCE": "Selecteer bron",
+        "FROM_FILE": "Toevoegen vanuit bestand",
+        "FILE_NO_CODE": "Geen code gevonden in deze afbeelding.",
+        "TORCH": "Zaklamp",
+        "DENIED_TITLE": "Camera toegang staat uit",
+        "DENIED_HINT": "Sta in je browserinstellingen toe dat deze site toegang krijgt tot de camera en probeer het opnieuw. Je kunt de kaart ook toevoegen aan de hand van een foto.",
+        "UNAVAILABLE_TITLE": "Geen Camera beschikbaar",
+        "UNAVAILABLE_HINT": "Geen camera gevonden, of een andere app gebruikt de camera. Je kunt de kaart in plaats daarvan toevoegen aan de hand van een foto.",
+        "RETRY": "Probeer opnieuw",
+        "CAMERA": "Camera",
+        "CAMERA_BACK": "Camera aan de achterzijde",
+        "CAMERA_FRONT": "Camera aan de voorkant"
+      },
+      "SUCCESS": {
+        "SAVE": "Kaart opgeslagen",
+        "DELETE": "Kaart verwijderd"
+      }
+    },
+    "VIEWER": {
+      "INVERT": "Kleuren omkeren"
+    },
+    "SHARED_WITH_YOU": "Met jou gedeeld"
+  },
+  "USER": {
+    "USERNAME": "Gebruikersnaam",
+    "EMAIL": "E-mail",
+    "CHANGE_PASSWORD": "Wachtwoord wijzigen",
+    "CURRENT_PASSWORD": "Huidig wachtwoord",
+    "PASSWORD": "Wachtwoord",
+    "CONFIRM_PASSWORD": "Wachtwoord bevestigen",
+    "PASSWORDS_MISMATCH": "Wachtwoorden komen niet overeen",
+    "PASSWORD_HINTS": [
+      "Ten minste 8 tekens",
+      "Hoofdletters en kleine letters",
+      "Getallen"
+    ],
+    "DELETE_WARN": "Wil je de gebruiker en alle bijbehorende gegevens definitief verwijderen?",
+    "SUCCESS": {
+      "UPDATE": "Gebruikersgegevens bijgewerkt",
+      "DELETE": "Gebruiker verwijderd"
+    }
+  },
+  "ADMIN": {
+    "HEALTH": "App status",
+    "SMTP_STATUS": "SMTP status",
+    "SMTP_TEST": "Test",
+    "SMTP_TEST_SUCCESS": "E-mail verzonden",
+    "SETTINGS": {
+      "TITLE": "Instellingen",
+      "KEY": "Key",
+      "VALUE": "Waarde",
+      "UPDATED_AT": "Datum van update",
+      "KEYS": {
+        "ALLOW_REGISTRATION": "Registratie toestaan"
+      }
+    },
+    "USERS": {
+      "TITLE": "Gebruikers",
+      "ID": "ID",
+      "USERNAME": "Gebruikersnaam",
+      "EMAIL": "E-mail",
+      "ROLE": "Rol",
+      "CREATED_AT": "Registratie Datum",
+      "UPDATED_AT": "Laatst bijgewerkt",
+      "ROLES": {
+        "OWNER": "Eigenaar",
+        "ADMIN": "Admin",
+        "MEMBER": "Lid"
+      },
+      "CHANGE_ROLE": {
+        "TO_ADMIN": "Maak admin",
+        "TO_MEMBER": "Maak lid",
+        "CONFIRM": "Rol wijzigen",
+        "CONFIRM_SUBTITLE": "Bevestig rolwijziging naar: {{role}}"
+      }
+    }
+  },
+  "ABOUT": {
+    "HOMEPAGE": "Home pagina",
+    "IMAGE_VERSION": "Docker image versie",
+    "EXAMPLES": "Voorbeelden van ondersteunde codes",
+    "CHANGELOG": "Wijzigingenlogboek"
+  },
+  "SORT_FILTER": {
+    "TITLE": "Sorteren en filteren",
+    "SORT_BY": "Sorteren op",
+    "SORT_DIR": "Richting",
+    "SORT_DIRS": {
+      "ASC": "Oplopend",
+      "DESC": "Aflopend"
+    },
+    "FILTER_BY": "Filter op",
+    "CRITERIA": "Criteria",
+    "VALUE": "Waarde",
+    "ADD_FILTER": "Filter toevoegen",
+    "BOOL_LABEL": {
+      "TRUE": "Ja",
+      "FALSE": "Nee"
+    },
+    "CRITERIAS": {
+      "LIKE": "Bevat",
+      "EQUALS": "Gelijk aan",
+      "NOT_EQUALS": "Niet gelijk aan",
+      "NULL": "Is leeg",
+      "NOT_NULL": "Is niet leeg",
+      "GREATER": "Groter dan",
+      "LESS": "Kleinder dan",
+      "GREATER_OR_EQUALS": "Groter of gelijk",
+      "LESS_OR_EQUALS": "Kleiner of gelijk"
+    }
+  },
+  "SHARED_CARDS": {
+    "TITLE": "Gedeelde kaarten",
+    "ACTION_SHARE_SINGLE": "Deel",
+    "ACTION_SHARE_ALL": "Deel alle kaarten",
+    "SECTION_YOU_SHARE": "Gedeelde kaarten",
+    "SECTION_SHARED_WITH_YOU": "Met jou gedeeld",
+    "EMPTY_YOU_SHARE": "Je hebt nog geen kaarten gedeeld",
+    "EMPTY_SHARED_WITH_YOU": "Nog geen kaarten met jou gedeeld",
+    "SHARED_BY": "Gedeeld door",
+    "SECTION_PENDING": "Ik wacht op uw antwoord",
+    "SECTION_DECLINED": "Afgewezen",
+    "ACTION_ACCEPT": "Accepteren",
+    "ACTION_DECLINE": "Afwijzen",
+    "STATUS": {
+      "PENDING": "wachten",
+      "ACCEPTED": "geaccepteerd",
+      "DECLINED": "afgewezen"
+    },
+    "DIALOG": {
+      "TITLE_ADD": "Deel kaart",
+      "TITLE_EDIT": "Wijzig gedeelde kaart",
+      "TITLE_SHARE_ALL": "Deel alle kaarten",
+      "SELECT_CARD": "Selecteer kaart",
+      "CARD_REQUIRED": "Kaartselectie is vereist",
+      "SELECT_USERS": "Gebruikers selecteren",
+      "USERS_REQUIRED": "Er moet ten minste één gebruiker worden geselecteerd",
+      "SHARE_ALL_HINT": "Waarschuwing: alle bestaande deelregels voor al uw kaarten worden vervangen door toegang voor de geselecteerde gebruikers.",
+      "NO_USERS": "Er zijn geen gebruikers beschikbaar om mee te delen."
+    },
+    "CONFIRM_DELETE_OWN": {
+      "TITLE": "Stoppen met het delen van de kaart?",
+      "SUBTITLE": "Alle gebruikers verliezen de toegang tot deze kaart."
+    },
+    "CONFIRM_DELETE_SHARED": {
+      "TITLE": "Gedeelde kaart verwijderen?",
+      "SUBTITLE": "De kaart zal niet langer in je lijst verschijnen."
+    }
+  }
+}
