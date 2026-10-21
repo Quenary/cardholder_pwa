@@ -29,7 +29,11 @@ import { UpdateService } from './core/services/update.service';
 import { userReducer } from './entities/user/state/user.reducers';
 import { UserEffects } from './entities/user/state/user.effects';
 import { userInitializer } from './core/app-initializers/user-initializer';
-import { localeInitializer } from './core/app-initializers/locale-initializer';
+import {
+  appLanguage,
+  appLocale,
+  localeInitializer,
+} from './core/app-initializers/locale-initializer';
 import { appInitializer } from './core/app-initializers/app-initializer';
 import { provideNativeDateAdapter } from '@angular/material/core';
 
@@ -51,14 +55,11 @@ export const appConfig: ApplicationConfig = {
         suffix: '.json',
       }),
       fallbackLang: 'en',
-      lang: navigator.language.split('-').at(0) || 'en',
+      lang: appLanguage(),
     }),
     {
       provide: LOCALE_ID,
-      useFactory: () => {
-        const locale = navigator.language || 'en-US';
-        return locale;
-      },
+      useFactory: () => appLocale(),
     },
     provideAppInitializer(() => appInitializer()),
     provideAppInitializer(() => localeInitializer()),
