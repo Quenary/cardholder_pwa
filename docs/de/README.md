@@ -8,10 +8,10 @@
 - 🇷🇺 [Русский](/docs/ru/README.md)
 
 <p align="center">
-  <img src="../../resources/login.jpg" width="30%" />
-  <img src="../../resources/qr.jpg" width="30%" />
-  <img src="../../resources/cardholder_pwa.gif" width="30%" />
+  <img src="../../resources/screenshots/hero.webp" alt="Cardholder PWA: Kartenliste, QR-Code, Teilen und dunkles Design" width="100%" />
 </p>
+
+<sub>Marken, Logos und Codes in den Screenshots sind für die Demo erfunden.</sub>
 
 ## Demo
 
@@ -22,12 +22,27 @@ Sie laufen bei kostenlosen Anbietern, die Container aussetzen können. Der erste
 
 ### Wichtigste Funktionen
 
-- PWA, aus dem Browser auf dem Gerät installierbar und auch offline nutzbar (nur lesend)
-- Mehrere Benutzer, mit den Rollen Eigentümer, Administrator und Mitglied
-- Geteilte Karten zwischen Benutzern (eine Karte oder alle auf einmal)
-- Passwort zurücksetzen per E-Mail (wenn SMTP eingerichtet ist)
+- PWA – lässt sich aus dem Browser auf dem Gerät installieren und auch offline nutzen (nur lesend)
+- Karten mit der Kamera scannen (Taschenlampe, Front-/Rückkamera) oder Code und Typ eingeben
+- Logos auf den Karten, als Raster oder große Karten, Favoriten, Suche, Sortierung und Filter
+- Code im Vollbild mit Farbumkehr, zum Vorzeigen an der Kasse
+- Mehrbenutzerbetrieb mit den Rollen Besitzer, Administrator und Mitglied
+- Karten mit anderen Benutzern teilen (eine oder alle auf einmal); der Empfänger nimmt an oder lehnt ab
+- Helles und dunkles Design, je nach System
+- Englisch, Deutsch, Spanisch, Französisch, Italienisch und Russisch
+- Passwort-Wiederherstellung per E-Mail (wenn SMTP eingerichtet ist)
 - Einfach selbst zu hosten
 - Open Source
+
+### Screenshots
+
+| Karten | Code | Bearbeiten | Teilen |
+| :---: | :---: | :---: | :---: |
+| <img src="../../resources/screenshots/cards.webp" width="200" /> | <img src="../../resources/screenshots/code.webp" width="200" /> | <img src="../../resources/screenshots/edit.webp" width="200" /> | <img src="../../resources/screenshots/shared.webp" width="200" /> |
+
+| Anmeldung | Große Karten | Admin | Dunkles Design |
+| :---: | :---: | :---: | :---: |
+| <img src="../../resources/screenshots/login.webp" width="200" /> | <img src="../../resources/screenshots/cards-large.webp" width="200" /> | <img src="../../resources/screenshots/admin-user.webp" width="200" /> | <img src="../../resources/screenshots/cards-dark.webp" width="200" /> |
 
 ### Technik
 

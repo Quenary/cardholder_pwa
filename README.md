@@ -8,10 +8,10 @@
 - 🇷🇺 [Русский](/docs/ru/README.md)
 
 <p align="center">
-  <img src="resources/login.jpg" width="30%" />
-  <img src="resources/qr.jpg" width="30%" />
-  <img src="resources/cardholder_pwa.gif" width="30%" />
+  <img src="resources/screenshots/hero.webp" alt="Cardholder PWA: card list, QR code, sharing and dark theme" width="100%" />
 </p>
+
+<sub>The brands, logos and codes in the screenshots are made up for the demo.</sub>
 
 ## Demo
 
@@ -20,14 +20,29 @@
 
 It's powered by free providers and can be suspended, which will lead to a long initial load - up to a minute, according to their notes.
 
-### Main features:
+### Main features
 
 - PWA - you can install it on device from browser and use even offline (read-only)
+- Scan a card with the camera (torch, front/rear camera), or type the code and its type
+- Logos on cards, a grid or large cards, favorites, search, sorting and filters
+- Full-screen code with color inversion, to show at the checkout
 - Multi-user support with owner, admin, and member roles
-- Card sharing between users (share one card or all cards at once)
+- Card sharing between users (one card or all at once), which the recipient accepts or declines
+- Light and dark theme, following the system
+- English, German, Spanish, French, Italian and Russian
 - Password recovery by email (when SMTP is configured)
 - Easy to self-host
 - Open-source
+
+### Screenshots
+
+| Cards | Code | Card editor | Sharing |
+| :---: | :---: | :---: | :---: |
+| <img src="resources/screenshots/cards.webp" width="200" /> | <img src="resources/screenshots/code.webp" width="200" /> | <img src="resources/screenshots/edit.webp" width="200" /> | <img src="resources/screenshots/shared.webp" width="200" /> |
+
+| Sign in | Large cards | Admin | Dark theme |
+| :---: | :---: | :---: | :---: |
+| <img src="resources/screenshots/login.webp" width="200" /> | <img src="resources/screenshots/cards-large.webp" width="200" /> | <img src="resources/screenshots/admin-user.webp" width="200" /> | <img src="resources/screenshots/cards-dark.webp" width="200" /> |
 
 ### Core
 
