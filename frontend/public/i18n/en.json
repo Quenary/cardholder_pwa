@@ -24,11 +24,11 @@
     "REGISTER": "Registration",
     "PASSWORD_RECOVERY": "Password recovery",
     "CARD": "Cards",
-    "SHARED_CARDS": "Shared Cards",
+    "SHARED_CARDS": "Shared cards",
     "USER": "User",
     "ADMIN": "Admin panel",
     "ABOUT": "About",
-    "EXIT": "Exit"
+    "EXIT": "Sign out"
   },
   "AUTH": {
     "WELCOME": "Welcome",
@@ -127,7 +127,7 @@
       "TITLE": "Settings",
       "KEY": "Key",
       "VALUE": "Value",
-      "UPDATED_AT": "Date of update",
+      "UPDATED_AT": "Last updated",
       "KEYS": {
         "ALLOW_REGISTRATION": "Allow registration"
       }
@@ -138,8 +138,8 @@
       "USERNAME": "Username",
       "EMAIL": "E-mail",
       "ROLE": "Role",
-      "CREATED_AT": "Date of create",
-      "UPDATED_AT": "Date of update",
+      "CREATED_AT": "Created",
+      "UPDATED_AT": "Last updated",
       "ROLES": {
         "OWNER": "Owner",
         "ADMIN": "Admin",
