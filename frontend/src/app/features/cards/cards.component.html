@@ -56,11 +56,17 @@
           class="cards-list-item"
           matRipple
           [routerLink]="['/cards', card.id]">
-          <section class="cards-list-item-header">
-            <span class="cards-list-item-header-text">
+          <app-card-preview
+            class="cards-list-item-preview"
+            [card]="card"
+            [interactive]="true"
+            (previewClick)="updateUsedDate(card)">
+          </app-card-preview>
+          <section class="cards-list-item-footer">
+            <span class="cards-list-item-footer-text">
               {{ card.name }}
             </span>
-            <section class="cards-list-item-header-icons">
+            <section class="cards-list-item-footer-icons">
               @if (card.is_favorite) {
                 <mat-icon
                   class="warn-color"
@@ -79,12 +85,6 @@
               }
             </section>
           </section>
-          <app-card-preview
-            class="cards-list-item-preview"
-            [card]="card"
-            [interactive]="true"
-            (previewClick)="updateUsedDate(card)">
-          </app-card-preview>
         </div>
       }
     }
@@ -107,19 +107,19 @@
           (click)="showSharedCardCode(item.card)"
           (keydown.enter)="showSharedCardCode(item.card)"
           (keydown.space)="$event.preventDefault(); showSharedCardCode(item.card)">
-          <section class="cards-list-item-header">
-            <span class="cards-list-item-header-text">
-              {{ item.card.name }}
-            </span>
-            <section class="cards-list-item-header-icons">
-              <mat-icon class="accent-color"> group </mat-icon>
-            </section>
-          </section>
           <app-card-preview
             class="cards-list-item-preview"
             [card]="item.card"
             [interactive]="false">
           </app-card-preview>
+          <section class="cards-list-item-footer">
+            <span class="cards-list-item-footer-text">
+              {{ item.card.name }}
+            </span>
+            <section class="cards-list-item-footer-icons">
+              <mat-icon class="accent-color"> group </mat-icon>
+            </section>
+          </section>
         </div>
       }
     </section>
