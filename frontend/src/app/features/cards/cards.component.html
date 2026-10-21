@@ -30,6 +30,19 @@
     </mat-form-field>
 
     <button
+      class="cards-header-layout"
+      mat-icon-button
+      [attr.aria-label]="
+        (layout() === 'grid' ? 'CARDS.LAYOUT_LARGE' : 'CARDS.LAYOUT_GRID')
+          | translate
+      "
+      (click)="toggleLayout()">
+      <mat-icon
+        >{{ layout() === 'grid' ? 'view_agenda' : 'grid_view' }}</mat-icon
+      >
+    </button>
+
+    <button
       mat-fab
       [matBadge]="filtersCount()"
       [matBadgeHidden]="!filtersCount()"
@@ -45,7 +58,9 @@
     </button>
   </section>
 
-  <section class="cards-list">
+  <section
+    class="cards-list"
+    [class.large]="layout() === 'large'">
     @if (isLoading()) {
       @for (pc of cardsPlaceholder; track pc) {
         <div class="cards-list-item animated-placeholder"> </div>
@@ -96,7 +111,9 @@
       <span>{{ 'CARDS.SHARED_WITH_YOU' | translate }}</span>
     </div>
 
-    <section class="cards-list">
+    <section
+      class="cards-list"
+      [class.large]="layout() === 'large'">
       @for (item of filteredSharedCards(); track item.card.id) {
         <div
           class="cards-list-item shared-card"

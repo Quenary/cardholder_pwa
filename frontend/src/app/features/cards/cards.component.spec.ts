@@ -11,6 +11,7 @@ import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
 import { CardCodeViewerDialogComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
 import { createCardShareApiServiceMock } from 'src/testing';
 import { CardShareApiService } from '../shared-cards/services/card-share-api.service';
+import { ELocalStorageKey } from 'src/app/app.consts';
 
 describe('CardsComponent', () => {
   let component: CardsComponent;
@@ -43,6 +44,30 @@ describe('CardsComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
     expect(component).toBeTruthy();
+  });
+
+  describe('layout', () => {
+    beforeEach(() => localStorage.removeItem(ELocalStorageKey.CARD_LAYOUT));
+
+    it('defaults to the grid', () => {
+      fixture = TestBed.createComponent(CardsComponent);
+      expect(fixture.componentInstance['layout']()).toBe('grid');
+    });
+
+    it('switches to large cards and remembers it', () => {
+      fixture = TestBed.createComponent(CardsComponent);
+      fixture.componentInstance['toggleLayout']();
+      expect(fixture.componentInstance['layout']()).toBe('large');
+      expect(localStorage.getItemJson(ELocalStorageKey.CARD_LAYOUT)).toBe(
+        'large',
+      );
+    });
+
+    it('starts from the remembered layout', () => {
+      localStorage.setItemJson(ELocalStorageKey.CARD_LAYOUT, 'large');
+      fixture = TestBed.createComponent(CardsComponent);
+      expect(fixture.componentInstance['layout']()).toBe('large');
+    });
   });
 
   describe('cards computed', () => {

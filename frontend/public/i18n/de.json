@@ -59,6 +59,8 @@
   "CARDS": {
     "SEARCH": "Suchen",
     "SEARCH_PLACEHOLDER": "Name",
+    "LAYOUT_LARGE": "Große Karten",
+    "LAYOUT_GRID": "Kartenraster",
     "CARD": {
       "CODE": "Code",
       "CODE_TYPE": "Codetyp",

@@ -59,6 +59,8 @@
   "CARDS": {
     "SEARCH": "Search",
     "SEARCH_PLACEHOLDER": "Name",
+    "LAYOUT_LARGE": "Large cards",
+    "LAYOUT_GRID": "Card grid",
     "CARD": {
       "CODE": "Code",
       "CODE_TYPE": "Code type",
