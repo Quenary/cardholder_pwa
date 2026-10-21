@@ -8,10 +8,10 @@
 - 🇷🇺 [Русский](/docs/ru/README.md)
 
 <p align="center">
-  <img src="../../resources/login.jpg" width="30%" />
-  <img src="../../resources/qr.jpg" width="30%" />
-  <img src="../../resources/cardholder_pwa.gif" width="30%" />
+  <img src="../../resources/screenshots/hero.webp" alt="Cardholder PWA: lista de tarjetas, código QR, compartir y tema oscuro" width="100%" />
 </p>
+
+<sub>Las marcas, logotipos y códigos de las capturas son inventados para la demo.</sub>
 
 ## Demostración
 
@@ -22,12 +22,27 @@ Están alojadas en proveedores gratuitos, que pueden suspender los contenedores.
 
 ### Funciones principales
 
-- PWA: se puede instalar en el dispositivo desde el navegador y usar incluso sin conexión (solo lectura)
-- Varios usuarios, con los roles propietario, administrador y miembro
-- Tarjetas compartidas entre usuarios (una tarjeta o todas a la vez)
-- Recuperación de contraseña por correo electrónico (si SMTP está configurado)
+- PWA: se instala en el dispositivo desde el navegador y funciona incluso sin conexión (solo lectura)
+- Escaneo de tarjetas con la cámara (linterna, cámara delantera/trasera) o introducción manual del código y su tipo
+- Logotipos en las tarjetas, en cuadrícula o en tamaño grande, favoritos, búsqueda, orden y filtros
+- Código a pantalla completa con inversión de colores, para mostrarlo en caja
+- Varios usuarios con los roles de propietario, administrador y miembro
+- Compartir tarjetas entre usuarios (una o todas a la vez), que el destinatario acepta o rechaza
+- Tema claro y oscuro, según el sistema
+- Inglés, alemán, español, francés, italiano y ruso
+- Recuperación de contraseña por correo (si SMTP está configurado)
 - Fácil de autoalojar
 - Código abierto
+
+### Capturas de pantalla
+
+| Tarjetas | Código | Edición | Compartir |
+| :---: | :---: | :---: | :---: |
+| <img src="../../resources/screenshots/cards.webp" width="200" /> | <img src="../../resources/screenshots/code.webp" width="200" /> | <img src="../../resources/screenshots/edit.webp" width="200" /> | <img src="../../resources/screenshots/shared.webp" width="200" /> |
+
+| Inicio de sesión | Tarjetas grandes | Admin | Tema oscuro |
+| :---: | :---: | :---: | :---: |
+| <img src="../../resources/screenshots/login.webp" width="200" /> | <img src="../../resources/screenshots/cards-large.webp" width="200" /> | <img src="../../resources/screenshots/admin-user.webp" width="200" /> | <img src="../../resources/screenshots/cards-dark.webp" width="200" /> |
 
 ### Tecnologías
 

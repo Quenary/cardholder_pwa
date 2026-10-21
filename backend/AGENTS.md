@@ -54,7 +54,7 @@ Domain data: users and roles, loyalty cards (code + type + optional logo file), 
 
 ## Auth and roles
 
-JWT access tokens (`python-jose`) and refresh tokens in the DB. `OAuth2PasswordBearer` on protected routes. First registered user becomes **owner**; **admin** and **member** roles gate admin UI and destructive actions.
+JWT access tokens (`PyJWT`) and refresh tokens in the DB. `OAuth2PasswordBearer` on protected routes. First registered user becomes **owner**; **admin** and **member** roles gate admin UI and destructive actions.
 
 `public_api` exposes version and public settings without auth where appropriate. Password recovery emails require SMTP configuration (`smtp_core`).
 
