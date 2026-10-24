@@ -182,6 +182,8 @@ export class CardScannerComponent implements OnDestroy {
   private readonly stream = signal<MediaStream>(null);
 
   private decoders: IBarcodeDecoder[] = [];
+  /** Loaded after the first frame, so it does not delay the other decoders. */
+  private tapirscan?: Promise<IBarcodeDecoder | null>;
   /** Rotates through the decoders, one per frame, see decodeNextFrame. */
   private decoderIndex = 0;
   private loopSubscription: Subscription = null;
@@ -207,6 +209,7 @@ export class CardScannerComponent implements OnDestroy {
     this.stopLoop();
     this.releaseStream();
     this.matBottomSheet.dismiss();
+    void this.tapirscan?.then((decoder) => decoder?.dispose?.());
   }
 
   /**
@@ -216,6 +219,7 @@ export class CardScannerComponent implements OnDestroy {
    */
   protected onVideoPlaying(): void {
     this.isStarting.set(false);
+    void this.addTapirscan();
   }
 
   protected close($event?: ICardScannerResult): void {
@@ -264,8 +268,13 @@ export class CardScannerComponent implements OnDestroy {
     this.stopLoop();
     try {
       const frame = await this.drawImage(file);
+      this.tapirscan ??= this.decodingService.loadTapirscan();
       const result = frame
-        ? await this.decodingService.decodeAll(frame, this.decoders)
+        ? await this.decodingService.decodeAll(
+            frame,
+            this.decoders,
+            this.tapirscan,
+          )
         : null;
       if (result) {
         this.onResult(result);
@@ -525,6 +534,18 @@ export class CardScannerComponent implements OnDestroy {
       cameras.find((device) => REAR_LABEL.test(device.label)) ||
       cameras[0]
     );
+  }
+
+  /** Adds tapirscan to the rotation once loaded, also after a camera switch. */
+  private async addTapirscan(): Promise<void> {
+    this.tapirscan ??= this.decodingService.loadTapirscan();
+    const tapirscan = await this.tapirscan;
+    if (tapirscan && !this.decoders.includes(tapirscan)) {
+      this.decoders = this.decodingService.withTapirscan(
+        this.decoders,
+        tapirscan,
+      );
+    }
   }
 
   private startLoop(): void {

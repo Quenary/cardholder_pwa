@@ -27,6 +27,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "medium.wasm",
+                "input": "node_modules/tapirscan/wasm",
+                "output": "tapirscan"
               }
             ],
             "stylePreprocessorOptions": {

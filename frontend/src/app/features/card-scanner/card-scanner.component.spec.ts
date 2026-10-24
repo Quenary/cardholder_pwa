@@ -278,6 +278,43 @@ describe('CardScannerComponent', () => {
     });
   });
 
+  describe('tapirscan', () => {
+    it('joins the rotation once loaded and is disposed with the dialog', async () => {
+      const zxing = createBarcodeDecoderMock('zxing');
+      const tapirscan = {
+        ...createBarcodeDecoderMock('tapirscan'),
+        dispose: vi.fn(),
+      };
+      decodingServiceMock.createDecoders.mockResolvedValue([zxing]);
+      decodingServiceMock.loadTapirscan.mockResolvedValue(tapirscan);
+      await create('backcamera2');
+      expect(decodingServiceMock.loadTapirscan).not.toHaveBeenCalled();
+
+      component['onVideoPlaying']();
+      await fixture.whenStable();
+      component['onVideoPlaying']();
+      await fixture.whenStable();
+
+      expect(decodingServiceMock.loadTapirscan).toHaveBeenCalledTimes(1);
+      expect(component['decoders']).toEqual([zxing, tapirscan]);
+
+      fixture.destroy();
+      await Promise.resolve();
+      expect(tapirscan.dispose).toHaveBeenCalledTimes(1);
+    });
+
+    it('scans without it when it cannot load', async () => {
+      const zxing = createBarcodeDecoderMock('zxing');
+      decodingServiceMock.createDecoders.mockResolvedValue([zxing]);
+      await create('backcamera2');
+      component['onVideoPlaying']();
+      await fixture.whenStable();
+
+      expect(component['decoders']).toEqual([zxing]);
+      expect(decodingServiceMock.withTapirscan).not.toHaveBeenCalled();
+    });
+  });
+
   describe('onResult', () => {
     it('closes the dialog with the code', async () => {
       await create('backcamera2');

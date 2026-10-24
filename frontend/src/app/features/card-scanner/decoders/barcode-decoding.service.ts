@@ -4,6 +4,7 @@ import { NativeToBwipMap } from 'src/app/entities/cards/cards-const';
 import { IBarcodeDecoder, IScannerResult } from './barcode-decoder';
 import { NativeDecoder } from './native.decoder';
 import { Quagga2Decoder } from './quagga2.decoder';
+import { TapirscanDecoder } from './tapirscan.decoder';
 import { ZxingDecoder } from './zxing.decoder';
 
 /**
@@ -22,7 +23,8 @@ export class BarcodeDecodingService {
    * Builds the decoders available in this browser, best first.
    *
    * The two libraries are always present and complement each other: zxing
-   * carries the 2D formats, quagga2 the long tail of 1D ones.
+   * carries the 2D formats, quagga2 the long tail of 1D ones. Tapirscan is
+   * added once loaded, see loadTapirscan.
    */
   public async createDecoders(): Promise<IBarcodeDecoder[]> {
     const decoders: IBarcodeDecoder[] = [];
@@ -34,6 +36,21 @@ export class BarcodeDecodingService {
     return decoders;
   }
 
+  /** Null when this browser cannot run tapirscan. */
+  public loadTapirscan(): Promise<IBarcodeDecoder | null> {
+    return TapirscanDecoder.load();
+  }
+
+  /** Puts tapirscan after native and before the libraries. */
+  public withTapirscan(
+    decoders: IBarcodeDecoder[],
+    tapirscan: IBarcodeDecoder,
+  ): IBarcodeDecoder[] {
+    const native = decoders.filter((decoder) => decoder.name === 'native');
+    const rest = decoders.filter((decoder) => decoder.name !== 'native');
+    return [...native, tapirscan, ...rest];
+  }
+
   /**
    * Runs every decoder against one frame and returns the first code read.
    *
@@ -43,6 +60,7 @@ export class BarcodeDecodingService {
   public async decodeAll(
     frame: HTMLCanvasElement,
     decoders: IBarcodeDecoder[],
+    pending?: Promise<IBarcodeDecoder | null>,
   ): Promise<IScannerResult | null> {
     for (const decoder of decoders) {
       const result = await decoder.decode(frame).catch(() => null);
@@ -50,7 +68,11 @@ export class BarcodeDecodingService {
         return result;
       }
     }
-    return null;
+    // Waits for tapirscan only once the others have failed.
+    const late = await pending;
+    return late && !decoders.includes(late)
+      ? late.decode(frame).catch(() => null)
+      : null;
   }
 
   private async createNativeDecoder(): Promise<IBarcodeDecoder | null> {

@@ -5,6 +5,8 @@ export function createBarcodeDecodingServiceMock(): Mocked<BarcodeDecodingServic
   const mock: Partial<Mocked<BarcodeDecodingService>> = {
     createDecoders: vi.fn().mockResolvedValue([]),
     decodeAll: vi.fn().mockResolvedValue(null),
+    loadTapirscan: vi.fn().mockResolvedValue(null),
+    withTapirscan: vi.fn((decoders, tapirscan) => [...decoders, tapirscan]),
   };
   return mock as Mocked<BarcodeDecodingService>;
 }

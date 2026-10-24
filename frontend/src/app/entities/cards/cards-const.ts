@@ -1,6 +1,7 @@
 import type { BarcodeFormat } from '@zxing/browser';
 import type bwip from '@bwip-js/browser';
 import { QuaggaJSCodeReader } from '@ericblade/quagga2';
+import type { Format as TapirscanFormat } from 'tapirscan/browser/medium';
 
 /**
  * Check if code type is supported
@@ -205,6 +206,30 @@ export const ZxingToBwipMap: Record<
   // RSS formats
   RSS_14: null,
   RSS_EXPANDED: null,
+};
+//#endregion
+
+//#region Tapirscan
+/** Tapirscan to bwip codes map; other formats stay with zxing and quagga2. */
+export const TapirscanToBwipMap: Partial<
+  Record<TapirscanFormat, keyof typeof EBwipBcid & keyof typeof bwip>
+> = {
+  // 2D barcodes
+  Aztec: 'azteccode',
+  DataMatrix: 'datamatrix',
+  MaxiCode: 'maxicode',
+  PDF417: 'pdf417',
+  QRCode: 'qrcode',
+  // 1D barcodes
+  Codabar: 'rationalizedCodabar',
+  Code39: 'code39',
+  Code93: 'code93',
+  Code128: 'code128',
+  EAN8: 'ean8',
+  EAN13: 'ean13',
+  ITF: 'interleaved2of5',
+  UPCA: 'upca',
+  UPCE: 'upce',
 };
 //#endregion
 

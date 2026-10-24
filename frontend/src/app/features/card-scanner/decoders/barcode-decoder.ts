@@ -24,6 +24,8 @@ export interface IBarcodeDecoder {
    * which is the ordinary outcome on most frames and not an error.
    */
   decode(frame: HTMLCanvasElement): Promise<IScannerResult | null>;
+  /** Releases what the decoder holds, if anything. */
+  dispose?(): void;
 }
 
 /**
