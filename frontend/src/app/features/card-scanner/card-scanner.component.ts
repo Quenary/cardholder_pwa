@@ -286,6 +286,10 @@ export class CardScannerComponent implements OnDestroy {
       ELocalStorageKey.SCANNER_CAMERA,
     );
     await this.openCamera(remembered ?? null);
+    // A remembered camera can be gone, or have a new id, on the next visit.
+    if (remembered && this.cameraError()) {
+      await this.openCamera(null);
+    }
     await this.listDevices();
     // A remembered camera was already proved to focus, so the search is only
     // worth running the first time, or if that camera has since gone.
@@ -316,7 +320,9 @@ export class CardScannerComponent implements OnDestroy {
       return;
     }
     const currentId = this.getStreamDeviceId();
-    if (this.supportsContinuousFocus(track)) {
+    // A browser that reports no focus modes at all, like Safari, cannot show
+    // any camera to be focusable, so probing the others only costs time.
+    if (this.supportsContinuousFocus(track) || !this.reportsFocusModes(track)) {
       this.rememberCamera(currentId);
       return;
     }
@@ -326,8 +332,12 @@ export class CardScannerComponent implements OnDestroy {
     this.releaseStream();
     const focusable = await this.findFocusableCamera(currentId);
     await this.openCamera(focusable ?? currentId);
+    // Remembered also when none focuses, so the probe runs once rather than
+    // on every visit; undefined means no camera opened, so try again later.
+    if (focusable !== undefined) {
+      this.rememberCamera(focusable ?? currentId);
+    }
     if (focusable) {
-      this.rememberCamera(focusable);
       this.selectedDevice.set(
         this.cameras().find((camera) => camera.device.deviceId === focusable)
           ?.device ?? this.selectedDevice(),
@@ -341,18 +351,22 @@ export class CardScannerComponent implements OnDestroy {
    * Capabilities are only legible on a live track, so there is no way to ask
    * this of a device without opening it.
    */
-  private async findFocusableCamera(excludeId: string): Promise<string | null> {
+  private async findFocusableCamera(
+    excludeId: string,
+  ): Promise<string | null | undefined> {
     const candidates = this.cameras()
       .map((camera) => camera.device)
       .filter((device) => device.deviceId && device.deviceId !== excludeId)
       // An empty label says nothing either way, so such a device stays in.
       .filter((device) => !device.label || REAR_LABEL.test(device.label));
+    let opened = !candidates.length;
     for (const device of candidates) {
       let probe: MediaStream = null;
       try {
         probe = await this.mediaDevicesService.getUserMedia({
           video: { deviceId: { exact: device.deviceId } },
         });
+        opened = true;
         const focusable = this.supportsContinuousFocus(
           probe?.getVideoTracks?.()?.[0],
         );
@@ -365,7 +379,13 @@ export class CardScannerComponent implements OnDestroy {
         probe?.getTracks?.().forEach((track) => track.stop());
       }
     }
-    return null;
+    return opened ? null : undefined;
+  }
+
+  private reportsFocusModes(track: MediaStreamTrack): boolean {
+    const capabilities = track?.getCapabilities?.() as
+      { focusMode?: string[] } | undefined;
+    return !!capabilities?.focusMode;
   }
 
   private supportsContinuousFocus(track: MediaStreamTrack): boolean {
