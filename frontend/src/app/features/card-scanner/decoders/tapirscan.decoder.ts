@@ -26,35 +26,35 @@ async function createScanner(): Promise<Scanner> {
 }
 
 /**
- * Loads tapirscan once prepared or asked to decode, and is unavailable until
- * then. It stays unavailable where the browser lacks WebAssembly SIMD, and
- * after its first error.
+ * Loads tapirscan once prepared, and is unavailable until then. After a
+ * failed load or a scan error it is unavailable until prepared again, which
+ * the dialog does when it opens. Where the browser lacks WebAssembly SIMD it
+ * never loads.
  */
 export class TapirscanDecoder implements IBarcodeDecoder {
   public readonly name = 'tapirscan';
   private loading?: Promise<void>;
   private scanner: Scanner | null = null;
-  private failed = !browserSupported();
+  private readonly unsupported = !browserSupported();
 
   constructor(private readonly create = createScanner) {}
 
   public get available(): boolean {
-    return !this.failed && !!this.scanner;
+    return !!this.scanner;
   }
 
   public prepare(): void {
-    if (this.failed) {
+    if (this.unsupported) {
       return;
     }
     this.loading ??= this.create().then(
       (scanner) => {
-        if (this.failed) {
-          scanner.dispose();
-        } else {
-          this.scanner = scanner;
-        }
+        this.scanner = scanner;
       },
-      (error) => this.fail(error),
+      (error) => {
+        console.warn('Tapirscan could not load, scanning without it', error);
+        this.loading = undefined;
+      },
     );
   }
 
@@ -62,11 +62,7 @@ export class TapirscanDecoder implements IBarcodeDecoder {
     frame: HTMLCanvasElement,
     waitMs = 0,
   ): Promise<IScannerResult | null> {
-    this.prepare();
-    if (this.failed) {
-      return null;
-    }
-    if (!this.scanner && waitMs) {
+    if (!this.scanner && this.loading && waitMs) {
       let timer: ReturnType<typeof setTimeout>;
       await Promise.race([
         this.loading,
@@ -74,13 +70,14 @@ export class TapirscanDecoder implements IBarcodeDecoder {
       ]);
       clearTimeout(timer);
     }
-    if (!this.scanner) {
+    const scanner = this.scanner;
+    if (!scanner) {
       return null;
     }
     try {
-      const { barcodes } = await this.scanner.scan(frame);
+      const { barcodes } = await scanner.scan(frame);
       for (const barcode of barcodes) {
-        // Tapirscan reports Codabar's start and stop letters apart from its text.
+        // Tapirscan reports Codabar's start and stop letters separately.
         const [start = '', stop = ''] = barcode.codabarStartStop ?? '';
         const result = toScannerResult(
           start + barcode.text + stop,
@@ -92,21 +89,13 @@ export class TapirscanDecoder implements IBarcodeDecoder {
       }
       return null;
     } catch (error) {
-      this.fail(error);
+      console.warn('Tapirscan stopped, scanning without it', error);
+      if (this.scanner === scanner) {
+        this.scanner = null;
+        this.loading = undefined;
+      }
+      scanner.dispose();
       return null;
     }
-  }
-
-  public dispose(): void {
-    this.failed = true;
-    this.scanner?.dispose();
-    this.scanner = null;
-  }
-
-  private fail(error: unknown): void {
-    if (!this.failed) {
-      console.warn('Tapirscan stopped, scanning without it', error);
-    }
-    this.dispose();
   }
 }

@@ -12,12 +12,16 @@ function createScannerMock(barcodes: object[] = []) {
   };
 }
 
+/** Lets pending promises settle. */
+const settle = () => new Promise((resolve) => setTimeout(resolve));
+
 /** A decoder whose scanner has loaded. */
 async function loaded(scanner: ReturnType<typeof createScannerMock>) {
   const decoder = new TapirscanDecoder(() =>
     Promise.resolve(scanner as unknown as Scanner),
   );
-  await decoder.decode(frame);
+  decoder.prepare();
+  await settle();
   return decoder;
 }
 
@@ -43,7 +47,7 @@ describe('TapirscanDecoder', () => {
       { format: 'EAN13', text: '4006381333931' },
     ]);
     resolve(scanner as unknown as Scanner);
-    await Promise.resolve();
+    await settle();
 
     expect(decoder.available).toBe(true);
     expect(await decoder.decode(frame)).toEqual({
@@ -89,16 +93,28 @@ describe('TapirscanDecoder', () => {
     });
   });
 
-  it('stays unavailable when it cannot load', async () => {
-    const create = vi.fn().mockRejectedValue(new Error('offline'));
+  it('is unavailable after a failed load and retries when prepared', async () => {
+    const scanner = createScannerMock([{ format: 'QRCode', text: 'online' }]);
+    const create = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValue(scanner);
     const decoder = new TapirscanDecoder(create);
 
-    await decoder.decode(frame);
-    await Promise.resolve();
-
+    decoder.prepare();
+    decoder.prepare();
+    await settle();
     expect(decoder.available).toBe(false);
-    expect(await decoder.decode(frame)).toBeNull();
     expect(create).toHaveBeenCalledTimes(1);
+
+    decoder.prepare();
+    await settle();
+
+    expect(create).toHaveBeenCalledTimes(2);
+    expect(await decoder.decode(frame)).toEqual({
+      code: 'online',
+      type: EBwipBcid.qrcode,
+    });
   });
 
   it('never loads where the browser cannot run it', async () => {
@@ -112,36 +128,28 @@ describe('TapirscanDecoder', () => {
     expect(create).not.toHaveBeenCalled();
   });
 
-  it('is dead after its first scan error', async () => {
-    const scanner = createScannerMock();
-    scanner.scan.mockRejectedValue(new Error('worker died'));
-    const decoder = await loaded(scanner);
+  it('is unavailable after a scan error until prepared again', async () => {
+    const dead = createScannerMock();
+    dead.scan.mockRejectedValue(new Error('worker died'));
+    const fresh = createScannerMock([{ format: 'QRCode', text: 'again' }]);
+    const create = vi.fn().mockResolvedValueOnce(dead).mockResolvedValue(fresh);
+    const decoder = new TapirscanDecoder(create);
+    decoder.prepare();
+    await settle();
 
     expect(await decoder.decode(frame)).toBeNull();
     expect(await decoder.decode(frame)).toBeNull();
-
     expect(decoder.available).toBe(false);
-    expect(scanner.scan).toHaveBeenCalledTimes(1);
-    expect(scanner.dispose).toHaveBeenCalledTimes(1);
-  });
+    expect(dead.scan).toHaveBeenCalledTimes(1);
+    expect(dead.dispose).toHaveBeenCalledTimes(1);
 
-  it('disposes its scanner, also one that loads after dispose', async () => {
-    const scanner = createScannerMock();
-    const decoder = await loaded(scanner);
-    decoder.dispose();
-    expect(scanner.dispose).toHaveBeenCalledTimes(1);
+    decoder.prepare();
+    await settle();
 
-    let resolve: (scanner: Scanner) => void;
-    const late = createScannerMock();
-    const loading = new TapirscanDecoder(
-      () => new Promise<Scanner>((r) => (resolve = r)),
-    );
-    await loading.decode(frame);
-    loading.dispose();
-    resolve(late as unknown as Scanner);
-    await Promise.resolve();
-
-    expect(late.dispose).toHaveBeenCalledTimes(1);
+    expect(await decoder.decode(frame)).toEqual({
+      code: 'again',
+      type: EBwipBcid.qrcode,
+    });
   });
 
   describe('waitMs', () => {
@@ -155,6 +163,7 @@ describe('TapirscanDecoder', () => {
             setTimeout(() => r(scanner as unknown as Scanner), 10),
           ),
       );
+      decoder.prepare();
 
       expect(await decoder.decode(frame, 1000)).toEqual({
         code: 'late',
@@ -167,6 +176,7 @@ describe('TapirscanDecoder', () => {
       const decoder = new TapirscanDecoder(
         () => new Promise<Scanner>(() => undefined),
       );
+      decoder.prepare();
 
       const result = decoder.decode(frame, 1000);
       await vi.advanceTimersByTimeAsync(1000);

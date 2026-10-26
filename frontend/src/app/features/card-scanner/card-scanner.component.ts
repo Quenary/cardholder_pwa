@@ -206,7 +206,6 @@ export class CardScannerComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.decoders.forEach((decoder) => decoder.dispose?.());
     this.stopLoop();
     this.releaseStream();
     this.matBottomSheet.dismiss();
@@ -219,7 +218,6 @@ export class CardScannerComponent implements OnDestroy {
    */
   protected onVideoPlaying(): void {
     this.isStarting.set(false);
-    this.decoders.forEach((decoder) => decoder.prepare?.());
   }
 
   protected close($event?: ICardScannerResult): void {
@@ -289,8 +287,9 @@ export class CardScannerComponent implements OnDestroy {
   }
 
   private async start(): Promise<void> {
-    this.decoders.forEach((decoder) => decoder.dispose?.());
     this.decoders = await this.decodingService.createDecoders();
+    // Loads while the camera starts, which takes seconds on phones.
+    this.decoders.forEach((decoder) => decoder.prepare?.());
     const remembered = storageGetItemJson<string>(
       ELocalStorageKey.SCANNER_CAMERA,
     );

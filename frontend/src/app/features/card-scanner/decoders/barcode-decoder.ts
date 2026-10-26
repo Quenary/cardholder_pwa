@@ -32,10 +32,8 @@ export interface IBarcodeDecoder {
    * left out of the camera rotation, and decode may wait waitMs for it.
    */
   readonly available?: boolean;
-  /** Starts loading, for a decoder that needs to; called on the first frame. */
+  /** Starts loading, for a decoder that needs to. */
   prepare?(): void;
-  /** Releases what the decoder holds, if anything. */
-  dispose?(): void;
 }
 
 /**

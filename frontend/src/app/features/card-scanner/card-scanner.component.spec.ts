@@ -257,6 +257,17 @@ describe('CardScannerComponent', () => {
     });
   });
 
+  it('prepares the decoders before opening the camera', async () => {
+    const decoder = { ...createBarcodeDecoderMock('lazy'), prepare: vi.fn() };
+    decodingServiceMock.createDecoders.mockResolvedValue([decoder]);
+    await create('backcamera2');
+
+    expect(decoder.prepare).toHaveBeenCalledTimes(1);
+    expect(decoder.prepare.mock.invocationCallOrder[0]).toBeLessThan(
+      mediaDevicesServiceMock.getUserMedia.mock.invocationCallOrder[0],
+    );
+  });
+
   describe('decodeNextFrame', () => {
     it('rotates through decoders', async () => {
       const first = createBarcodeDecoderMock('first');
@@ -380,16 +391,6 @@ describe('CardScannerComponent', () => {
       fixture.detectChanges();
 
       expect(frame()).toBeTruthy();
-    });
-
-    it('prepares the decoders', async () => {
-      const decoder = { ...createBarcodeDecoderMock('lazy'), prepare: vi.fn() };
-      decodingServiceMock.createDecoders.mockResolvedValue([decoder]);
-      await create('backcamera2');
-
-      component['onVideoPlaying']();
-
-      expect(decoder.prepare).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -620,16 +621,6 @@ describe('CardScannerComponent', () => {
       fixture.destroy();
 
       expect(track.stop).toHaveBeenCalled();
-    });
-
-    it('disposes the decoders', async () => {
-      const decoder = { ...createBarcodeDecoderMock('held'), dispose: vi.fn() };
-      decodingServiceMock.createDecoders.mockResolvedValue([decoder]);
-      await create('backcamera2');
-
-      fixture.destroy();
-
-      expect(decoder.dispose).toHaveBeenCalledTimes(1);
     });
   });
 });

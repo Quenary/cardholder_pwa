@@ -55,6 +55,14 @@ describe('BarcodeDecodingService', () => {
       ]);
     });
 
+    it('shares one tapirscan between calls', async () => {
+      const first = await service.createDecoders();
+      const second = await service.createDecoders();
+
+      expect(second[0]).toBe(first[0]);
+      expect(second[1]).not.toBe(first[1]);
+    });
+
     it('filters native formats to renderable types', async () => {
       barcodeDetectorServiceMock.isSupported.mockReturnValue(true);
       barcodeDetectorServiceMock.getSupportedFormats.mockResolvedValue([

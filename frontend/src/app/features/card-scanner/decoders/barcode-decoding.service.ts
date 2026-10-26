@@ -18,6 +18,8 @@ import { ZxingDecoder } from './zxing.decoder';
 })
 export class BarcodeDecodingService {
   private readonly barcodeDetectorService = inject(BarcodeDetectorService);
+  /** Shared by every scanner dialog, so it loads once per page. */
+  private readonly tapirscan = new TapirscanDecoder();
 
   /**
    * Builds the decoders available in this browser, best first.
@@ -32,11 +34,7 @@ export class BarcodeDecodingService {
     if (native) {
       decoders.push(native);
     }
-    decoders.push(
-      new TapirscanDecoder(),
-      new ZxingDecoder(),
-      new Quagga2Decoder(),
-    );
+    decoders.push(this.tapirscan, new ZxingDecoder(), new Quagga2Decoder());
     return decoders;
   }
 
