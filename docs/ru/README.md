@@ -55,10 +55,12 @@
 - TL;DR Это основные 2D (напр. QR) и 1D (напр. штрихкод) типы.
 - Приложение использует:
   - [zxing-js/browser](https://github.com/zxing-js/browser) и [quagga2](https://github.com/ericblade/quagga2) для сканирования кодов.
+  - [tapirscan](https://github.com/kleinicke/tapirscan) для повёрнутых кодов и кодов, снятых под углом. Его WebAssembly загружается при первом использовании сканера, поэтому при первом использовании без сети работают только остальные декодеры.
   - [bwip-js](https://github.com/metafloor/bwip-js) для отображения кодов.
 - Ссылки на поддерживаемые типы:
   - [Типы `zxing-js`](https://github.com/zxing-js/library?tab=readme-ov-file#supported-formats)
   - [Типы `quagga2`](https://github.com/ericblade/quagga2/tree/master/src/reader)
+  - [Типы `tapirscan`](https://github.com/kleinicke/tapirscan/blob/main/docs/FORMATS.md)
   - [Типы `bwip-js`](https://github.com/metafloor/bwip-js/wiki/BWIPP-Barcode-Types)
 - Можно вручную ввести значение и тип кода - `bwip-js` отобразит его, если он поддерживается.
 - Я заметил, что `zxing` плохо справляется с распознаванием светлых кодов на темном фоне. Возможно, это касается и других сканеров.

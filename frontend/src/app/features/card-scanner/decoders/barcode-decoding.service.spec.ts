@@ -28,10 +28,11 @@ describe('BarcodeDecodingService', () => {
   });
 
   describe('createDecoders', () => {
-    it('always includes zxing and quagga2', async () => {
+    it('always includes tapirscan, zxing and quagga2', async () => {
       const decoders = await service.createDecoders();
 
       expect(decoders.map((decoder) => decoder.name)).toEqual([
+        'tapirscan',
         'zxing',
         'quagga2',
       ]);
@@ -48,6 +49,7 @@ describe('BarcodeDecodingService', () => {
 
       expect(decoders.map((decoder) => decoder.name)).toEqual([
         'native',
+        'tapirscan',
         'zxing',
         'quagga2',
       ]);
@@ -76,54 +78,11 @@ describe('BarcodeDecodingService', () => {
       const decoders = await service.createDecoders();
 
       expect(decoders.map((decoder) => decoder.name)).toEqual([
-        'zxing',
-        'quagga2',
-      ]);
-      expect(barcodeDetectorServiceMock.create).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('loadTapirscan', () => {
-    it('resolves to null where the browser cannot run it', async () => {
-      // jsdom has no Worker, as a browser without the features would not.
-      expect(await service.loadTapirscan()).toBeNull();
-    });
-  });
-
-  describe('withTapirscan', () => {
-    const names = (decoders: { name: string }[]) =>
-      decoders.map((decoder) => decoder.name);
-
-    it('goes after native and before the libraries', () => {
-      const tapirscan = createBarcodeDecoderMock('tapirscan');
-      const decoders = service.withTapirscan(
-        [
-          createBarcodeDecoderMock('native'),
-          createBarcodeDecoderMock('zxing'),
-          createBarcodeDecoderMock('quagga2'),
-        ],
-        tapirscan,
-      );
-
-      expect(names(decoders)).toEqual([
-        'native',
         'tapirscan',
         'zxing',
         'quagga2',
       ]);
-    });
-
-    it('goes first without native', () => {
-      const tapirscan = createBarcodeDecoderMock('tapirscan');
-      const decoders = service.withTapirscan(
-        [
-          createBarcodeDecoderMock('zxing'),
-          createBarcodeDecoderMock('quagga2'),
-        ],
-        tapirscan,
-      );
-
-      expect(names(decoders)).toEqual(['tapirscan', 'zxing', 'quagga2']);
+      expect(barcodeDetectorServiceMock.create).not.toHaveBeenCalled();
     });
   });
 
@@ -152,27 +111,45 @@ describe('BarcodeDecodingService', () => {
       expect(result).toEqual({ code: '12345', type: EBwipBcid.code128 });
     });
 
-    it('waits for a decoder still loading once the others gave up', async () => {
+    it('tries a decoder still loading last, waiting for it', async () => {
       const frame = document.createElement('canvas');
-      const empty = createBarcodeDecoderMock('empty');
-      const late = createBarcodeDecoderMock('late', '12345');
-
-      const result = await service.decodeAll(
-        frame,
-        [empty],
-        Promise.resolve(late),
+      const loading = {
+        ...createBarcodeDecoderMock('loading'),
+        available: false,
+      };
+      loading.decode.mockImplementation((_frame, waitMs) =>
+        Promise.resolve(
+          waitMs ? { code: '12345', type: EBwipBcid.code128 } : null,
+        ),
       );
+      const empty = createBarcodeDecoderMock('empty');
+
+      const result = await service.decodeAll(frame, [loading, empty], 500);
 
       expect(result).toEqual({ code: '12345', type: EBwipBcid.code128 });
+      expect(empty.decode).toHaveBeenCalledWith(frame);
+      expect(loading.decode).toHaveBeenLastCalledWith(frame, 500);
     });
 
-    it('does not run a loaded decoder twice', async () => {
+    it('retries a decoder that finished loading meanwhile', async () => {
       const frame = document.createElement('canvas');
-      const loaded = createBarcodeDecoderMock('loaded');
+      const loading = {
+        ...createBarcodeDecoderMock('loading'),
+        available: false,
+      };
+      loading.decode.mockResolvedValueOnce(null).mockResolvedValue({
+        code: '12345',
+        type: EBwipBcid.code128,
+      });
+      const empty = createBarcodeDecoderMock('empty');
+      empty.decode.mockImplementation(async () => {
+        loading.available = true;
+        return null;
+      });
 
-      await service.decodeAll(frame, [loaded], Promise.resolve(loaded));
+      const result = await service.decodeAll(frame, [loading, empty], 500);
 
-      expect(loaded.decode).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ code: '12345', type: EBwipBcid.code128 });
     });
   });
 });

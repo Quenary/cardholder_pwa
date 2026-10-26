@@ -88,6 +88,8 @@ export class CardScannerDeviceSheetComponent {
  * queued, so this is an upper bound on the attempt rate and not a promise.
  */
 const FRAME_INTERVAL_MS = 120;
+/** How long a picked photo waits for a decoder that is still loading. */
+const PHOTO_WAIT_MS = 3000;
 
 /**
  * Longest edge of the image handed to the decoders.
@@ -182,8 +184,6 @@ export class CardScannerComponent implements OnDestroy {
   private readonly stream = signal<MediaStream>(null);
 
   private decoders: IBarcodeDecoder[] = [];
-  /** Loaded after the first frame, so it does not delay the other decoders. */
-  private tapirscan?: Promise<IBarcodeDecoder | null>;
   /** Rotates through the decoders, one per frame, see decodeNextFrame. */
   private decoderIndex = 0;
   private loopSubscription: Subscription = null;
@@ -206,10 +206,10 @@ export class CardScannerComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.decoders.forEach((decoder) => decoder.dispose?.());
     this.stopLoop();
     this.releaseStream();
     this.matBottomSheet.dismiss();
-    void this.tapirscan?.then((decoder) => decoder?.dispose?.());
   }
 
   /**
@@ -219,7 +219,7 @@ export class CardScannerComponent implements OnDestroy {
    */
   protected onVideoPlaying(): void {
     this.isStarting.set(false);
-    void this.addTapirscan();
+    this.decoders.forEach((decoder) => decoder.prepare?.());
   }
 
   protected close($event?: ICardScannerResult): void {
@@ -268,12 +268,11 @@ export class CardScannerComponent implements OnDestroy {
     this.stopLoop();
     try {
       const frame = await this.drawImage(file);
-      this.tapirscan ??= this.decodingService.loadTapirscan();
       const result = frame
         ? await this.decodingService.decodeAll(
             frame,
             this.decoders,
-            this.tapirscan,
+            PHOTO_WAIT_MS,
           )
         : null;
       if (result) {
@@ -290,6 +289,7 @@ export class CardScannerComponent implements OnDestroy {
   }
 
   private async start(): Promise<void> {
+    this.decoders.forEach((decoder) => decoder.dispose?.());
     this.decoders = await this.decodingService.createDecoders();
     const remembered = storageGetItemJson<string>(
       ELocalStorageKey.SCANNER_CAMERA,
@@ -536,18 +536,6 @@ export class CardScannerComponent implements OnDestroy {
     );
   }
 
-  /** Adds tapirscan to the rotation once loaded, also after a camera switch. */
-  private async addTapirscan(): Promise<void> {
-    this.tapirscan ??= this.decodingService.loadTapirscan();
-    const tapirscan = await this.tapirscan;
-    if (tapirscan && !this.decoders.includes(tapirscan)) {
-      this.decoders = this.decodingService.withTapirscan(
-        this.decoders,
-        tapirscan,
-      );
-    }
-  }
-
   private startLoop(): void {
     this.stopLoop();
     if (!this.decoders.length) {
@@ -577,14 +565,17 @@ export class CardScannerComponent implements OnDestroy {
    * a second.
    */
   private async decodeNextFrame(): Promise<IScannerResult | null> {
-    if (!this.decoders.length) {
+    const decoders = this.decoders.filter(
+      (decoder) => decoder.available !== false,
+    );
+    if (!decoders.length) {
       return null;
     }
     const frame = this.grabFrame();
     if (!frame) {
       return null;
     }
-    const decoder = this.decoders[this.decoderIndex % this.decoders.length];
+    const decoder = decoders[this.decoderIndex % decoders.length];
     this.decoderIndex++;
     return decoder.decode(frame).catch(() => null);
   }

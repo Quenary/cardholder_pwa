@@ -23,8 +23,8 @@ export class BarcodeDecodingService {
    * Builds the decoders available in this browser, best first.
    *
    * The two libraries are always present and complement each other: zxing
-   * carries the 2D formats, quagga2 the long tail of 1D ones. Tapirscan is
-   * added once loaded, see loadTapirscan.
+   * carries the 2D formats, quagga2 the long tail of 1D ones. Tapirscan,
+   * between native and them, joins once it has loaded.
    */
   public async createDecoders(): Promise<IBarcodeDecoder[]> {
     const decoders: IBarcodeDecoder[] = [];
@@ -32,47 +32,41 @@ export class BarcodeDecodingService {
     if (native) {
       decoders.push(native);
     }
-    decoders.push(new ZxingDecoder(), new Quagga2Decoder());
+    decoders.push(
+      new TapirscanDecoder(),
+      new ZxingDecoder(),
+      new Quagga2Decoder(),
+    );
     return decoders;
-  }
-
-  /** Null when this browser cannot run tapirscan. */
-  public loadTapirscan(): Promise<IBarcodeDecoder | null> {
-    return TapirscanDecoder.load();
-  }
-
-  /** Puts tapirscan after native and before the libraries. */
-  public withTapirscan(
-    decoders: IBarcodeDecoder[],
-    tapirscan: IBarcodeDecoder,
-  ): IBarcodeDecoder[] {
-    const native = decoders.filter((decoder) => decoder.name === 'native');
-    const rest = decoders.filter((decoder) => decoder.name !== 'native');
-    return [...native, tapirscan, ...rest];
   }
 
   /**
    * Runs every decoder against one frame and returns the first code read.
    *
    * For a picked file, where there is a single image and no next frame to
-   * fall back on, it is worth spending all of them.
+   * fall back on, it is worth spending all of them. Decoders still loading
+   * are tried last, waiting up to waitMs for them.
    */
   public async decodeAll(
     frame: HTMLCanvasElement,
     decoders: IBarcodeDecoder[],
-    pending?: Promise<IBarcodeDecoder | null>,
+    waitMs = 0,
   ): Promise<IScannerResult | null> {
+    // Taken first: one may finish loading while the others decode.
+    const loading = decoders.filter((d) => d.available === false);
     for (const decoder of decoders) {
       const result = await decoder.decode(frame).catch(() => null);
       if (result) {
         return result;
       }
     }
-    // Waits for tapirscan only once the others have failed.
-    const late = await pending;
-    return late && !decoders.includes(late)
-      ? late.decode(frame).catch(() => null)
-      : null;
+    for (const decoder of loading) {
+      const result = await decoder.decode(frame, waitMs).catch(() => null);
+      if (result) {
+        return result;
+      }
+    }
+    return null;
   }
 
   private async createNativeDecoder(): Promise<IBarcodeDecoder | null> {
