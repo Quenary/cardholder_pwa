@@ -16,7 +16,7 @@ const LOCALE_DATA: Record<string, () => Promise<{ default: unknown }>> = {
 };
 
 /** Languages with a file in public/i18n. */
-export const TRANSLATED_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'ru'];
+export const TRANSLATED_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'nl', 'ru'];
 
 const languageOf = (locale: string | undefined): string =>
   (locale ?? '').split('-')[0].toLowerCase();
