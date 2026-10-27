@@ -23,7 +23,17 @@ export interface IBarcodeDecoder {
    * Resolves to null when the frame holds no code this decoder understands,
    * which is the ordinary outcome on most frames and not an error.
    */
-  decode(frame: HTMLCanvasElement): Promise<IScannerResult | null>;
+  decode(
+    frame: HTMLCanvasElement,
+    waitMs?: number,
+  ): Promise<IScannerResult | null>;
+  /**
+   * False while the decoder cannot read, for one that loads first. It is then
+   * left out of the camera rotation, and decode may wait waitMs for it.
+   */
+  readonly available?: boolean;
+  /** Starts loading, for a decoder that needs to. */
+  prepare?(): void;
 }
 
 /**

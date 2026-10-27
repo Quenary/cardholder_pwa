@@ -54,10 +54,12 @@ It's powered by free providers and can be suspended, which will lead to a long i
 - TL;DR these are the main 2D (e.g. QR) and 1D (e.g. barcode) types.
 - App relies on:
   - [zxing-js/browser](https://github.com/zxing-js/browser) and [quagga2](https://github.com/ericblade/quagga2) for scanning codes.
+  - [tapirscan](https://github.com/kleinicke/tapirscan) for codes that are turned or seen at an angle. Its WebAssembly is downloaded when the scanner is first used, so on a first use without a connection only the other decoders work.
   - [bwip-js](https://github.com/metafloor/bwip-js) for displaying codes.
 - Supported codes:
   - [Types of `zxing-js`](https://github.com/zxing-js/library?tab=readme-ov-file#supported-formats)
   - [Types of `quagga2`](https://github.com/ericblade/quagga2/tree/master/src/reader)
+  - [Types of `tapirscan`](https://github.com/kleinicke/tapirscan/blob/main/docs/FORMATS.md)
   - [Types of `bwip-js`](https://github.com/metafloor/bwip-js/wiki/BWIPP-Barcode-Types)
 - You can enter value and type of the code manually - `bwip-js` will display the code, if it is supported.
 - I noticed that `zxing` has a hard time detecting light codes on dark backgrounds. Maybe other scanners are affected by this as well.

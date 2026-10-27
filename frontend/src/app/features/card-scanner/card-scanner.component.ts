@@ -88,6 +88,8 @@ export class CardScannerDeviceSheetComponent {
  * queued, so this is an upper bound on the attempt rate and not a promise.
  */
 const FRAME_INTERVAL_MS = 120;
+/** How long a picked photo waits for a decoder that is still loading. */
+const PHOTO_WAIT_MS = 3000;
 
 /**
  * Longest edge of the image handed to the decoders.
@@ -265,7 +267,11 @@ export class CardScannerComponent implements OnDestroy {
     try {
       const frame = await this.drawImage(file);
       const result = frame
-        ? await this.decodingService.decodeAll(frame, this.decoders)
+        ? await this.decodingService.decodeAll(
+            frame,
+            this.decoders,
+            PHOTO_WAIT_MS,
+          )
         : null;
       if (result) {
         this.onResult(result);
@@ -282,6 +288,8 @@ export class CardScannerComponent implements OnDestroy {
 
   private async start(): Promise<void> {
     this.decoders = await this.decodingService.createDecoders();
+    // Loads while the camera starts, which takes seconds on phones.
+    this.decoders.forEach((decoder) => decoder.prepare?.());
     const remembered = storageGetItemJson<string>(
       ELocalStorageKey.SCANNER_CAMERA,
     );
@@ -556,14 +564,17 @@ export class CardScannerComponent implements OnDestroy {
    * a second.
    */
   private async decodeNextFrame(): Promise<IScannerResult | null> {
-    if (!this.decoders.length) {
+    const decoders = this.decoders.filter(
+      (decoder) => decoder.available !== false,
+    );
+    if (!decoders.length) {
       return null;
     }
     const frame = this.grabFrame();
     if (!frame) {
       return null;
     }
-    const decoder = this.decoders[this.decoderIndex % this.decoders.length];
+    const decoder = decoders[this.decoderIndex % decoders.length];
     this.decoderIndex++;
     return decoder.decode(frame).catch(() => null);
   }
