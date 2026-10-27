@@ -1,6 +1,24 @@
 # CHANGELOG
 
 
+## v1.16.0 (2026-10-27)
+
+### Bug Fixes
+
+- **scanner**: Stop probing every rear camera on each Safari open
+  ([`8417c0b`](https://github.com/Quenary/cardholder_pwa/commit/8417c0be9ad562d02658e8ab8214ddc5e2372222))
+
+### Features
+
+- **scanner**: Add Tapirscan as a decoder between native and zxing
+  ([`00a94b5`](https://github.com/Quenary/cardholder_pwa/commit/00a94b5afc35a6b7d6b7a72496606ec92ffa5485))
+
+### Performance Improvements
+
+- **scanner**: Load Tapirscan once per page, while the camera starts
+  ([`ffa5000`](https://github.com/Quenary/cardholder_pwa/commit/ffa50009635bc78eccb3497ccd80d52f2855b094))
+
+
 ## v1.15.0 (2026-10-21)
 
 ### Bug Fixes
