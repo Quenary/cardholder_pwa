@@ -8,10 +8,10 @@
 - 🇷🇺 [Русский](/docs/ru/README.md)
 
 <p align="center">
-  <img src="../../resources/login.jpg" width="30%" />
-  <img src="../../resources/qr.jpg" width="30%" />
-  <img src="../../resources/cardholder_pwa.gif" width="30%" />
+  <img src="../../resources/screenshots/hero.webp" alt="Cardholder PWA: elenco delle carte, codice QR, condivisione e tema scuro" width="100%" />
 </p>
+
+<sub>Marchi, loghi e codici negli screenshot sono inventati per la demo.</sub>
 
 ## Demo
 
@@ -22,12 +22,27 @@ Sono ospitate su servizi gratuiti, che possono sospendere i container. Il primo 
 
 ### Funzionalità principali
 
-- PWA, installabile sul dispositivo dal browser e utilizzabile anche offline (in sola lettura)
-- Più utenti, con i ruoli proprietario, amministratore e membro
-- Carte condivise tra utenti (una carta o tutte insieme)
+- PWA: si installa sul dispositivo dal browser e funziona anche offline (sola lettura)
+- Scansione delle carte con la fotocamera (torcia, fotocamera anteriore/posteriore) o inserimento manuale del codice e del tipo
+- Loghi sulle carte, in griglia o in formato grande, preferiti, ricerca, ordinamento e filtri
+- Codice a schermo intero con inversione dei colori, da mostrare alla cassa
+- Più utenti con i ruoli di proprietario, amministratore e membro
+- Condivisione delle carte tra utenti (una o tutte insieme), che il destinatario accetta o rifiuta
+- Tema chiaro e scuro, in base al sistema
+- Inglese, tedesco, spagnolo, francese, italiano e russo
 - Recupero della password via e-mail (se SMTP è configurato)
 - Facile da ospitare in proprio
 - Open source
+
+### Screenshot
+
+| Carte | Codice | Modifica | Condivisione |
+| :---: | :---: | :---: | :---: |
+| <img src="../../resources/screenshots/cards.webp" width="200" /> | <img src="../../resources/screenshots/code.webp" width="200" /> | <img src="../../resources/screenshots/edit.webp" width="200" /> | <img src="../../resources/screenshots/shared.webp" width="200" /> |
+
+| Accesso | Carte grandi | Admin | Tema scuro |
+| :---: | :---: | :---: | :---: |
+| <img src="../../resources/screenshots/login.webp" width="200" /> | <img src="../../resources/screenshots/cards-large.webp" width="200" /> | <img src="../../resources/screenshots/admin-user.webp" width="200" /> | <img src="../../resources/screenshots/cards-dark.webp" width="200" /> |
 
 ### Tecnologie
 

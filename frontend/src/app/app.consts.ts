@@ -31,6 +31,10 @@ export enum ELocalStorageKey {
    * Saves working out again which of several rear cameras can focus.
    */
   SCANNER_CAMERA = 'cardholder-scanner-camera',
+  /**
+   * Card list layout on this device: a grid of small cards or large ones.
+   */
+  CARD_LAYOUT = 'cardholder-card-layout',
 }
 /**
  * Enum of useful regexp

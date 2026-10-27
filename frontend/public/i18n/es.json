@@ -59,6 +59,8 @@
   "CARDS": {
     "SEARCH": "Buscar",
     "SEARCH_PLACEHOLDER": "Nombre",
+    "LAYOUT_LARGE": "Tarjetas grandes",
+    "LAYOUT_GRID": "Cuadrícula de tarjetas",
     "CARD": {
       "CODE": "Código",
       "CODE_TYPE": "Tipo de código",

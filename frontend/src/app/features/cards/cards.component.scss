@@ -16,6 +16,13 @@
 
     .cards-header-search {
       flex: 1;
+      min-width: 0;
+    }
+
+    // Centred on the 56px fabs; its own padding stands in for the gap.
+    .cards-header-layout {
+      flex-shrink: 0;
+      margin: 4px -8px 0;
     }
   }
 
@@ -34,25 +41,54 @@
     }
   }
 
+  // Two columns on a phone, more as the screen grows, like a wallet app.
   .cards-list {
-    @include mx.flex-container;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px 12px;
+
+    // One card across a phone, for those who prefer them big.
+    &.large {
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px 16px;
+
+      .cards-list-item-footer {
+        font: var(--mat-sys-title-medium);
+      }
+    }
 
     &-item {
-      background-color: var(--mat-sys-surface-container);
       color: var(--mat-sys-on-surface);
       border-radius: 12px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      justify-content: flex-start;
-      aspect-ratio: 4/3;
+      gap: 4px;
+      min-width: 0;
 
-      &-header {
-        display: inline-flex;
+      &.animated-placeholder {
+        aspect-ratio: 1.586;
+        background-color: var(--mat-sys-surface-container);
+      }
+
+      // The ISO/IEC 7810 ID-1 ratio of a physical loyalty card.
+      &-preview {
+        aspect-ratio: 1.586;
+        height: auto;
+        border-radius: 12px;
+        background-color: var(--mat-sys-surface-container);
+        box-shadow: var(--mat-sys-level1);
+      }
+
+      &-footer {
+        display: flex;
+        align-items: center;
         width: 100%;
-        font-size: 20px;
-        padding: 16px 16px 8px 16px;
+        min-height: 32px;
+        padding: 0 2px 0 4px;
+        box-sizing: border-box;
+        font: var(--mat-sys-title-small);
 
         &-text {
           text-overflow: ellipsis;
@@ -62,11 +98,14 @@
         }
 
         &-icons {
-          overflow: unset;
           display: inline-flex;
-          gap: 8px;
+          flex-shrink: 0;
+          gap: 4px;
           & > * {
             color: var(--mat-sys-primary);
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
           }
         }
       }

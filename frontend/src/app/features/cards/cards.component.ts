@@ -23,7 +23,7 @@ import {
   selectCardsList,
 } from 'src/app/entities/cards/state/cards.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { MatFabButton } from '@angular/material/button';
+import { MatFabButton, MatIconButton } from '@angular/material/button';
 import { CardCodeViewerDialogComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
 import { CardPreviewComponent } from 'src/app/shared/components/card-preview/card-preview.component';
 import { IsOldCodeType } from 'src/app/shared/pipes/is-old-code-type.pipe';
@@ -39,6 +39,8 @@ import { ELocalStorageKey } from 'src/app/app.consts';
 import { MatBadgeModule } from '@angular/material/badge';
 import { CardShareApiService } from '../shared-cards/services/card-share-api.service';
 import { ISharedWithMeItem } from '../shared-cards/shared-cards.interface';
+
+type TCardLayout = 'grid' | 'large';
 
 @Component({
   selector: 'app-cards',
@@ -56,6 +58,7 @@ import { ISharedWithMeItem } from '../shared-cards/shared-cards.interface';
     ReactiveFormsModule,
     MatRipple,
     MatFabButton,
+    MatIconButton,
     CardPreviewComponent,
     RouterLink,
     IsOldCodeType,
@@ -73,6 +76,13 @@ export class CardsComponent {
   protected readonly cardsPlaceholder: number[] = Array(6).fill(Math.random());
   protected readonly sharedCards = signal<ISharedWithMeItem[]>([]);
   protected readonly isLoading = this.store.selectSignal(selectCardsIsLoading);
+  /**
+   * Small cards in a grid, or large ones, as chosen on this device.
+   */
+  protected readonly layout = signal<TCardLayout>(
+    localStorage.getItemJson<TCardLayout>(ELocalStorageKey.CARD_LAYOUT) ??
+      'grid',
+  );
   /**
    * Form control for search field
    */
@@ -185,6 +195,12 @@ export class CardsComponent {
         });
       }
     });
+  }
+
+  protected toggleLayout(): void {
+    const layout = this.layout() === 'grid' ? 'large' : 'grid';
+    this.layout.set(layout);
+    localStorage.setItemJson(ELocalStorageKey.CARD_LAYOUT, layout);
   }
 
   protected toggleFavorite(card: ICard): void {

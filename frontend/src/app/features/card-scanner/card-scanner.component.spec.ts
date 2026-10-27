@@ -27,6 +27,7 @@ import { of } from 'rxjs';
 import { BarcodeDecodingService } from './decoders/barcode-decoding.service';
 import { HapticsService } from 'src/app/core/services/haptics.service';
 import { EBwipBcid } from 'src/app/entities/cards/cards-const';
+import { ELocalStorageKey } from 'src/app/app.consts';
 
 describe('CardScannerComponent', () => {
   let component: CardScannerComponent;
@@ -257,6 +258,17 @@ describe('CardScannerComponent', () => {
     });
   });
 
+  it('prepares the decoders before opening the camera', async () => {
+    const decoder = { ...createBarcodeDecoderMock('lazy'), prepare: vi.fn() };
+    decodingServiceMock.createDecoders.mockResolvedValue([decoder]);
+    await create('backcamera2');
+
+    expect(decoder.prepare).toHaveBeenCalledTimes(1);
+    expect(decoder.prepare.mock.invocationCallOrder[0]).toBeLessThan(
+      mediaDevicesServiceMock.getUserMedia.mock.invocationCallOrder[0],
+    );
+  });
+
   describe('decodeNextFrame', () => {
     it('rotates through decoders', async () => {
       const first = createBarcodeDecoderMock('first');
@@ -275,6 +287,26 @@ describe('CardScannerComponent', () => {
 
       expect(first.decode).toHaveBeenCalledTimes(2);
       expect(second.decode).toHaveBeenCalledTimes(1);
+    });
+
+    it('skips decoders that are unavailable', async () => {
+      const loading = {
+        ...createBarcodeDecoderMock('loading'),
+        available: false,
+      };
+      const reader = createBarcodeDecoderMock('reader');
+      decodingServiceMock.createDecoders.mockResolvedValue([loading, reader]);
+      await create('backcamera2');
+      vi.spyOn(
+        component as unknown as { grabFrame: () => HTMLCanvasElement },
+        'grabFrame',
+      ).mockReturnValue(document.createElement('canvas'));
+
+      await component['decodeNextFrame']();
+      await component['decodeNextFrame']();
+
+      expect(loading.decode).not.toHaveBeenCalled();
+      expect(reader.decode).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -571,6 +603,97 @@ describe('CardScannerComponent', () => {
 
       expect(component['getStreamDeviceId']()).toEqual('back-fixed');
       expect(component['cameraError']()).toBeNull();
+    });
+
+    it('probes only once when no camera focuses continuously', async () => {
+      mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+        samsungDevices,
+      );
+      mediaDevicesServiceMock.getUserMedia.mockImplementation(() =>
+        Promise.resolve(
+          createMediaStreamMock('back-fixed', false, ['manual']).stream,
+        ),
+      );
+      await bring();
+      const firstRun = mediaDevicesServiceMock.getUserMedia.mock.calls.length;
+
+      await bring();
+
+      const secondRun =
+        mediaDevicesServiceMock.getUserMedia.mock.calls.length - firstRun;
+      expect(secondRun).toEqual(1);
+    });
+
+    it('probes again when no other camera could be opened', async () => {
+      mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+        samsungDevices,
+      );
+      mediaDevicesServiceMock.getUserMedia.mockImplementation(
+        (constraints: MediaStreamConstraints) => {
+          const video = constraints.video as MediaTrackConstraints;
+          const wanted = (video?.deviceId as ConstrainDOMStringParameters)
+            ?.exact;
+          return wanted && wanted !== 'back-fixed'
+            ? Promise.reject({ name: 'NotReadableError' })
+            : Promise.resolve(
+                createMediaStreamMock('back-fixed', false, ['manual']).stream,
+              );
+        },
+      );
+      await bring();
+      const firstRun = mediaDevicesServiceMock.getUserMedia.mock.calls.length;
+
+      await bring();
+
+      const secondRun =
+        mediaDevicesServiceMock.getUserMedia.mock.calls.length - firstRun;
+      expect(secondRun).toEqual(firstRun);
+    });
+
+    it('falls back to the default camera when the remembered one is gone', async () => {
+      localStorage.setItem(
+        ELocalStorageKey.SCANNER_CAMERA,
+        JSON.stringify('gone'),
+      );
+      mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+        samsungDevices,
+      );
+      mediaDevicesServiceMock.getUserMedia.mockImplementation(
+        (constraints: MediaStreamConstraints) => {
+          const video = constraints.video as MediaTrackConstraints;
+          return (video?.deviceId as ConstrainDOMStringParameters)?.exact ===
+            'gone'
+            ? Promise.reject({ name: 'OverconstrainedError' })
+            : Promise.resolve(
+                createMediaStreamMock('back-fixed', false, []).stream,
+              );
+        },
+      );
+
+      await bring();
+
+      expect(component['getStreamDeviceId']()).toEqual('back-fixed');
+      expect(component['cameraError']()).toBeNull();
+    });
+
+    it('does not probe where the browser reports no focus modes', async () => {
+      mediaDevicesServiceMock.enumerateDevices.mockResolvedValue(
+        samsungDevices,
+      );
+      // Safari: getCapabilities has no focusMode at all.
+      mediaDevicesServiceMock.getUserMedia.mockResolvedValue(
+        createMediaStreamMock('back-fixed', false, []).stream,
+      );
+
+      await bring();
+      await bring();
+
+      expect(component['getStreamDeviceId']()).toEqual('back-fixed');
+      expect(mediaDevicesServiceMock.getUserMedia).toHaveBeenCalledTimes(2);
+      const constraints = mediaDevicesServiceMock.getUserMedia.mock.calls[1][0];
+      expect((constraints.video as MediaTrackConstraints).deviceId).toEqual({
+        exact: 'back-fixed',
+      });
     });
   });
 

@@ -28,10 +28,11 @@ describe('BarcodeDecodingService', () => {
   });
 
   describe('createDecoders', () => {
-    it('always includes zxing and quagga2', async () => {
+    it('always includes tapirscan, zxing and quagga2', async () => {
       const decoders = await service.createDecoders();
 
       expect(decoders.map((decoder) => decoder.name)).toEqual([
+        'tapirscan',
         'zxing',
         'quagga2',
       ]);
@@ -48,9 +49,18 @@ describe('BarcodeDecodingService', () => {
 
       expect(decoders.map((decoder) => decoder.name)).toEqual([
         'native',
+        'tapirscan',
         'zxing',
         'quagga2',
       ]);
+    });
+
+    it('shares one tapirscan between calls', async () => {
+      const first = await service.createDecoders();
+      const second = await service.createDecoders();
+
+      expect(second[0]).toBe(first[0]);
+      expect(second[1]).not.toBe(first[1]);
     });
 
     it('filters native formats to renderable types', async () => {
@@ -76,6 +86,7 @@ describe('BarcodeDecodingService', () => {
       const decoders = await service.createDecoders();
 
       expect(decoders.map((decoder) => decoder.name)).toEqual([
+        'tapirscan',
         'zxing',
         'quagga2',
       ]);
@@ -104,6 +115,47 @@ describe('BarcodeDecodingService', () => {
       const reader = createBarcodeDecoderMock('reader', '12345');
 
       const result = await service.decodeAll(frame, [broken, reader]);
+
+      expect(result).toEqual({ code: '12345', type: EBwipBcid.code128 });
+    });
+
+    it('tries a decoder still loading last, waiting for it', async () => {
+      const frame = document.createElement('canvas');
+      const loading = {
+        ...createBarcodeDecoderMock('loading'),
+        available: false,
+      };
+      loading.decode.mockImplementation((_frame, waitMs) =>
+        Promise.resolve(
+          waitMs ? { code: '12345', type: EBwipBcid.code128 } : null,
+        ),
+      );
+      const empty = createBarcodeDecoderMock('empty');
+
+      const result = await service.decodeAll(frame, [loading, empty], 500);
+
+      expect(result).toEqual({ code: '12345', type: EBwipBcid.code128 });
+      expect(empty.decode).toHaveBeenCalledWith(frame);
+      expect(loading.decode).toHaveBeenLastCalledWith(frame, 500);
+    });
+
+    it('retries a decoder that finished loading meanwhile', async () => {
+      const frame = document.createElement('canvas');
+      const loading = {
+        ...createBarcodeDecoderMock('loading'),
+        available: false,
+      };
+      loading.decode.mockResolvedValueOnce(null).mockResolvedValue({
+        code: '12345',
+        type: EBwipBcid.code128,
+      });
+      const empty = createBarcodeDecoderMock('empty');
+      empty.decode.mockImplementation(async () => {
+        loading.available = true;
+        return null;
+      });
+
+      const result = await service.decodeAll(frame, [loading, empty], 500);
 
       expect(result).toEqual({ code: '12345', type: EBwipBcid.code128 });
     });

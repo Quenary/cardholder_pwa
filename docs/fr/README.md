@@ -8,10 +8,10 @@
 - 🇷🇺 [Русский](/docs/ru/README.md)
 
 <p align="center">
-  <img src="../../resources/login.jpg" width="30%" />
-  <img src="../../resources/qr.jpg" width="30%" />
-  <img src="../../resources/cardholder_pwa.gif" width="30%" />
+  <img src="../../resources/screenshots/hero.webp" alt="Cardholder PWA : liste des cartes, QR code, partage et thème sombre" width="100%" />
 </p>
+
+<sub>Les enseignes, logos et codes des captures sont inventés pour la démo.</sub>
 
 ## Démo
 
@@ -23,11 +23,26 @@ Elles tournent chez des hébergeurs gratuits, qui peuvent suspendre les conteneu
 ### Principales fonctionnalités
 
 - PWA, installable sur l'appareil depuis le navigateur et utilisable même hors ligne (en lecture seule)
+- Scan d'une carte à la caméra (lampe, caméra avant/arrière), ou saisie du code et de son type
+- Logos sur les cartes, en grille ou en grand format, favoris, recherche, tri et filtres
+- Code en plein écran avec inversion des couleurs, à présenter en caisse
 - Multi-utilisateur, avec les rôles propriétaire, administrateur et membre
-- Partage de cartes entre utilisateurs (une carte ou toutes d'un coup)
+- Partage de cartes entre utilisateurs (une carte ou toutes d'un coup), que le destinataire accepte ou refuse
+- Thème clair et sombre, selon le système
+- Anglais, allemand, espagnol, français, italien et russe
 - Récupération du mot de passe par e-mail (si SMTP est configuré)
 - Simple à auto-héberger
 - Open source
+
+### Captures d'écran
+
+| Cartes | Code | Édition | Partage |
+| :---: | :---: | :---: | :---: |
+| <img src="../../resources/screenshots/cards.webp" width="200" /> | <img src="../../resources/screenshots/code.webp" width="200" /> | <img src="../../resources/screenshots/edit.webp" width="200" /> | <img src="../../resources/screenshots/shared.webp" width="200" /> |
+
+| Connexion | Grandes cartes | Admin | Thème sombre |
+| :---: | :---: | :---: | :---: |
+| <img src="../../resources/screenshots/login.webp" width="200" /> | <img src="../../resources/screenshots/cards-large.webp" width="200" /> | <img src="../../resources/screenshots/admin-user.webp" width="200" /> | <img src="../../resources/screenshots/cards-dark.webp" width="200" /> |
 
 ### Technologies
 

@@ -1,6 +1,56 @@
 # CHANGELOG
 
 
+## v1.16.0 (2026-10-27)
+
+### Bug Fixes
+
+- **scanner**: Stop probing every rear camera on each Safari open
+  ([`8417c0b`](https://github.com/Quenary/cardholder_pwa/commit/8417c0be9ad562d02658e8ab8214ddc5e2372222))
+
+### Features
+
+- **scanner**: Add Tapirscan as a decoder between native and zxing
+  ([`00a94b5`](https://github.com/Quenary/cardholder_pwa/commit/00a94b5afc35a6b7d6b7a72496606ec92ffa5485))
+
+### Performance Improvements
+
+- **scanner**: Load Tapirscan once per page, while the camera starts
+  ([`ffa5000`](https://github.com/Quenary/cardholder_pwa/commit/ffa50009635bc78eccb3497ccd80d52f2855b094))
+
+
+## v1.15.0 (2026-10-21)
+
+### Bug Fixes
+
+- **backend**: Store refresh tokens as a sha256
+  ([`ba702d8`](https://github.com/Quenary/cardholder_pwa/commit/ba702d8ecdf345b0b762020696829f61687774d7))
+
+- **frontend**: Fall back to en-US when the browser locale has no data
+  ([`4f125d0`](https://github.com/Quenary/cardholder_pwa/commit/4f125d07fc51563cb56f06a46de9be2e3e88a702))
+
+- **i18n**: Plainer english for sign out and the admin dates
+  ([`7dc43c2`](https://github.com/Quenary/cardholder_pwa/commit/7dc43c26ba992788ba15caee214cfe2c1f40e3dc))
+
+### Build System
+
+- **deps**: Urllib3 2.8.0 and virtualenv 21.14.11 (advisories)
+  ([`210c45c`](https://github.com/Quenary/cardholder_pwa/commit/210c45c730e1c8b3bd641d684edafd7c04f51066))
+
+### Documentation
+
+- New screenshots, current feature list, and how to answer a share
+  ([`6628fff`](https://github.com/Quenary/cardholder_pwa/commit/6628fff2326e81d145fc5a8bcf2de757ea5e1b56))
+
+### Features
+
+- **frontend**: Lay the card list out as a two-column wallet grid
+  ([`7015412`](https://github.com/Quenary/cardholder_pwa/commit/701541276ff14892f984ec220552cc3bc35e2857))
+
+- **frontend**: Let each device choose small cards in a grid or large ones
+  ([`0055062`](https://github.com/Quenary/cardholder_pwa/commit/00550629d6f1e5a67ac06a2429ddb69a31421555))
+
+
 ## v1.14.0 (2026-10-02)
 
 ### Bug Fixes

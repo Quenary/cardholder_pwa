@@ -59,6 +59,13 @@
       }
     },
     {
+      "name": "tapirscan",
+      "installMode": "lazy",
+      "resources": {
+        "files": ["/tapirscan/*.wasm"]
+      }
+    },
+    {
       "name": "no-cache",
       "installMode": "lazy",
       "updateMode": "lazy",

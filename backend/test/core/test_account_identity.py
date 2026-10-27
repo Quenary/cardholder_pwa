@@ -1,10 +1,10 @@
 """Tests for how accounts are identified: the token subject and the
 uniqueness of usernames and emails."""
 
+import jwt
 import pytest
 import pytest_asyncio
 from fastapi import HTTPException
-from jose import jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.config import Config

@@ -59,6 +59,8 @@
   "CARDS": {
     "SEARCH": "Поиск",
     "SEARCH_PLACEHOLDER": "Наименование",
+    "LAYOUT_LARGE": "Крупные карты",
+    "LAYOUT_GRID": "Сетка карт",
     "CARD": {
       "CODE": "Код",
       "CODE_TYPE": "Тип кода",

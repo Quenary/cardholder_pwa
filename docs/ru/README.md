@@ -9,10 +9,10 @@
 - 🇷🇺 [Русский](/docs/ru/README.md)
 
 <p align="center">
-  <img src="../../resources/login.jpg" width="30%" />
-  <img src="../../resources/qr.jpg" width="30%" />
-  <img src="../../resources/cardholder_pwa.gif" width="30%" />
+  <img src="../../resources/screenshots/hero.webp" alt="Cardholder PWA: список карт, QR-код, общий доступ и тёмная тема" width="100%" />
 </p>
+
+<sub>Бренды, логотипы и коды на скриншотах выдуманы для демонстрации.</sub>
 
 ## Демо
 
@@ -24,11 +24,26 @@
 ### Основные особенности
 
 - PWA — можно установить прямо из браузера и использовать даже офлайн (для просмотра)
+- Сканирование карты камерой (фонарик, фронтальная/основная камера) или ручной ввод кода и его типа
+- Логотипы карт, сеткой или крупно, избранное, поиск, сортировка и фильтры
+- Код на весь экран с инверсией цветов — удобно показать на кассе
 - Несколько пользователей с ролями владельца, администратора и участника
-- Совместный доступ к картам (можно поделиться одной картой или всеми сразу)
+- Совместный доступ к картам (одной или всем сразу), который получатель принимает или отклоняет
+- Светлая и тёмная тема, как в системе
+- Английский, немецкий, испанский, французский, итальянский и русский
 - Восстановление пароля по email (если настроен SMTP)
 - Простое развертывание
 - Открытый исходный код
+
+### Скриншоты
+
+| Карты | Код | Редактирование | Общий доступ |
+| :---: | :---: | :---: | :---: |
+| <img src="../../resources/screenshots/cards.webp" width="200" /> | <img src="../../resources/screenshots/code.webp" width="200" /> | <img src="../../resources/screenshots/edit.webp" width="200" /> | <img src="../../resources/screenshots/shared.webp" width="200" /> |
+
+| Вход | Крупные карты | Админ | Тёмная тема |
+| :---: | :---: | :---: | :---: |
+| <img src="../../resources/screenshots/login.webp" width="200" /> | <img src="../../resources/screenshots/cards-large.webp" width="200" /> | <img src="../../resources/screenshots/admin-user.webp" width="200" /> | <img src="../../resources/screenshots/cards-dark.webp" width="200" /> |
 
 ### Технологии
 
@@ -40,10 +55,12 @@
 - TL;DR Это основные 2D (напр. QR) и 1D (напр. штрихкод) типы.
 - Приложение использует:
   - [zxing-js/browser](https://github.com/zxing-js/browser) и [quagga2](https://github.com/ericblade/quagga2) для сканирования кодов.
+  - [tapirscan](https://github.com/kleinicke/tapirscan) для повёрнутых кодов и кодов, снятых под углом. Его WebAssembly загружается при первом использовании сканера, поэтому при первом использовании без сети работают только остальные декодеры.
   - [bwip-js](https://github.com/metafloor/bwip-js) для отображения кодов.
 - Ссылки на поддерживаемые типы:
   - [Типы `zxing-js`](https://github.com/zxing-js/library?tab=readme-ov-file#supported-formats)
   - [Типы `quagga2`](https://github.com/ericblade/quagga2/tree/master/src/reader)
+  - [Типы `tapirscan`](https://github.com/kleinicke/tapirscan/blob/main/docs/FORMATS.md)
   - [Типы `bwip-js`](https://github.com/metafloor/bwip-js/wiki/BWIPP-Barcode-Types)
 - Можно вручную ввести значение и тип кода - `bwip-js` отобразит его, если он поддерживается.
 - Я заметил, что `zxing` плохо справляется с распознаванием светлых кодов на темном фоне. Возможно, это касается и других сканеров.

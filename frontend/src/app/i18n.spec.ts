@@ -5,6 +5,7 @@ import esJson from '../../public/i18n/es.json';
 import frJson from '../../public/i18n/fr.json';
 import itJson from '../../public/i18n/it.json';
 import ruJson from '../../public/i18n/ru.json';
+import { TRANSLATED_LANGUAGES } from './core/app-initializers/locale-initializer';
 
 /**
  * Every locale carries the same keys as English.
@@ -13,7 +14,8 @@ import ruJson from '../../public/i18n/ru.json';
  * gap went unnoticed because a missing key falls back to English at runtime,
  * so nothing looks broken. This makes it fail instead.
  *
- * A new locale goes in the map below as well as in public/i18n.
+ * A new locale goes in the map below, in TRANSLATED_LANGUAGES and in
+ * public/i18n.
  */
 const translations: Record<string, unknown> = {
   de: deJson,
@@ -46,6 +48,12 @@ const flatten = (node: Tree, prefix = ''): Map<string, unknown> => {
 const english = flatten(enJson as Tree);
 
 describe('translations', () => {
+  it('are the languages the app offers', () => {
+    expect([...Object.keys(translations), 'en'].sort()).toEqual(
+      [...TRANSLATED_LANGUAGES].sort(),
+    );
+  });
+
   for (const [locale, tree] of Object.entries(translations)) {
     describe(locale, () => {
       const translated = flatten(tree as Tree);
