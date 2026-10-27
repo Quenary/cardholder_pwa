@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v1.17.0 (2026-10-27)
+
+### Features
+
+- **i18n**: Add Dutch translation by @Darkguver
+  ([`3eef78f`](https://github.com/Quenary/cardholder_pwa/commit/3eef78f7e797a5b68a83dafec9690ed707f53d9a))
+
+
 ## v1.16.0 (2026-10-27)
 
 ### Bug Fixes
