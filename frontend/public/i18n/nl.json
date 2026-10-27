@@ -59,6 +59,8 @@
   "CARDS": {
     "SEARCH": "Zoeken",
     "SEARCH_PLACEHOLDER": "Naam",
+    "LAYOUT_LARGE": "Grote kaarten",
+    "LAYOUT_GRID": "Kaartenraster",
     "CARD": {
       "CODE": "Code",
       "CODE_TYPE": "Code type",
@@ -67,7 +69,7 @@
       "COLOR": "Kleur",
       "LOGO": "Logo",
       "LOGO_HINT": "PNG, JPEG, WebP, GIF of SVG. De afbeelding wordt geschaald en opnieuw gecodeerd.",
-      "LOGO_SAVE_FIRST": "Sla eerst de kaart op om een ​​logo toe te voegen.",
+      "LOGO_SAVE_FIRST": "Sla eerst de kaart op om een logo toe te voegen.",
       "LOGO_UPLOAD": "Kies een afbeelding",
       "LOGO_REMOVE": "Verwijderen",
       "IS_FAVORITE": "Favoriet",
@@ -182,7 +184,7 @@
       "NULL": "Is leeg",
       "NOT_NULL": "Is niet leeg",
       "GREATER": "Groter dan",
-      "LESS": "Kleinder dan",
+      "LESS": "Kleiner dan",
       "GREATER_OR_EQUALS": "Groter of gelijk",
       "LESS_OR_EQUALS": "Kleiner of gelijk"
     }
