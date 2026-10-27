@@ -4,6 +4,7 @@ import enJson from '../../public/i18n/en.json';
 import esJson from '../../public/i18n/es.json';
 import frJson from '../../public/i18n/fr.json';
 import itJson from '../../public/i18n/it.json';
+import nlJson from '../../public/i18n/nl.json';
 import ruJson from '../../public/i18n/ru.json';
 import { TRANSLATED_LANGUAGES } from './core/app-initializers/locale-initializer';
 
@@ -22,6 +23,7 @@ const translations: Record<string, unknown> = {
   es: esJson,
   fr: frJson,
   it: itJson,
+  nl: nlJson,
   ru: ruJson,
 };
 
