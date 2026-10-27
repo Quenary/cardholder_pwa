@@ -32,6 +32,10 @@ describe('appLanguage', () => {
   });
 
   it('falls back to english for a language with no file', () => {
-    expect(appLanguage('nl-NL')).toBe('en');
+    expect(appLanguage('pt-BR')).toBe('en');
+  });
+
+  it('uses dutch when the browser locale is dutch', () => {
+    expect(appLanguage('nl-NL')).toBe('nl');
   });
 });
