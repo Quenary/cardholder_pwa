@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v1.18.0 (2026-11-16)
+
+### Features
+
+- **i18n**: Add Japanese translation
+  ([`c834a80`](https://github.com/Quenary/cardholder_pwa/commit/c834a80e3e3d128919685080a30851b835279195))
+
+
 ## v1.17.0 (2026-10-27)
 
 ### Features
