@@ -1,0 +1,226 @@
+{
+  "GENERAL": {
+    "TITLE": "Cardholder",
+    "CONNECTION": "接続中",
+    "YES": "はい",
+    "NO": "いいえ",
+    "SAVE": "保存",
+    "CLOSE": "閉じる",
+    "CANCEL": "キャンセル",
+    "UNKNOWN_ERROR": "不明なエラー",
+    "REQUEST_ERROR": "リクエストのエラー",
+    "UNSAVED_WARN": "保存していないデータは失われます",
+    "CONFIRM": "確認",
+    "DELETE_WARN": "削除の確認",
+    "DELETE": "削除"
+  },
+  "UPDATE": {
+    "TITLE": "アップデート",
+    "SUBTITLE": "アプリの新しいバージョンがあります。アップデートするには、ページを再読み込みしてください。",
+    "RELOAD": "再読み込み"
+  },
+  "NAV": {
+    "AUTH": "ログイン",
+    "REGISTER": "新規登録",
+    "PASSWORD_RECOVERY": "パスワードの再設定",
+    "CARD": "カード",
+    "SHARED_CARDS": "共有カード",
+    "USER": "ユーザー",
+    "ADMIN": "管理画面",
+    "ABOUT": "このアプリについて",
+    "EXIT": "ログアウト"
+  },
+  "AUTH": {
+    "WELCOME": "ようこそ",
+    "USERNAME": "ユーザー名",
+    "PASSWORD": "パスワード",
+    "SIGNIN": "ログイン",
+    "SIGNUP": "アカウントをお持ちでない方",
+    "PASSWORD_RECOVERY": "パスワードの再設定",
+    "REGISTRATION_DISABLED": "アプリの設定で新規登録が無効になっています",
+    "SMTP_DISABLED": "環境変数で SMTP が無効になっています"
+  },
+  "REGISTER": {
+    "NEW_ACCOUNT": "新しいアカウント",
+    "SIGNUP": "登録する",
+    "SIGNIN": "アカウントをお持ちの方",
+    "SUCCESS": "アカウントを作成しました！"
+  },
+  "PASSWORD_RECOVERY": {
+    "TITLE": "パスワードの再設定",
+    "EMAIL": "メールアドレス",
+    "CODE": "コード",
+    "PASSWORD": "パスワード",
+    "CONFIRM_PASSWORD": "パスワード（確認）",
+    "HAVE_CODE": "コードをお持ちの方",
+    "SENT": "ユーザーが存在する場合は、手順をメールでお送りします。",
+    "SUCCESS": "パスワードを再設定しました"
+  },
+  "CARDS": {
+    "SEARCH": "検索",
+    "SEARCH_PLACEHOLDER": "名前",
+    "LAYOUT_LARGE": "大きなカード",
+    "LAYOUT_GRID": "カードの一覧",
+    "CARD": {
+      "CODE": "コード",
+      "CODE_TYPE": "コードの種類",
+      "NAME": "名前",
+      "DESCRIPTION": "説明",
+      "COLOR": "色",
+      "LOGO": "ロゴ",
+      "LOGO_HINT": "PNG、JPEG、WebP、GIF、SVG に対応。画像はサイズを調整し、エンコードし直して保存します。",
+      "LOGO_SAVE_FIRST": "ロゴを追加するには、先にカードを保存してください。",
+      "LOGO_UPLOAD": "画像を選ぶ",
+      "LOGO_REMOVE": "削除",
+      "IS_FAVORITE": "お気に入り",
+      "USED_AT": "使用日時",
+      "CREATED_AT": "作成日時",
+      "UPDATED_AT": "更新日時",
+      "CODE_FORMAT_WARN": "コードの種類の呼び名が変わりました。新しいコードの種類を選んで、カードを保存してください。",
+      "SCAN": {
+        "SELECT_SOURCE": "読み取り元を選ぶ",
+        "FROM_FILE": "ファイルから追加",
+        "FILE_NO_CODE": "この画像にコードが見つかりません。",
+        "TORCH": "ライト",
+        "DENIED_TITLE": "カメラへのアクセスがオフです",
+        "DENIED_HINT": "ブラウザの設定でこのサイトにカメラを許可してから、もう一度お試しください。写真からカードを追加することもできます。",
+        "UNAVAILABLE_TITLE": "使えるカメラがありません",
+        "UNAVAILABLE_HINT": "カメラが見つからないか、別のアプリが使っています。代わりに写真からカードを追加できます。",
+        "RETRY": "もう一度試す",
+        "CAMERA": "カメラ",
+        "CAMERA_BACK": "背面カメラ",
+        "CAMERA_FRONT": "前面カメラ"
+      },
+      "SUCCESS": {
+        "SAVE": "カードを保存しました",
+        "DELETE": "カードを削除しました"
+      }
+    },
+    "VIEWER": {
+      "INVERT": "色を反転"
+    },
+    "SHARED_WITH_YOU": "あなたと共有"
+  },
+  "USER": {
+    "USERNAME": "ユーザー名",
+    "EMAIL": "メールアドレス",
+    "CHANGE_PASSWORD": "パスワードを変更",
+    "CURRENT_PASSWORD": "現在のパスワード",
+    "PASSWORD": "パスワード",
+    "CONFIRM_PASSWORD": "パスワード（確認）",
+    "PASSWORDS_MISMATCH": "パスワードが一致しません",
+    "PASSWORD_HINTS": ["8文字以上", "英字の大文字と小文字", "数字"],
+    "DELETE_WARN": "ユーザーと、関連するすべてのデータを完全に削除しますか？",
+    "SUCCESS": {
+      "UPDATE": "ユーザーのデータを更新しました",
+      "DELETE": "ユーザーを削除しました"
+    }
+  },
+  "ADMIN": {
+    "HEALTH": "アプリの状態",
+    "SMTP_STATUS": "SMTP の状態",
+    "SMTP_TEST": "テスト",
+    "SMTP_TEST_SUCCESS": "メールを送信しました",
+    "SETTINGS": {
+      "TITLE": "設定",
+      "KEY": "キー",
+      "VALUE": "値",
+      "UPDATED_AT": "最終更新",
+      "KEYS": {
+        "ALLOW_REGISTRATION": "新規登録を許可"
+      }
+    },
+    "USERS": {
+      "TITLE": "ユーザー",
+      "ID": "ID",
+      "USERNAME": "ユーザー名",
+      "EMAIL": "メールアドレス",
+      "ROLE": "権限",
+      "CREATED_AT": "作成日時",
+      "UPDATED_AT": "最終更新",
+      "ROLES": {
+        "OWNER": "オーナー",
+        "ADMIN": "管理者",
+        "MEMBER": "メンバー"
+      },
+      "CHANGE_ROLE": {
+        "TO_ADMIN": "管理者にする",
+        "TO_MEMBER": "メンバーにする",
+        "CONFIRM": "権限の変更",
+        "CONFIRM_SUBTITLE": "ユーザーの権限を次に変更します：{{role}}"
+      }
+    }
+  },
+  "ABOUT": {
+    "HOMEPAGE": "ホームページ",
+    "IMAGE_VERSION": "Docker イメージのバージョン",
+    "EXAMPLES": "対応しているコードの例",
+    "CHANGELOG": "更新履歴"
+  },
+  "SORT_FILTER": {
+    "TITLE": "並べ替えと絞り込み",
+    "SORT_BY": "並べ替えの項目",
+    "SORT_DIR": "順序",
+    "SORT_DIRS": {
+      "ASC": "昇順",
+      "DESC": "降順"
+    },
+    "FILTER_BY": "絞り込みの項目",
+    "CRITERIA": "条件",
+    "VALUE": "値",
+    "ADD_FILTER": "絞り込みを追加",
+    "BOOL_LABEL": {
+      "TRUE": "はい",
+      "FALSE": "いいえ"
+    },
+    "CRITERIAS": {
+      "LIKE": "含む",
+      "EQUALS": "等しい",
+      "NOT_EQUALS": "等しくない",
+      "NULL": "空",
+      "NOT_NULL": "空でない",
+      "GREATER": "より大きい",
+      "LESS": "より小さい",
+      "GREATER_OR_EQUALS": "以上",
+      "LESS_OR_EQUALS": "以下"
+    }
+  },
+  "SHARED_CARDS": {
+    "TITLE": "共有カード",
+    "ACTION_SHARE_SINGLE": "共有",
+    "ACTION_SHARE_ALL": "すべてのカードを共有",
+    "SECTION_YOU_SHARE": "あなたが共有中",
+    "SECTION_SHARED_WITH_YOU": "あなたと共有",
+    "EMPTY_YOU_SHARE": "まだカードを共有していません",
+    "EMPTY_SHARED_WITH_YOU": "共有されたカードはまだありません",
+    "SHARED_BY": "共有元",
+    "SECTION_PENDING": "あなたの回答待ち",
+    "SECTION_DECLINED": "辞退済み",
+    "ACTION_ACCEPT": "受け取る",
+    "ACTION_DECLINE": "辞退する",
+    "STATUS": {
+      "PENDING": "回答待ち",
+      "ACCEPTED": "受け取り済み",
+      "DECLINED": "辞退済み"
+    },
+    "DIALOG": {
+      "TITLE_ADD": "カードを共有",
+      "TITLE_EDIT": "共有のアクセス権を編集",
+      "TITLE_SHARE_ALL": "すべてのカードを共有",
+      "SELECT_CARD": "カードを選ぶ",
+      "CARD_REQUIRED": "カードを選んでください",
+      "SELECT_USERS": "ユーザーを選ぶ",
+      "USERS_REQUIRED": "ユーザーを1人以上選んでください",
+      "SHARE_ALL_HINT": "注意：すべてのカードの今の共有の設定は、選んだユーザーへの共有に置き換わります。",
+      "NO_USERS": "共有できるユーザーがいません"
+    },
+    "CONFIRM_DELETE_OWN": {
+      "TITLE": "カードの共有をやめますか？",
+      "SUBTITLE": "すべてのユーザーが、このカードにアクセスできなくなります。"
+    },
+    "CONFIRM_DELETE_SHARED": {
+      "TITLE": "共有されたカードを外しますか？",
+      "SUBTITLE": "このカードは、あなたの一覧に表示されなくなります。"
+    }
+  }
+}

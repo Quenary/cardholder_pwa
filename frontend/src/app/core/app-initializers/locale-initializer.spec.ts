@@ -38,4 +38,8 @@ describe('appLanguage', () => {
   it('uses dutch when the browser locale is dutch', () => {
     expect(appLanguage('nl-NL')).toBe('nl');
   });
+
+  it('uses japanese when the browser locale is japanese', () => {
+    expect(appLanguage('ja-JP')).toBe('ja');
+  });
 });
