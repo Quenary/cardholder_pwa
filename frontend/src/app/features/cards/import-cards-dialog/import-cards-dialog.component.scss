@@ -1,0 +1,44 @@
+.import-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 65vh;
+  min-width: 280px;
+}
+
+.import-dialog-hint {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.875rem;
+}
+
+.import-cards-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.import-card-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 8px;
+  background-color: var(--mat-sys-surface-container);
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.import-card-preview {
+  width: 100%;
+}
+
+.import-card-name {
+  margin-top: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}

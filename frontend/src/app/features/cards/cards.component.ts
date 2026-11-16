@@ -37,8 +37,14 @@ import { ECardFieldType, ICard } from 'src/app/entities/cards/cards-interface';
 import { Filter, Sorting } from 'src/app/shared/types';
 import { ELocalStorageKey } from 'src/app/app.consts';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatTooltip } from '@angular/material/tooltip';
 import { CardShareApiService } from '../shared-cards/services/card-share-api.service';
 import { ISharedWithMeItem } from '../shared-cards/shared-cards.interface';
+import { CardApiService } from 'src/app/entities/cards/cards-api.service';
+import { SnackService } from 'src/app/core/services/snack.service';
+import { TranslateService } from '@ngx-translate/core';
+import { parseCatimaCsv } from 'src/app/shared/functions/catima-csv-parser.function';
+import { ImportCardsDialogComponent } from './import-cards-dialog/import-cards-dialog.component';
 
 type TCardLayout = 'grid' | 'large';
 
@@ -63,6 +69,7 @@ type TCardLayout = 'grid' | 'large';
     RouterLink,
     IsOldCodeType,
     MatBadgeModule,
+    MatTooltip,
   ],
   templateUrl: './cards.component.html',
   styleUrl: './cards.component.scss',
@@ -71,6 +78,9 @@ export class CardsComponent {
   private readonly store = inject(Store);
   private readonly matDialog = inject(MatDialog);
   private readonly cardShareApiService = inject(CardShareApiService);
+  private readonly cardApiService = inject(CardApiService);
+  private readonly snackService = inject(SnackService);
+  private readonly translateService = inject(TranslateService);
 
   protected readonly showParent = signal<boolean>(true);
   protected readonly cardsPlaceholder: number[] = Array(6).fill(Math.random());
@@ -354,5 +364,54 @@ export class CardsComponent {
           localStorage.setItemJson(ELocalStorageKey.CARD_FILTERS, filterModels);
         }
       });
+  }
+
+  protected onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      // Reset input value so re-selecting the same file triggers change
+      input.value = '';
+      const content = reader.result as string;
+      const parsedCards = parseCatimaCsv(content);
+
+      if (parsedCards.length === 0) {
+        this.snackService.error(
+          this.translateService.instant('CARDS.IMPORT.NO_CARDS'),
+        );
+        return;
+      }
+
+      this.matDialog
+        .open(ImportCardsDialogComponent, {
+          data: { cards: parsedCards },
+          width: '500px',
+          maxWidth: '90vw',
+        })
+        .afterClosed()
+        .subscribe((confirmed) => {
+          if (confirmed) {
+            this.cardApiService.bulkCreate(parsedCards).subscribe({
+              next: () => {
+                this.snackService.success(
+                  this.translateService.instant('CARDS.IMPORT.SUCCESS'),
+                );
+                this.store.dispatch(CardsActions.list());
+              },
+              error: (_err) => {
+                this.snackService.error(
+                  this.translateService.instant('CARDS.IMPORT.ERROR'),
+                );
+              },
+            });
+          }
+        });
+    };
+    reader.readAsText(file);
   }
 }

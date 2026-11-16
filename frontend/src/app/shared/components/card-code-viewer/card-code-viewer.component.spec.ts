@@ -52,6 +52,21 @@ describe('CardCodeViewerComponent', () => {
       expect(console.error).toHaveBeenCalledTimes(0);
     });
 
+    it('draws rationalizedCodabar without delimiters by wrapping with A', () => {
+      fixture = TestBed.createComponent(CardCodeViewerComponent);
+      component = fixture.componentInstance;
+      component.card.set({
+        code: '1234567890',
+        code_type: 'rationalizedCodabar',
+      });
+      const canvasElement: HTMLCanvasElement =
+        fixture.nativeElement.querySelector('.canvas');
+      fixture.detectChanges();
+
+      expect(canvasElement).toBeTruthy();
+      expect(console.error).toHaveBeenCalledTimes(0);
+    });
+
     it('logs on invalid code', () => {
       fixture = TestBed.createComponent(CardCodeViewerComponent);
       component = fixture.componentInstance;

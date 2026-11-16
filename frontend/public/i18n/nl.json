@@ -99,7 +99,16 @@
     "VIEWER": {
       "INVERT": "Kleuren omkeren"
     },
-    "SHARED_WITH_YOU": "Met jou gedeeld"
+    "SHARED_WITH_YOU": "Met jou gedeeld",
+    "IMPORT": {
+      "BUTTON": "Kaarten importeren uit CSV",
+      "TITLE": "Kaarten importeren",
+      "CONFIRM_HINT": "De volgende kaarten zijn gevonden in het CSV-bestand. Wilt u ze importeren?",
+      "CONFIRM": "Importeren",
+      "SUCCESS": "Kaarten succesvol geïmporteerd",
+      "NO_CARDS": "Geen geldige kaarten gevonden in het geselecteerde bestand",
+      "ERROR": "Kan kaarten niet importeren"
+    }
   },
   "USER": {
     "USERNAME": "Gebruikersnaam",

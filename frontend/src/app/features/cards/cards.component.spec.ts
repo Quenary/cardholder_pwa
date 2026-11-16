@@ -9,9 +9,17 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { CardsActions } from 'src/app/entities/cards/state/cards.actions';
 import { CardCodeViewerDialogComponent } from 'src/app/shared/components/card-code-viewer/card-code-viewer.component';
-import { createCardShareApiServiceMock } from 'src/testing';
+import {
+  createCardShareApiServiceMock,
+  createCardApiServiceMock,
+  createSnackServiceMock,
+} from 'src/testing';
 import { CardShareApiService } from '../shared-cards/services/card-share-api.service';
+import { CardApiService } from 'src/app/entities/cards/cards-api.service';
+import { SnackService } from 'src/app/core/services/snack.service';
 import { ELocalStorageKey } from 'src/app/app.consts';
+import { of } from 'rxjs';
+import { ImportCardsDialogComponent } from './import-cards-dialog/import-cards-dialog.component';
 
 describe('CardsComponent', () => {
   let component: CardsComponent;
@@ -20,8 +28,13 @@ describe('CardsComponent', () => {
   let storeMock: MockStore;
   let initialState: ITestAppState;
 
+  let cardApiServiceMock: ReturnType<typeof createCardApiServiceMock>;
+  let snackServiceMock: ReturnType<typeof createSnackServiceMock>;
+
   beforeEach(async () => {
     initialState = { ...testAppState };
+    cardApiServiceMock = createCardApiServiceMock();
+    snackServiceMock = createSnackServiceMock();
 
     await TestBed.configureTestingModule({
       providers: [
@@ -31,6 +44,14 @@ describe('CardsComponent', () => {
         {
           provide: CardShareApiService,
           useValue: createCardShareApiServiceMock(),
+        },
+        {
+          provide: CardApiService,
+          useValue: cardApiServiceMock,
+        },
+        {
+          provide: SnackService,
+          useValue: snackServiceMock,
         },
       ],
       imports: [CardsComponent],
@@ -144,6 +165,87 @@ describe('CardsComponent', () => {
       expect(dispatchSpy).toHaveBeenCalledWith(
         expect.objectContaining({ type: CardsActions.patchListItem.type }),
       );
+    });
+  });
+
+  describe('onFileSelected', () => {
+    it('shows error if no valid cards in CSV', () => {
+      fixture = TestBed.createComponent(CardsComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+
+      const blob = new Blob(['invalid csv content'], { type: 'text/csv' });
+      const file = new File([blob], 'empty.csv', { type: 'text/csv' });
+      const event = {
+        target: {
+          files: [file],
+          value: 'C:\\fakepath\\empty.csv',
+        },
+      } as unknown as Event;
+
+      component['onFileSelected'](event);
+
+      // Wait for FileReader
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          expect(snackServiceMock.error).toHaveBeenCalled();
+          resolve();
+        }, 50);
+      });
+    });
+
+    it('opens import dialog and bulk creates cards on confirm', () => {
+      fixture = TestBed.createComponent(CardsComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+
+      const matDialog = TestBed.inject(MatDialog);
+      const dialogRefMock = {
+        afterClosed: vi.fn().mockReturnValue(of(true)),
+      };
+      const openSpy = vi
+        .spyOn(matDialog, 'open')
+        .mockReturnValue(dialogRefMock as never);
+      const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
+
+      const csvContent = `_id,store,note,validfrom,expiry,balance,balancetype,cardid,barcodeid,barcodetype,barcodeencoding,headercolor,starstatus,lastused,archive
+20,Test Store,,,,0,,12345678,,CODE_128,ISO-8859-1,-957596,1,1792296418,0`;
+
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const file = new File([blob], 'test.csv', { type: 'text/csv' });
+      const event = {
+        target: {
+          files: [file],
+          value: 'test.csv',
+        },
+      } as unknown as Event;
+
+      component['onFileSelected'](event);
+
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          expect(openSpy).toHaveBeenCalledWith(
+            ImportCardsDialogComponent,
+            expect.objectContaining({
+              data: expect.objectContaining({
+                cards: expect.arrayContaining([
+                  expect.objectContaining({
+                    name: 'Test Store',
+                    code: '12345678',
+                    code_type: 'code128',
+                  }),
+                ]),
+              }),
+            }),
+          );
+          expect(cardApiServiceMock.bulkCreate).toHaveBeenCalled();
+          expect(snackServiceMock.success).toHaveBeenCalled();
+          expect(dispatchSpy).toHaveBeenCalledWith(
+            expect.objectContaining({ type: CardsActions.list.type }),
+          );
+          resolve();
+        }, 50);
+      });
     });
   });
 });

@@ -61,6 +61,20 @@ async def create_card(
     return new_card
 
 
+@router.post("/cards/bulk", response_model=list[CardSchema], status_code=201)
+async def bulk_create_cards(
+    cards: list[CardCreateSchema],
+    session: AsyncSession = Depends(get_async_session),
+    user: UserModel = Depends(is_user),
+):
+    new_cards = [CardModel(**card.model_dump(), user_id=user.id) for card in cards]
+    session.add_all(new_cards)
+    await session.commit()
+    for card in new_cards:
+        await session.refresh(card)
+    return new_cards
+
+
 @router.put("/cards/{card_id}", response_model=CardSchema)
 async def update_card(
     card_id: int,
