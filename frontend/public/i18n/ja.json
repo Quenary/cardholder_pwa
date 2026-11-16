@@ -109,11 +109,7 @@
     "PASSWORD": "パスワード",
     "CONFIRM_PASSWORD": "パスワード（確認）",
     "PASSWORDS_MISMATCH": "パスワードが一致しません",
-    "PASSWORD_HINTS": [
-      "8文字以上",
-      "英字の大文字と小文字",
-      "数字"
-    ],
+    "PASSWORD_HINTS": ["8文字以上", "英字の大文字と小文字", "数字"],
     "DELETE_WARN": "ユーザーと、関連するすべてのデータを完全に削除しますか？",
     "SUCCESS": {
       "UPDATE": "ユーザーのデータを更新しました",
