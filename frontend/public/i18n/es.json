@@ -99,7 +99,16 @@
     "VIEWER": {
       "INVERT": "Invertir colores"
     },
-    "SHARED_WITH_YOU": "Compartidas contigo"
+    "SHARED_WITH_YOU": "Compartidas contigo",
+    "IMPORT": {
+      "BUTTON": "Importar tarjetas desde CSV",
+      "TITLE": "Importar tarjetas",
+      "CONFIRM_HINT": "Se encontraron las siguientes tarjetas en el archivo CSV. ¿Deseas importarlas?",
+      "CONFIRM": "Importar",
+      "SUCCESS": "Tarjetas importadas con éxito",
+      "NO_CARDS": "No se encontraron tarjetas válidas en el archivo seleccionado",
+      "ERROR": "Error al importar tarjetas"
+    }
   },
   "USER": {
     "USERNAME": "Nombre de usuario",

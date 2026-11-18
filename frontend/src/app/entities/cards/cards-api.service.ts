@@ -14,6 +14,10 @@ export class CardApiService extends BaseApiService<'cards'> {
     return this.httpClient.post<ICard>(`${this.basePath}`, body);
   }
 
+  bulkCreate(body: ICardBase[]): Observable<ICard[]> {
+    return this.httpClient.post<ICard[]>(`${this.basePath}/bulk`, body);
+  }
+
   read(cardId: number): Observable<ICard> {
     return this.httpClient.get<ICard>(`${this.basePath}/${cardId}`);
   }

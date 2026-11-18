@@ -116,6 +116,11 @@ export class CardCodeViewerComponent {
       codeType = ZxingToBwipMap[codeType];
       this.OnNewType.emit(codeType);
     }
+    // Codabar (rationalizedCodabar) requires start/stop delimiters [A-D].
+    // If not present in raw scanned/imported numbers, default to standard 'A' delimiters.
+    if (codeType === 'rationalizedCodabar' && !/^[ABCD].*[ABCD]$/i.test(code)) {
+      code = `A${code}A`;
+    }
     try {
       Bwip.toCanvas(canvas, {
         bcid: codeType,

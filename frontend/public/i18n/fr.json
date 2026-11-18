@@ -99,7 +99,16 @@
     "VIEWER": {
       "INVERT": "Inverser les couleurs"
     },
-    "SHARED_WITH_YOU": "Partagées avec vous"
+    "SHARED_WITH_YOU": "Partagées avec vous",
+    "IMPORT": {
+      "BUTTON": "Importer des cartes depuis un CSV",
+      "TITLE": "Importer des cartes",
+      "CONFIRM_HINT": "Les cartes suivantes ont été trouvées dans le fichier CSV. Voulez-vous les importer ?",
+      "CONFIRM": "Importer",
+      "SUCCESS": "Cartes importées avec succès",
+      "NO_CARDS": "Aucune carte valide trouvée dans le fichier sélectionné",
+      "ERROR": "Échec de l'importation des cartes"
+    }
   },
   "USER": {
     "USERNAME": "Nom d'utilisateur",
