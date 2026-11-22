@@ -80,6 +80,8 @@ If `JWT_SECRET_KEY` is unset, a secret is generated at process start. Access
 tokens then become invalid on every container restart; refresh tokens in the
 database stay valid. Set a stable secret in production.
 
+Password recovery codes, like refresh tokens, are stored only as sha256 hashes.
+
 ### Logos
 
 Uploaded logos are size-capped, SVG is rasterised in a child process with a

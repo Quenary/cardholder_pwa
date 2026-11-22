@@ -1,4 +1,3 @@
-import hashlib
 import secrets
 from datetime import datetime, timedelta
 from typing import cast
@@ -12,6 +11,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.config import Config
+from backend.core.hash_core import hash_token
 from backend.db.models.refresh_token_model import RefreshTokenModel
 from backend.db.models.settings_model import SettingModel
 from backend.db.models.user_model import UserModel
@@ -60,10 +60,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 
 def hash_refresh_token(token: str) -> str:
-    """What refresh_tokens.token stores: a sha256, so a copy of the database
-    (a backup, a leaked volume) holds no session anyone can use. A fast hash
-    is enough for 256 random bits; there is nothing to brute-force."""
-    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+    return hash_token(token)
 
 
 async def create_refresh_token(

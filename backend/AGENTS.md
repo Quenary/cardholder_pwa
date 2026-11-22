@@ -12,7 +12,7 @@ Repo workflow and commits: [docs/CONTRIBUTING.md](../docs/CONTRIBUTING.md). How 
 - `start.py` — production-style entry (used in Docker).
 - `db/` — `BaseModel`, async engine, `get_async_session`, `cleanup` loop, SQLAlchemy models under `db/models/`.
 - `api/` — one `*_api.py` per area with an `APIRouter` (`auth`, `user`, `card`, `card_share`, `password_recovery`, `public`, `admin`).
-- `core/` — `auth_core` (JWT, bcrypt, role dependencies), `user_core`, `smtp_core`.
+- `core/` — `auth_core` (JWT, bcrypt, role dependencies), `hash_core` (sha256 of high-entropy tokens), `user_core`, `smtp_core`.
 - `schemas/` — Pydantic request/response models; `validators.py` for shared validation.
 - `enums/`, `helpers/` — shared enums and helpers (e.g. logo storage, typed settings).
 - `alembic/` — migrations. `env.py` uses `BaseModel.metadata`; model modules are imported via `db/models/__init__.py` for autogenerate.
