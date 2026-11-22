@@ -2,7 +2,12 @@
 
 For general contributing workflow and commit standards, see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md). Package guides: [backend/AGENTS.md](backend/AGENTS.md), [frontend/AGENTS.md](frontend/AGENTS.md).
 
-## 1. Architecture Overview
+## 1. Language
+
+- Think and plan in English.
+- Reply to the user in the language the user is using.
+
+## 2. Architecture Overview
 
 - **`backend/`** (FastAPI + SQLAlchemy 2.0 async + SQLite/PostgreSQL/MySQL):
   - `backend/app.py`: FastAPI entrypoint, `lifespan()` startup and shutdown.
@@ -17,7 +22,7 @@ For general contributing workflow and commit standards, see [docs/CONTRIBUTING.m
 - **`frontend/`**: Angular PWA (loyalty/discount cards, scanner, sharing, admin).
 - **`docs/`**: User and contributor documentation (multiple locales under `docs/*/README.md`).
 
-## 2. Dev & Validation Commands
+## 3. Dev & Validation Commands
 
 ### Local Dev
 
