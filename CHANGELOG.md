@@ -1,6 +1,27 @@
 # CHANGELOG
 
 
+## v1.19.0 (2026-11-23)
+
+### Bug Fixes
+
+- **backend**: Store password recovery codes as a sha256
+  ([`6de27c0`](https://github.com/Quenary/cardholder_pwa/commit/6de27c0ef4730b52c85f151f2d53e35cdbdf6579))
+
+### Documentation
+
+- Env.example reverse proxy configuration and allowed IPs
+  ([`32b89a2`](https://github.com/Quenary/cardholder_pwa/commit/32b89a220003f08ce083216323c25a33fd685fc5))
+
+- Short readme, separate docs for codes, roles, 2FA and encryption, other docs updates
+  ([`c6514e3`](https://github.com/Quenary/cardholder_pwa/commit/c6514e3ad7cb3e3bfca6ec92df444f21f1e87a20))
+
+### Features
+
+- TOTP two-factor authentication
+  ([`085aaca`](https://github.com/Quenary/cardholder_pwa/commit/085aacae9634fde543d525536501cfd9ef37f54a))
+
+
 ## v1.18.0 (2026-11-16)
 
 ### Features
