@@ -68,9 +68,11 @@ npm --prefix frontend run test:ci
 
 Update the matching documentation in the same change when behavior, configuration, architecture, or contracts change. General docs live in `docs/`. Package docs live beside the code (`backend/README.md`, `frontend/README.md`). The root `README.md` is the product overview.
 
+Codes, encryption, account roles, two-factor authentication, and shared cards are described in [CODES.md](./CODES.md), [ENCRYPTION.md](./ENCRYPTION.md), [ROLES.md](./ROLES.md), [TWO_FACTOR.md](./TWO_FACTOR.md), and [SHARED_CARDS.md](./SHARED_CARDS.md). Link to those pages instead of copying them here.
+
 - **Compact and readable.** Short sections, lists and tables instead of long prose. Extend an existing doc rather than adding a new one, and remove text that the change made stale.
 - **Behavior, rules, and flow.** Describe what the feature does, the rules and permissions, and how the parts interact. API request and response schemas, error codes, timeouts, magic numbers, and algorithm internals stay in the code, the Pydantic schemas in `backend/schemas/`, and the OpenAPI docs (`/docs`).
 - **Technical voice.** Third person, present tense: "The app supports…", "The server stores…". No direct address and no marketing wording.
 - **Diagrams.** Flows, state decisions, and component relations use Mermaid (`flowchart`, `sequenceDiagram`). Each diagram stays small and parses.
 - **Language and format.** Contributor docs are in English. File, class, and setting names are in backticks. Relative links and anchors stay valid.
-- **User-facing docs.** When user-facing behavior changes, update the root `README.md` and every locale under `docs/{de,es,fr,it,ru}/README.md`.
+- **User-facing docs.** When the product overview changes, update the root `README.md` and every locale under `docs/{de,es,fr,it,ru}/README.md`.

@@ -24,6 +24,7 @@ Sie laufen bei kostenlosen Anbietern, die Container aussetzen können. Der erste
 
 - PWA – lässt sich aus dem Browser auf dem Gerät installieren und auch offline nutzen (nur lesend)
 - Karten mit der Kamera scannen (Taschenlampe, Front-/Rückkamera) oder Code und Typ eingeben
+- Die meisten 2D- und 1D-Codes werden unterstützt
 - Logos auf den Karten, als Raster oder große Karten, Favoriten, Suche, Sortierung und Filter
 - Code im Vollbild mit Farbumkehr, zum Vorzeigen an der Kasse
 - Mehrbenutzerbetrieb mit den Rollen Besitzer, Administrator und Mitglied
@@ -35,6 +36,18 @@ Sie laufen bei kostenlosen Anbietern, die Container aussetzen können. Der erste
 - Einfach selbst zu hosten
 - Open Source
 
+### Dokumentation
+
+Diese Dokumente gibt es nur auf Englisch:
+
+- [Unterstützte Codes](/docs/CODES.md)
+- [Zwei-Faktor-Authentifizierung](/docs/TWO_FACTOR.md)
+- [Verschlüsselung](/docs/ENCRYPTION.md)
+- [Kontenrollen](/docs/ROLES.md)
+- [Geteilte Karten](/docs/SHARED_CARDS.md)
+- [Contributing](/docs/CONTRIBUTING.md)
+- [Security](/docs/SECURITY.md)
+
 ### Screenshots
 
 |                              Karten                              |                              Code                               |                           Bearbeiten                            |                              Teilen                               |
@@ -45,38 +58,10 @@ Sie laufen bei kostenlosen Anbietern, die Container aussetzen können. Der erste
 | :--------------------------------------------------------------: | :--------------------------------------------------------------------: | :-------------------------------------------------------------------: | :-------------------------------------------------------------------: |
 | <img src="../../resources/screenshots/login.webp" width="200" /> | <img src="../../resources/screenshots/cards-large.webp" width="200" /> | <img src="../../resources/screenshots/admin-user.webp" width="200" /> | <img src="../../resources/screenshots/cards-dark.webp" width="200" /> |
 
-### Technik
-
-- Angular für das Frontend
-- Python mit FastAPI und SQLAlchemy für das Backend
-
-### Unterstützte Codes
-
-- Kurz gesagt die gängigen 2D-Typen (etwa der QR-Code) und 1D-Typen (etwa der Barcode).
-- Die Anwendung setzt auf:
-  - [zxing-js/browser](https://github.com/zxing-js/browser) und [quagga2](https://github.com/ericblade/quagga2) zum Lesen der Codes.
-  - [bwip-js](https://github.com/metafloor/bwip-js) zur Darstellung.
-- Unterstützte Codes:
-  - [Typen von `zxing-js`](https://github.com/zxing-js/library?tab=readme-ov-file#supported-formats)
-  - [Typen von `quagga2`](https://github.com/ericblade/quagga2/tree/master/src/reader)
-  - [Typen von `bwip-js`](https://github.com/metafloor/bwip-js/wiki/BWIPP-Barcode-Types)
-- Wert und Typ des Codes lassen sich auch von Hand eingeben, `bwip-js` stellt ihn dar, sofern er unterstützt wird.
-- Mir ist aufgefallen, dass `zxing` helle Codes auf dunklem Hintergrund schlecht erkennt. Andere Leser sind davon vielleicht ebenso betroffen.
-
 ### Vorbereitung
 
-- **Umgebungsvariablen** sind nicht erforderlich, Sie können aber welche setzen. In [.env.example](/.env.example) sind alle mit Beschreibung aufgeführt. Ich empfehle, mindestens **SMTP** einzurichten, damit das Zurücksetzen des Passworts funktioniert, und **MASTER_KEY**, wenn Sie die Zwei-Faktor-Authentifizierung nutzen möchten.
-- **MASTER_KEY** ist der allgemeine Schlüssel für Geheimnisse, die gespeichert werden. Derzeit dient er nur der Zwei-Faktor-Authentifizierung: dem TOTP-Geheimnis und dem Schlüssel, mit dem die Wiederherstellungscodes per HMAC abgelegt werden. Erzeugen Sie ihn mit `openssl rand -base64 32` und bewahren Sie eine Kopie getrennt von der Datenbanksicherung auf. Ohne ihn können Benutzer die 2FA nicht einschalten. Ein Wechsel oder Verlust macht vorhandene 2FA-Geheimnisse und Wiederherstellungscodes unbrauchbar; ein Administrator muss diese Benutzer zurücksetzen (oder der Eigentümer nutzt das SQL unten). Eine Schlüsselrotation wird noch nicht unterstützt. Ein späteres Werkzeug braucht das Präfix `v1:` am gespeicherten Geheimtext.
+- **Umgebungsvariablen** sind nicht erforderlich, Sie können aber welche setzen. In [.env.example](/.env.example) sind alle mit Beschreibung aufgeführt. Ich empfehle, mindestens **SMTP** einzurichten, damit das Zurücksetzen des Passworts funktioniert, und **MASTER_KEY**, wenn Sie die Zwei-Faktor-Authentifizierung nutzen möchten. Siehe [Verschlüsselung](/docs/ENCRYPTION.md).
 - Für die **PWA** und den Scanner über den **Videostream** ist ein Zugriff über **HTTPS** nötig. Ich verwende dafür ein eigenes Nginx mit einem Let's-Encrypt-Zertifikat.
-
-### Zwei-Faktor-Authentifizierung
-
-Auf der Benutzerseite **2FA aktivieren** wählen, den QR-Code mit einer Authenticator-App scannen und mit dem Passwort sowie einem 6-stelligen Code bestätigen. Die Anwendung zeigt danach einmal zehn Wiederherstellungscodes. Jeder Code gilt ein einziges Mal, wenn der Authenticator verloren geht. Ein Administrator oder der Eigentümer kann die 2FA eines anderen Benutzers in dessen Admin-Dialog zurücksetzen (nicht die eigene und nicht die des Eigentümers). Wenn der Eigentümer den Authenticator und alle Wiederherstellungscodes verliert, bleibt nur SQL in der Datenbank:
-
-```sql
-UPDATE users SET two_factor_secret = NULL, two_factor_enabled_at = NULL, two_factor_last_step = NULL, two_factor_failed_attempts = 0, two_factor_locked_until = NULL WHERE username = '<name>';
-DELETE FROM two_factor_recovery_codes WHERE user_id = (SELECT id FROM users WHERE username = '<name>');
-```
 
 ### Bereitstellung
 
@@ -100,26 +85,3 @@ ghcr.io/quenary/cardholder_pwa:1
 # docker-compose.pg.yml | docker-compose.my.yml - fuer eine vollwertige Datenbank (standardmaessig eigener Container im Netz der App)
 docker-compose -f <Datei> up -d
 ```
-
-### Kontenrollen
-
-- **Das zuerst registrierte Konto** (nach der Bereitstellung oder der Migration von Version 0.0.13) erhält die Rolle **Eigentümer**. Dieses Konto lässt sich vorerst nicht löschen, und die Rolle des Eigentümers lässt sich nicht bequem übertragen.
-- Vielleicht übertrieben, aber für alle Fälle habe ich auch die Rollen Administrator und Mitglied ergänzt.
-- Der **Eigentümer** kann:
-  - Einige Anwendungseinstellungen über die Oberfläche ändern
-  - Anderen Mitgliedern die Administratorrolle geben
-  - Konten von Administratoren oder Mitgliedern löschen
-- Der **Administrator** kann:
-  - Einige Anwendungseinstellungen über die Oberfläche ändern
-  - Konten von Mitgliedern löschen
-
-### Geteilte Karten
-
-Siehe [docs/SHARED_CARDS.md](/docs/SHARED_CARDS.md).
-
-### Mitwirken und Sicherheit
-
-Diese Dokumente gibt es nur auf Englisch:
-
-- [Contributing](/docs/CONTRIBUTING.md)
-- [Security](/docs/SECURITY.md)

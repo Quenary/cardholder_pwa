@@ -15,9 +15,9 @@ Before proposing a plan or editing code, read every document below that applies 
 - Backend — [backend/AGENTS.md](backend/AGENTS.md)
 - Frontend — [frontend/AGENTS.md](frontend/AGENTS.md)
 - Security — [docs/SECURITY.md](docs/SECURITY.md)
-- Feature behavior — the matching file in `docs/` (`SHARED_CARDS.md` and the others)
+- Feature behavior — the matching file in `docs/`: [CODES.md](docs/CODES.md), [ENCRYPTION.md](docs/ENCRYPTION.md), [ROLES.md](docs/ROLES.md), [SHARED_CARDS.md](docs/SHARED_CARDS.md), [TWO_FACTOR.md](docs/TWO_FACTOR.md)
 
-When a change makes an existing document false, update that document in the same change. Do not add documentation for behavior the current text does not state. A non-obvious constraint stays in a code comment. Follow [Documentation](docs/CONTRIBUTING.md#documentation).
+When a change makes an existing document false, update that document in the same change. A product-overview change also updates the root `README.md` and every locale under `docs/{de,es,fr,it,ru}/README.md`. Do not add documentation for behavior the current text does not state. A non-obvious constraint stays in a code comment. Follow [Documentation](docs/CONTRIBUTING.md#documentation).
 
 ## 3. Architecture Overview
 
@@ -32,7 +32,7 @@ When a change makes an existing document false, update that document in the same
   - `backend/alembic/`: database migrations.
   - `backend/test/`: API and core unit tests.
 - **`frontend/`**: Angular PWA (loyalty/discount cards, scanner, sharing, admin).
-- **`docs/`**: User and contributor documentation (multiple locales under `docs/*/README.md`).
+- **`docs/`**: contributor docs (`CONTRIBUTING.md`, `SECURITY.md`), feature behavior (`CODES.md`, `ENCRYPTION.md`, `ROLES.md`, `SHARED_CARDS.md`, `TWO_FACTOR.md`), and locales under `docs/*/README.md`.
 
 ## 4. Code principles
 
