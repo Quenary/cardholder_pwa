@@ -38,7 +38,15 @@
     "SIGNUP": "Heb je nog geen account?",
     "PASSWORD_RECOVERY": "Wachtwoord herstel",
     "REGISTRATION_DISABLED": "Registratie is uitgeschakeld in de applicatie-instellingen",
-    "SMTP_DISABLED": "SMTP is uitgeschakeld in de omgevingsvariabelen"
+    "SMTP_DISABLED": "SMTP is uitgeschakeld in de omgevingsvariabelen",
+    "TWO_FACTOR": {
+      "TITLE": "Tweestapsverificatie",
+      "HINT": "Voer de 6-cijferige code uit je authenticator-app in, of een van je herstelcodes",
+      "CODE": "Code",
+      "VERIFY": "Controleren",
+      "BACK": "Terug",
+      "EXPIRED": "Deze aanmeldstap is verlopen. Meld je opnieuw aan."
+    }
   },
   "REGISTER": {
     "NEW_ACCOUNT": "Nieuwe gebruiker",
@@ -118,6 +126,34 @@
     "SUCCESS": {
       "UPDATE": "Gebruikersgegevens bijgewerkt",
       "DELETE": "Gebruiker verwijderd"
+    },
+    "TWO_FACTOR": {
+      "TITLE": "Tweestapsverificatie",
+      "DESCRIPTION": "Bescherm het account met een authenticator-app en eenmalige herstelcodes.",
+      "UNAVAILABLE": "Tweestapsverificatie is op deze server niet beschikbaar: de beheerder heeft MASTER_KEY niet ingesteld",
+      "ENABLE": "2FA inschakelen",
+      "DISABLE": "2FA uitschakelen",
+      "REGENERATE": "Reservecodes opnieuw maken",
+      "SETUP_INTRO": "Scan de QR-code met je authenticator-app of voer het geheim handmatig in. Bevestig daarna met je wachtwoord en een code uit de app.",
+      "SECRET": "Geheim",
+      "COPY": "Kopiëren",
+      "COPIED": "Gekopieerd",
+      "CODE": "Code",
+      "RECOVERY_TITLE": "Herstelcodes",
+      "RECOVERY_DESCRIPTION": "Elke code werkt één keer. Ze worden alleen nu getoond, dus bewaar ze op een veilige plek.",
+      "COPY_ALL": "Alles kopiëren",
+      "DOWNLOAD": ".txt downloaden",
+      "SAVED": "Ik heb deze codes opgeslagen",
+      "DONE": "Klaar",
+      "CONFIRM_DISABLE_TITLE": "Tweestapsverificatie uitschakelen",
+      "CONFIRM_REGENERATE_TITLE": "Reservecodes opnieuw maken",
+      "CONFIRM_HINT": "Voer je huidige wachtwoord in en een code uit de authenticator-app of een herstelcode.",
+      "PASSWORD": "Huidig wachtwoord",
+      "CONFIRM": "Bevestigen",
+      "CANCEL": "Annuleren",
+      "ENABLE_SUCCESS": "Tweestapsverificatie staat aan",
+      "DISABLE_SUCCESS": "Tweestapsverificatie staat uit",
+      "REGENERATE_SUCCESS": "Nieuwe herstelcodes zijn klaar"
     }
   },
   "ADMIN": {
@@ -152,7 +188,10 @@
         "TO_MEMBER": "Maak lid",
         "CONFIRM": "Rol wijzigen",
         "CONFIRM_SUBTITLE": "Bevestig rolwijziging naar: {{role}}"
-      }
+      },
+      "RESET_TWO_FACTOR": "2FA resetten",
+      "RESET_TWO_FACTOR_CONFIRM": "Hiermee wordt tweestapsverificatie voor deze gebruiker uitgezet en wordt diegene op elk apparaat afgemeld.",
+      "RESET_TWO_FACTOR_SUCCESS": "Tweestapsverificatie is gereset"
     }
   },
   "ABOUT": {

@@ -60,6 +60,19 @@
     }
   }
   @if (
+    user.two_factor_enabled &&
+    (user.role_code === EUserRole.MEMBER ||
+      (user.role_code === EUserRole.ADMIN && isOwner()))
+  ) {
+    <button
+      class="warn-color"
+      mat-button
+      [disabled]="isLoading()"
+      (click)="resetTwoFactor()">
+      {{ 'ADMIN.USERS.RESET_TWO_FACTOR' | translate }}
+    </button>
+  }
+  @if (
     user.role_code === EUserRole.MEMBER || (user.role_code === EUserRole.ADMIN && isOwner())
   ) {
     <button

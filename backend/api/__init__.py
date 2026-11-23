@@ -6,4 +6,5 @@ from .card_api import router as card_router
 from .card_share_api import router as card_share_router
 from .password_recovery_api import router as password_recovery_router
 from .public_api import router as public_router
+from .two_factor_api import router as two_factor_router
 from .user_api import router as user_router

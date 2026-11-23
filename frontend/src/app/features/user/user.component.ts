@@ -1,4 +1,12 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -30,7 +38,14 @@ import { TInterfaceToForm } from 'src/app/shared/types/interface-to-form';
 import { passwordMatchValidator } from 'src/app/shared/validators/passwords-match.validator';
 import { PasswordsMatchErrorStateMatcher } from 'src/app/shared/validators/passwords-match.error-state-matcher';
 import { MatCheckbox, MatCheckboxChange } from '@angular/material/checkbox';
+import { MatDialog } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
+import { selectAppTwoFactorAvailable } from 'src/app/state/app.selectors';
+import { TwoFactorSetupDialogComponent } from './two-factor-setup-dialog/two-factor-setup-dialog.component';
+import {
+  ITwoFactorConfirmDialogData,
+  TwoFactorConfirmDialogComponent,
+} from './two-factor-confirm-dialog/two-factor-confirm-dialog.component';
 
 @Component({
   selector: 'app-user',
@@ -50,15 +65,22 @@ import { TranslatePipe } from '@ngx-translate/core';
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserComponent implements OnInit {
   protected readonly passwordsMatchErrorStateMatcher =
     new PasswordsMatchErrorStateMatcher();
   private readonly store = inject(Store);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly dialog = inject(MatDialog);
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
   protected readonly isOwner = this.store.selectSignal(selectUserIsOwner);
   protected readonly isLoading = this.store.selectSignal(selectUserIsLoading);
+  protected readonly userInfo = this.store.selectSignal(selectUserInfo);
+  protected readonly twoFactorAvailable = this.store.selectSignal(
+    selectAppTwoFactorAvailable,
+  );
   protected readonly hasChanges = this.store.selectSignal(selectUserHasChanges);
   protected readonly hideCurrentPassword = signal(true);
   protected readonly hidePassword = signal(true);
@@ -109,6 +131,7 @@ export class UserComponent implements OnInit {
       .subscribe((info) => {
         this.storedEmail.set(info?.email ?? null);
         this.form.patchValue(info);
+        this.changeDetector.markForCheck();
       });
     this.form.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -172,5 +195,23 @@ export class UserComponent implements OnInit {
 
   protected onDelete(): void {
     this.store.dispatch(UserActions.deleteAttempt());
+  }
+
+  protected openTwoFactorSetup(): void {
+    this.dialog.open(TwoFactorSetupDialogComponent, { width: '440px' });
+  }
+
+  protected openTwoFactorDisable(): void {
+    this.dialog.open(TwoFactorConfirmDialogComponent, {
+      width: '440px',
+      data: { action: 'disable' } as ITwoFactorConfirmDialogData,
+    });
+  }
+
+  protected openTwoFactorRegenerate(): void {
+    this.dialog.open(TwoFactorConfirmDialogComponent, {
+      width: '440px',
+      data: { action: 'regenerate' } as ITwoFactorConfirmDialogData,
+    });
   }
 }

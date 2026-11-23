@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.secret-label {
+  margin-bottom: 0;
+}
+
+.secret {
+  font-family: monospace;
+  letter-spacing: 0.04em;
+  word-break: break-all;
+}

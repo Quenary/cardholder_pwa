@@ -18,6 +18,10 @@ export class AdminApiService extends BaseApiService<'admin'> {
     return this.httpClient.delete(`${this.basePath}/users/${user_id}`);
   }
 
+  resetTwoFactor(userId: number): Observable<unknown> {
+    return this.httpClient.delete(`${this.basePath}/users/${userId}/2fa`);
+  }
+
   changeUserRole(user_id: number, role_code: EUserRole): Observable<unknown> {
     return this.httpClient.put(
       `${this.basePath}/users/role`,

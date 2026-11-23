@@ -1,0 +1,13 @@
+:host {
+  display: inline-block;
+  line-height: 0;
+  padding: 8px;
+  background: #fff;
+}
+
+canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  background: #fff;
+}

@@ -10,12 +10,15 @@ multi-tenant SaaS. Please read this page before opening a security advisory.
 - The instance is run by a household, family, or other **small trusted group**.
   The operator is expected to keep the host, reverse proxy, and database volume
   under their control.
-- Users are **not** all equally privileged:
+- Users are **not** all equally privileged. The full matrix is in
+  [ROLES.md](./ROLES.md):
   - **Member** — own cards only
-  - **Admin** — app settings, delete member accounts
-  - **Owner** — the same as admin, plus assigning admin/member roles. The first
-    registered account after a fresh deploy becomes owner; that role cannot be
-    reassigned in the UI
+  - **Admin** — app settings, delete member accounts, reset a member's
+    two-factor authentication
+  - **Owner** — the same as admin, plus admin accounts: assign admin/member
+    roles, delete an admin, reset an admin's two-factor authentication. The
+    first registered account after a fresh deploy becomes owner; that role
+    cannot be reassigned in the UI
 - A user's loyalty cards (barcodes, numbers, logos) are **private to that
   user** by default, unless explicitly shared with specific accounts via the
   shared cards feature. Even when shared:
@@ -80,6 +83,16 @@ If `JWT_SECRET_KEY` is unset, a secret is generated at process start. Access
 tokens then become invalid on every container restart; refresh tokens in the
 database stay valid. Set a stable secret in production.
 
+Password recovery codes, like refresh tokens, are stored only as sha256 hashes.
+
+### MASTER_KEY and two-factor authentication
+
+How to set `MASTER_KEY`, and what a lost or changed key does, is in [ENCRYPTION.md](./ENCRYPTION.md).
+
+TOTP secrets are sealed with AES-256-GCM. The key is HKDF-SHA256 of `MASTER_KEY`, and the ciphertext is bound to the user id so it cannot be copied onto another account. Recovery codes are 50 bits, so a plain hash of a code could be guessed from a database dump. They are stored as HMAC-SHA256 under a second HKDF key, and the database alone is not enough to recover them.
+
+Access tokens carry `typ: "access"`. A two-factor login challenge is a different JWT, `typ: "2fa_challenge"`, and it is not accepted as a session. An accepted TOTP step is stored and will not be accepted again. Five wrong codes lock that user for 15 minutes.
+
 ### Logos
 
 Uploaded logos are size-capped, SVG is rasterised in a child process with a
@@ -100,7 +113,7 @@ CVSS will be scored against this threat model.
 - Cross-user card access and auth/recovery bypass are treated as High
 - Privilege escalation across owner / admin / member is in scope
 - **PR:H** when only an authenticated owner or admin can trigger the issue
-  *and* the impact is something that role is already meant to do
+  _and_ the impact is something that role is already meant to do
 - Compromising the host or volume is outside the app's threat model
 
 ## Reporting

@@ -10,6 +10,7 @@ from sqlalchemy.orm import selectinload
 
 from backend.config import Config
 from backend.core.auth_core import get_password_hash
+from backend.core.hash_core import hash_token
 from backend.core.smtp_core import EmailSender
 from backend.db.models.password_recovery_code_model import (
     PasswordRecoveryCodeModel,
@@ -81,7 +82,7 @@ async def code(
         if last_code:
             return {}
 
-        code = secrets.token_urlsafe(8)
+        code = secrets.token_urlsafe(32)
         expires_at = now() + timedelta(
             minutes=Config.PASSWORD_RECOVERY_CODE_LIFETIME_MIN
         )
@@ -104,7 +105,7 @@ async def code(
             return {}
 
         db_code = PasswordRecoveryCodeModel(
-            code=code, expires_at=expires_at, user_id=user.id
+            code=hash_token(code), expires_at=expires_at, user_id=user.id
         )
         session.add(db_code)
         await session.commit()
@@ -120,7 +121,7 @@ async def password(
     stmt = (
         select(PasswordRecoveryCodeModel)
         .where(
-            PasswordRecoveryCodeModel.code == body.code,
+            PasswordRecoveryCodeModel.code == hash_token(body.code),
             PasswordRecoveryCodeModel.revoked.is_(False),
             PasswordRecoveryCodeModel.expires_at > now(),
         )

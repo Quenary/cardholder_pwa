@@ -6,5 +6,6 @@ from .card_share_model import CardShareModel
 from .password_recovery_code_model import PasswordRecoveryCodeModel
 from .refresh_token_model import RefreshTokenModel
 from .settings_model import SettingModel
+from .two_factor_recovery_code_model import TwoFactorRecoveryCodeModel
 from .user_model import UserModel
 from .user_role_model import UserRoleModel

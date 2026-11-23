@@ -39,6 +39,13 @@ export const selectAppSmtpDisabled = createSelector(_selectApp, (state) =>
     false,
   ),
 );
+export const selectAppTwoFactorAvailable = createSelector(_selectApp, (state) =>
+  _selectAppSettingValue(
+    state.settings,
+    EPublicSettingKey.TWO_FACTOR_AVAILABLE,
+    false,
+  ),
+);
 export const selectAppVersion = createSelector(
   _selectApp,
   (state) => state.version,

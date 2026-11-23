@@ -7,6 +7,9 @@ from backend.db.models.password_recovery_code_model import (
     PasswordRecoveryCodeModel,
 )
 from backend.db.models.refresh_token_model import RefreshTokenModel
+from backend.db.models.two_factor_recovery_code_model import (
+    TwoFactorRecoveryCodeModel,
+)
 from backend.db.models.user_model import UserModel
 from backend.enums.user_role_enum import EUserRole
 from backend.helpers.logo_storage import delete_logo
@@ -37,6 +40,11 @@ async def delete_user(
     await db.execute(
         delete(PasswordRecoveryCodeModel).where(
             PasswordRecoveryCodeModel.user_id == user.id
+        )
+    )
+    await db.execute(
+        delete(TwoFactorRecoveryCodeModel).where(
+            TwoFactorRecoveryCodeModel.user_id == user.id
         )
     )
     await db.delete(user)

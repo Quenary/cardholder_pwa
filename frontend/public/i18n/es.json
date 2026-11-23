@@ -38,7 +38,15 @@
     "SIGNUP": "¿No tienes una cuenta?",
     "PASSWORD_RECOVERY": "Recuperación de contraseña",
     "REGISTRATION_DISABLED": "El registro está desactivado en la configuración de la aplicación",
-    "SMTP_DISABLED": "SMTP está desactivado en las variables de entorno"
+    "SMTP_DISABLED": "SMTP está desactivado en las variables de entorno",
+    "TWO_FACTOR": {
+      "TITLE": "Autenticación en dos pasos",
+      "HINT": "Introduce el código de 6 dígitos de tu aplicación de autenticación o uno de tus códigos de recuperación",
+      "CODE": "Código",
+      "VERIFY": "Verificar",
+      "BACK": "Atrás",
+      "EXPIRED": "Este paso de inicio de sesión ha caducado. Vuelve a iniciar sesión."
+    }
   },
   "REGISTER": {
     "NEW_ACCOUNT": "Cuenta nueva",
@@ -118,6 +126,34 @@
     "SUCCESS": {
       "UPDATE": "Datos del usuario actualizados",
       "DELETE": "Usuario eliminado"
+    },
+    "TWO_FACTOR": {
+      "TITLE": "Autenticación en dos pasos",
+      "DESCRIPTION": "Protege la cuenta con una aplicación de autenticación y códigos de recuperación de un solo uso.",
+      "UNAVAILABLE": "La autenticación en dos pasos no está disponible en este servidor: el administrador no ha configurado MASTER_KEY",
+      "ENABLE": "Activar 2FA",
+      "DISABLE": "Desactivar 2FA",
+      "REGENERATE": "Regenerar códigos de respaldo",
+      "SETUP_INTRO": "Escanea el código QR con tu aplicación de autenticación o introduce el secreto a mano. Después confírmalo con tu contraseña y un código de la aplicación.",
+      "SECRET": "Secreto",
+      "COPY": "Copiar",
+      "COPIED": "Copiado",
+      "CODE": "Código",
+      "RECOVERY_TITLE": "Códigos de recuperación",
+      "RECOVERY_DESCRIPTION": "Cada código sirve una sola vez. Solo se muestran ahora, así que guárdalos en un lugar seguro.",
+      "COPY_ALL": "Copiar todos",
+      "DOWNLOAD": "Descargar .txt",
+      "SAVED": "He guardado estos códigos",
+      "DONE": "Listo",
+      "CONFIRM_DISABLE_TITLE": "Desactivar la autenticación en dos pasos",
+      "CONFIRM_REGENERATE_TITLE": "Regenerar códigos de respaldo",
+      "CONFIRM_HINT": "Introduce tu contraseña actual y un código de la aplicación de autenticación o un código de recuperación.",
+      "PASSWORD": "Contraseña actual",
+      "CONFIRM": "Confirmar",
+      "CANCEL": "Cancelar",
+      "ENABLE_SUCCESS": "La autenticación en dos pasos está activada",
+      "DISABLE_SUCCESS": "La autenticación en dos pasos está desactivada",
+      "REGENERATE_SUCCESS": "Los nuevos códigos de recuperación están listos"
     }
   },
   "ADMIN": {
@@ -152,7 +188,10 @@
         "TO_MEMBER": "Hacer miembro",
         "CONFIRM": "Cambio de rol",
         "CONFIRM_SUBTITLE": "Confirma el cambio de rol del usuario a: {{role}}"
-      }
+      },
+      "RESET_TWO_FACTOR": "Restablecer 2FA",
+      "RESET_TWO_FACTOR_CONFIRM": "Esto desactiva la autenticación en dos pasos de este usuario y cierra su sesión en todos los dispositivos.",
+      "RESET_TWO_FACTOR_SUCCESS": "Se ha restablecido la autenticación en dos pasos"
     }
   },
   "ABOUT": {

@@ -1,5 +1,10 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import {
@@ -45,6 +50,7 @@ export interface IAdminUserDialogData {
   ],
   templateUrl: './admin-user-dialog.component.html',
   styleUrl: './admin-user-dialog.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminUserDialogComponent {
   private readonly adminApiService = inject(AdminApiService);
@@ -62,6 +68,44 @@ export class AdminUserDialogComponent {
   protected readonly rolesTranslations =
     this.translateService.instant('ADMIN.USERS.ROLES');
   protected user = this.data.user;
+
+  protected resetTwoFactor(): void {
+    this.matDialog
+      .open(ConfirmDialogComponent, {
+        data: {
+          title: 'ADMIN.USERS.RESET_TWO_FACTOR',
+          subtitle: 'ADMIN.USERS.RESET_TWO_FACTOR_CONFIRM',
+        } as IConfirmDialogData,
+        minHeight: '220px',
+      })
+      .afterClosed()
+      .pipe(
+        switchMap((res) => {
+          if (!res) {
+            return EMPTY;
+          }
+          this.isLoading.set(true);
+          return this.adminApiService.resetTwoFactor(this.user.id).pipe(
+            tap(() => {
+              this.snackService.success(
+                this.translateService.instant(
+                  'ADMIN.USERS.RESET_TWO_FACTOR_SUCCESS',
+                ),
+              );
+              this.close();
+            }),
+            finalize(() => {
+              this.isLoading.set(false);
+            }),
+          );
+        }),
+      )
+      .subscribe({
+        error: (error) => {
+          this.snackService.error(error);
+        },
+      });
+  }
 
   protected deleteUser(): void {
     this.matDialog

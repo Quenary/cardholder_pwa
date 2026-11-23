@@ -24,6 +24,7 @@ Sono ospitate su servizi gratuiti, che possono sospendere i container. Il primo 
 
 - PWA: si installa sul dispositivo dal browser e funziona anche offline (sola lettura)
 - Scansione delle carte con la fotocamera (torcia, fotocamera anteriore/posteriore) o inserimento manuale del codice e del tipo
+- Sono supportati la maggior parte dei codici 2D e 1D
 - Loghi sulle carte, in griglia o in formato grande, preferiti, ricerca, ordinamento e filtri
 - Codice a schermo intero con inversione dei colori, da mostrare alla cassa
 - Più utenti con i ruoli di proprietario, amministratore e membro
@@ -31,40 +32,35 @@ Sono ospitate su servizi gratuiti, che possono sospendere i container. Il primo 
 - Tema chiaro e scuro, in base al sistema
 - Inglese, tedesco, spagnolo, francese, italiano e russo
 - Recupero della password via e-mail (se SMTP è configurato)
+- Autenticazione a due fattori con un'app di autenticazione e codici di recupero usa e getta
 - Facile da ospitare in proprio
 - Open source
 
+### Documentazione
+
+Questi documenti sono solo in inglese:
+
+- [Codici supportati](/docs/CODES.md)
+- [Autenticazione a due fattori](/docs/TWO_FACTOR.md)
+- [Crittografia](/docs/ENCRYPTION.md)
+- [Ruoli degli account](/docs/ROLES.md)
+- [Carte condivise](/docs/SHARED_CARDS.md)
+- [Contributing](/docs/CONTRIBUTING.md)
+- [Security](/docs/SECURITY.md)
+
 ### Screenshot
 
-| Carte | Codice | Modifica | Condivisione |
-| :---: | :---: | :---: | :---: |
+|                              Carte                               |                             Codice                              |                            Modifica                             |                           Condivisione                            |
+| :--------------------------------------------------------------: | :-------------------------------------------------------------: | :-------------------------------------------------------------: | :---------------------------------------------------------------: |
 | <img src="../../resources/screenshots/cards.webp" width="200" /> | <img src="../../resources/screenshots/code.webp" width="200" /> | <img src="../../resources/screenshots/edit.webp" width="200" /> | <img src="../../resources/screenshots/shared.webp" width="200" /> |
 
-| Accesso | Carte grandi | Admin | Tema scuro |
-| :---: | :---: | :---: | :---: |
+|                             Accesso                              |                              Carte grandi                              |                                 Admin                                 |                              Tema scuro                               |
+| :--------------------------------------------------------------: | :--------------------------------------------------------------------: | :-------------------------------------------------------------------: | :-------------------------------------------------------------------: |
 | <img src="../../resources/screenshots/login.webp" width="200" /> | <img src="../../resources/screenshots/cards-large.webp" width="200" /> | <img src="../../resources/screenshots/admin-user.webp" width="200" /> | <img src="../../resources/screenshots/cards-dark.webp" width="200" /> |
-
-### Tecnologie
-
-- Angular per il frontend
-- Python con FastAPI e SQLAlchemy per il backend
-
-### Codici supportati
-
-- In breve, i principali tipi 2D (per esempio il codice QR) e 1D (per esempio il codice a barre).
-- L'applicazione si basa su:
-  - [zxing-js/browser](https://github.com/zxing-js/browser) e [quagga2](https://github.com/ericblade/quagga2) per la lettura dei codici.
-  - [bwip-js](https://github.com/metafloor/bwip-js) per mostrarli.
-- Codici supportati:
-  - [Tipi di `zxing-js`](https://github.com/zxing-js/library?tab=readme-ov-file#supported-formats)
-  - [Tipi di `quagga2`](https://github.com/ericblade/quagga2/tree/master/src/reader)
-  - [Tipi di `bwip-js`](https://github.com/metafloor/bwip-js/wiki/BWIPP-Barcode-Types)
-- Puoi inserire a mano il valore e il tipo del codice: `bwip-js` lo mostrerà, se lo supporta.
-- Ho notato che `zxing` fatica a rilevare codici chiari su sfondo scuro. Forse la cosa riguarda anche gli altri lettori.
 
 ### Preparazione
 
-- Le **variabili d'ambiente** non sono obbligatorie, ma puoi impostarne alcune. Il file [.env.example](/.env.example) le elenca tutte con la relativa descrizione. Consiglio di configurare almeno **SMTP**, per abilitare il recupero della password.
+- Le **variabili d'ambiente** non sono obbligatorie, ma puoi impostarne alcune. Il file [.env.example](/.env.example) le elenca tutte con la relativa descrizione. Consiglio di configurare almeno **SMTP**, per abilitare il recupero della password, e **MASTER_KEY** se vuoi l'autenticazione a due fattori. Vedi [Crittografia](/docs/ENCRYPTION.md).
 - La **PWA** e lo scanner tramite **flusso video** richiedono un accesso in **HTTPS**. Io uso un Nginx separato con un certificato Let's Encrypt.
 
 ### Distribuzione
@@ -89,26 +85,3 @@ ghcr.io/quenary/cardholder_pwa:1
 # docker-compose.pg.yml | docker-compose.my.yml - per un database completo (container separato nella rete dell'app per impostazione predefinita)
 docker-compose -f <file> up -d
 ```
-
-### Ruoli degli account
-
-- **Il primo account registrato** (dopo la distribuzione o la migrazione dalla versione 0.0.13) riceve il ruolo di **proprietario**. Per ora questo account non può essere eliminato, e il ruolo di proprietario non può essere riassegnato in modo comodo.
-- Forse è eccessivo, ma per sicurezza ho aggiunto anche i ruoli di amministratore e membro.
-- Il **proprietario** può:
-  - Modificare alcune impostazioni dell'applicazione dall'interfaccia
-  - Assegnare il ruolo di amministratore ad altri membri
-  - Eliminare account di amministratori o membri
-- L'**amministratore** può:
-  - Modificare alcune impostazioni dell'applicazione dall'interfaccia
-  - Eliminare account di membri
-
-### Carte condivise
-
-Vedi [docs/SHARED_CARDS.md](/docs/SHARED_CARDS.md).
-
-### Contribuire e sicurezza
-
-Questi documenti sono solo in inglese:
-
-- [Contributing](/docs/CONTRIBUTING.md)
-- [Security](/docs/SECURITY.md)

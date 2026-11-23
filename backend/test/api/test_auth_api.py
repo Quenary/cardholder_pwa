@@ -118,8 +118,15 @@ async def test_two_refreshes_with_the_same_token_do_not_both_succeed(
 
                 async def execute(*args, **kwargs):
                     result = await original(*args, **kwargs)
-                    if not getattr(db, "_met", False):
-                        # Both callers have read the token before either updates.
+                    statement = str(args[0]).lower() if args else ""
+                    if (
+                        not getattr(db, "_met", False)
+                        and statement.startswith("select")
+                        and "refresh_tokens" in statement
+                    ):
+                        # Both callers have read the token before either claims it.
+                        # Waiting on the first statement would hold the user-row
+                        # write lock across the barrier and stall the other one.
                         db._met = True
                         await barrier.wait()
                     return result

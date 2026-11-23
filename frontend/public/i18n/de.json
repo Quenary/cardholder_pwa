@@ -38,7 +38,15 @@
     "SIGNUP": "Noch kein Konto?",
     "PASSWORD_RECOVERY": "Passwort zurücksetzen",
     "REGISTRATION_DISABLED": "Die Registrierung ist in den Anwendungseinstellungen deaktiviert",
-    "SMTP_DISABLED": "SMTP ist in den Umgebungsvariablen deaktiviert"
+    "SMTP_DISABLED": "SMTP ist in den Umgebungsvariablen deaktiviert",
+    "TWO_FACTOR": {
+      "TITLE": "Zwei-Faktor-Authentifizierung",
+      "HINT": "Gib den 6-stelligen Code aus deiner Authenticator-App oder einen Wiederherstellungscode ein",
+      "CODE": "Code",
+      "VERIFY": "Bestätigen",
+      "BACK": "Zurück",
+      "EXPIRED": "Dieser Anmeldeschritt ist abgelaufen. Melde dich erneut an."
+    }
   },
   "REGISTER": {
     "NEW_ACCOUNT": "Neues Konto",
@@ -118,6 +126,34 @@
     "SUCCESS": {
       "UPDATE": "Benutzerdaten aktualisiert",
       "DELETE": "Benutzer gelöscht"
+    },
+    "TWO_FACTOR": {
+      "TITLE": "Zwei-Faktor-Authentifizierung",
+      "DESCRIPTION": "Schütze das Konto mit einer Authenticator-App und einmaligen Wiederherstellungscodes.",
+      "UNAVAILABLE": "Zwei-Faktor-Authentifizierung ist auf diesem Server nicht verfügbar: der Administrator hat MASTER_KEY nicht gesetzt",
+      "ENABLE": "2FA aktivieren",
+      "DISABLE": "2FA deaktivieren",
+      "REGENERATE": "Sicherungscodes neu erzeugen",
+      "SETUP_INTRO": "Scanne den QR-Code mit deiner Authenticator-App oder gib das Geheimnis von Hand ein. Bestätige danach mit deinem Passwort und einem Code aus der App.",
+      "SECRET": "Geheimnis",
+      "COPY": "Kopieren",
+      "COPIED": "Kopiert",
+      "CODE": "Code",
+      "RECOVERY_TITLE": "Wiederherstellungscodes",
+      "RECOVERY_DESCRIPTION": "Jeder Code funktioniert nur einmal. Sie werden nur jetzt angezeigt, also bewahre sie an einem sicheren Ort auf.",
+      "COPY_ALL": "Alle kopieren",
+      "DOWNLOAD": ".txt herunterladen",
+      "SAVED": "Ich habe diese Codes gespeichert",
+      "DONE": "Fertig",
+      "CONFIRM_DISABLE_TITLE": "Zwei-Faktor-Authentifizierung deaktivieren",
+      "CONFIRM_REGENERATE_TITLE": "Sicherungscodes neu erzeugen",
+      "CONFIRM_HINT": "Gib dein aktuelles Passwort und einen Code aus der Authenticator-App oder einen Wiederherstellungscode ein.",
+      "PASSWORD": "Aktuelles Passwort",
+      "CONFIRM": "Bestätigen",
+      "CANCEL": "Abbrechen",
+      "ENABLE_SUCCESS": "Zwei-Faktor-Authentifizierung ist aktiv",
+      "DISABLE_SUCCESS": "Zwei-Faktor-Authentifizierung ist aus",
+      "REGENERATE_SUCCESS": "Neue Wiederherstellungscodes sind bereit"
     }
   },
   "ADMIN": {
@@ -152,7 +188,10 @@
         "TO_MEMBER": "Zum Mitglied machen",
         "CONFIRM": "Rollenwechsel",
         "CONFIRM_SUBTITLE": "Rollenwechsel des Benutzers bestätigen zu: {{role}}"
-      }
+      },
+      "RESET_TWO_FACTOR": "2FA zurücksetzen",
+      "RESET_TWO_FACTOR_CONFIRM": "Damit wird die Zwei-Faktor-Authentifizierung dieses Benutzers ausgeschaltet und er wird auf allen Geräten abgemeldet.",
+      "RESET_TWO_FACTOR_SUCCESS": "Die Zwei-Faktor-Authentifizierung wurde zurückgesetzt"
     }
   },
   "ABOUT": {

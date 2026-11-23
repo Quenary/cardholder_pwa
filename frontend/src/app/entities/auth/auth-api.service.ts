@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { IOAuth2PasswordRequestForm, ITokenResponse } from './auth-interface';
+import {
+  IOAuth2PasswordRequestForm,
+  ITokenResponse,
+  ITokenTwoFactorRequest,
+  ITwoFactorChallenge,
+} from './auth-interface';
 import { Observable } from 'rxjs';
 import { BaseApiService } from '../base/base-api.service';
 
@@ -9,14 +14,23 @@ import { BaseApiService } from '../base/base-api.service';
 export class AuthApiService extends BaseApiService<''> {
   protected override readonly prefix = '';
 
-  token(body: IOAuth2PasswordRequestForm): Observable<ITokenResponse> {
+  token(
+    body: IOAuth2PasswordRequestForm,
+  ): Observable<ITokenResponse | ITwoFactorChallenge> {
     const formData = new FormData();
     formData.append('grant_type', body.grant_type);
     formData.append('username', body.username);
     formData.append('password', body.password);
-    return this.httpClient.post<ITokenResponse>(
+    return this.httpClient.post<ITokenResponse | ITwoFactorChallenge>(
       `${this.basePath}/token`,
       formData,
+    );
+  }
+
+  tokenTwoFactor(body: ITokenTwoFactorRequest): Observable<ITokenResponse> {
+    return this.httpClient.post<ITokenResponse>(
+      `${this.basePath}/token/2fa`,
+      body,
     );
   }
 

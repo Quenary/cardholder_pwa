@@ -38,7 +38,15 @@
     "SIGNUP": "Vous n'avez pas de compte ?",
     "PASSWORD_RECOVERY": "Récupération du mot de passe",
     "REGISTRATION_DISABLED": "L'inscription est désactivée dans les paramètres de l'application",
-    "SMTP_DISABLED": "Le SMTP est désactivé dans les variables d'environnement"
+    "SMTP_DISABLED": "Le SMTP est désactivé dans les variables d'environnement",
+    "TWO_FACTOR": {
+      "TITLE": "Authentification à deux facteurs",
+      "HINT": "Saisissez le code à 6 chiffres de votre application d'authentification ou l'un de vos codes de récupération",
+      "CODE": "Code",
+      "VERIFY": "Vérifier",
+      "BACK": "Retour",
+      "EXPIRED": "Cette étape de connexion a expiré. Connectez-vous à nouveau."
+    }
   },
   "REGISTER": {
     "NEW_ACCOUNT": "Nouveau compte",
@@ -118,6 +126,34 @@
     "SUCCESS": {
       "UPDATE": "Données utilisateur mises à jour",
       "DELETE": "Utilisateur supprimé"
+    },
+    "TWO_FACTOR": {
+      "TITLE": "Authentification à deux facteurs",
+      "DESCRIPTION": "Protégez le compte avec une application d'authentification et des codes de récupération à usage unique.",
+      "UNAVAILABLE": "L'authentification à deux facteurs n'est pas disponible sur ce serveur : l'administrateur n'a pas défini MASTER_KEY",
+      "ENABLE": "Activer la 2FA",
+      "DISABLE": "Désactiver la 2FA",
+      "REGENERATE": "Régénérer les codes de secours",
+      "SETUP_INTRO": "Scannez le QR code avec votre application d'authentification, ou saisissez le secret à la main. Confirmez ensuite avec votre mot de passe et un code de l'application.",
+      "SECRET": "Secret",
+      "COPY": "Copier",
+      "COPIED": "Copié",
+      "CODE": "Code",
+      "RECOVERY_TITLE": "Codes de récupération",
+      "RECOVERY_DESCRIPTION": "Chaque code ne fonctionne qu'une fois. Ils ne s'affichent que maintenant, alors conservez-les en lieu sûr.",
+      "COPY_ALL": "Tout copier",
+      "DOWNLOAD": "Télécharger le .txt",
+      "SAVED": "J'ai enregistré ces codes",
+      "DONE": "Terminé",
+      "CONFIRM_DISABLE_TITLE": "Désactiver l'authentification à deux facteurs",
+      "CONFIRM_REGENERATE_TITLE": "Régénérer les codes de secours",
+      "CONFIRM_HINT": "Saisissez votre mot de passe actuel et un code de l'application d'authentification ou un code de récupération.",
+      "PASSWORD": "Mot de passe actuel",
+      "CONFIRM": "Confirmer",
+      "CANCEL": "Annuler",
+      "ENABLE_SUCCESS": "L'authentification à deux facteurs est activée",
+      "DISABLE_SUCCESS": "L'authentification à deux facteurs est désactivée",
+      "REGENERATE_SUCCESS": "Les nouveaux codes de récupération sont prêts"
     }
   },
   "ADMIN": {
@@ -152,7 +188,10 @@
         "TO_MEMBER": "Définir comme membre",
         "CONFIRM": "Changement de rôle",
         "CONFIRM_SUBTITLE": "Confirmer le changement de rôle de l'utilisateur en : {{role}}"
-      }
+      },
+      "RESET_TWO_FACTOR": "Réinitialiser la 2FA",
+      "RESET_TWO_FACTOR_CONFIRM": "Cela désactive l'authentification à deux facteurs de cet utilisateur et le déconnecte de tous ses appareils.",
+      "RESET_TWO_FACTOR_SUCCESS": "L'authentification à deux facteurs a été réinitialisée"
     }
   },
   "ABOUT": {

@@ -38,7 +38,15 @@
     "SIGNUP": "Don't have an account?",
     "PASSWORD_RECOVERY": "Password recovery",
     "REGISTRATION_DISABLED": "Registration is disabled in the application settings",
-    "SMTP_DISABLED": "SMTP is disabled in the environment variables"
+    "SMTP_DISABLED": "SMTP is disabled in the environment variables",
+    "TWO_FACTOR": {
+      "TITLE": "Two-factor authentication",
+      "HINT": "Enter the 6-digit code from your authenticator app or one of your recovery codes",
+      "CODE": "Code",
+      "VERIFY": "Verify",
+      "BACK": "Back",
+      "EXPIRED": "This sign-in step expired. Sign in again."
+    }
   },
   "REGISTER": {
     "NEW_ACCOUNT": "New account",
@@ -115,6 +123,34 @@
       "Numbers"
     ],
     "DELETE_WARN": "Do you want to permanently delete the user and all associated data?",
+    "TWO_FACTOR": {
+      "TITLE": "Two-factor authentication",
+      "DESCRIPTION": "Protect the account with an authenticator app and one-time recovery codes.",
+      "UNAVAILABLE": "Two-factor authentication is not available on this server: the administrator has not set MASTER_KEY",
+      "ENABLE": "Enable 2FA",
+      "DISABLE": "Disable 2FA",
+      "REGENERATE": "Regenerate backup codes",
+      "SETUP_INTRO": "Scan the QR code with your authenticator app, or enter the secret manually. Then confirm with your password and a code from the app.",
+      "SECRET": "Secret",
+      "COPY": "Copy",
+      "COPIED": "Copied",
+      "CODE": "Code",
+      "RECOVERY_TITLE": "Recovery codes",
+      "RECOVERY_DESCRIPTION": "Each code works once. They are shown only now, so save them somewhere safe.",
+      "COPY_ALL": "Copy all",
+      "DOWNLOAD": "Download .txt",
+      "SAVED": "I have saved these codes",
+      "DONE": "Done",
+      "CONFIRM_DISABLE_TITLE": "Disable two-factor authentication",
+      "CONFIRM_REGENERATE_TITLE": "Regenerate backup codes",
+      "CONFIRM_HINT": "Enter your current password and a code from your authenticator app or a recovery code.",
+      "PASSWORD": "Current password",
+      "CONFIRM": "Confirm",
+      "CANCEL": "Cancel",
+      "ENABLE_SUCCESS": "Two-factor authentication is on",
+      "DISABLE_SUCCESS": "Two-factor authentication is off",
+      "REGENERATE_SUCCESS": "New recovery codes are ready"
+    },
     "SUCCESS": {
       "UPDATE": "User data updated",
       "DELETE": "User deleted"
@@ -152,7 +188,10 @@
         "TO_MEMBER": "Make member",
         "CONFIRM": "Role change",
         "CONFIRM_SUBTITLE": "Confirm user role change to: {{role}}"
-      }
+      },
+      "RESET_TWO_FACTOR": "Reset 2FA",
+      "RESET_TWO_FACTOR_CONFIRM": "This turns off two-factor authentication for this user and signs them out of every device.",
+      "RESET_TWO_FACTOR_SUCCESS": "Two-factor authentication has been reset"
     }
   },
   "ABOUT": {

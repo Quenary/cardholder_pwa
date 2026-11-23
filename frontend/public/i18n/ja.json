@@ -38,7 +38,15 @@
     "SIGNUP": "アカウントをお持ちでない方",
     "PASSWORD_RECOVERY": "パスワードの再設定",
     "REGISTRATION_DISABLED": "アプリの設定で新規登録が無効になっています",
-    "SMTP_DISABLED": "環境変数で SMTP が無効になっています"
+    "SMTP_DISABLED": "環境変数で SMTP が無効になっています",
+    "TWO_FACTOR": {
+      "TITLE": "二要素認証",
+      "HINT": "認証アプリの6桁のコードか、リカバリーコードのいずれかを入力してください",
+      "CODE": "コード",
+      "VERIFY": "確認",
+      "BACK": "戻る",
+      "EXPIRED": "このサインイン手順の有効期限が切れました。もう一度サインインしてください。"
+    }
   },
   "REGISTER": {
     "NEW_ACCOUNT": "新しいアカウント",
@@ -114,6 +122,34 @@
     "SUCCESS": {
       "UPDATE": "ユーザーのデータを更新しました",
       "DELETE": "ユーザーを削除しました"
+    },
+    "TWO_FACTOR": {
+      "TITLE": "二要素認証",
+      "DESCRIPTION": "認証アプリと一度きりのリカバリーコードでアカウントを保護します。",
+      "UNAVAILABLE": "このサーバーでは二要素認証を利用できません。管理者が MASTER_KEY を設定していません",
+      "ENABLE": "2FAを有効にする",
+      "DISABLE": "2FAを無効にする",
+      "REGENERATE": "バックアップコードを再生成",
+      "SETUP_INTRO": "認証アプリでQRコードを読み取るか、シークレットを手入力してください。その後、パスワードとアプリのコードで確認します。",
+      "SECRET": "シークレット",
+      "COPY": "コピー",
+      "COPIED": "コピーしました",
+      "CODE": "コード",
+      "RECOVERY_TITLE": "リカバリーコード",
+      "RECOVERY_DESCRIPTION": "各コードは一度だけ使えます。表示されるのは今だけなので、安全な場所に保存してください。",
+      "COPY_ALL": "すべてコピー",
+      "DOWNLOAD": ".txtをダウンロード",
+      "SAVED": "これらのコードを保存しました",
+      "DONE": "完了",
+      "CONFIRM_DISABLE_TITLE": "二要素認証を無効にする",
+      "CONFIRM_REGENERATE_TITLE": "バックアップコードを再生成",
+      "CONFIRM_HINT": "現在のパスワードと、認証アプリのコードまたはリカバリーコードを入力してください。",
+      "PASSWORD": "現在のパスワード",
+      "CONFIRM": "確認",
+      "CANCEL": "キャンセル",
+      "ENABLE_SUCCESS": "二要素認証を有効にしました",
+      "DISABLE_SUCCESS": "二要素認証を無効にしました",
+      "REGENERATE_SUCCESS": "新しいリカバリーコードの準備ができました"
     }
   },
   "ADMIN": {
@@ -148,7 +184,10 @@
         "TO_MEMBER": "メンバーにする",
         "CONFIRM": "権限の変更",
         "CONFIRM_SUBTITLE": "ユーザーの権限を次に変更します：{{role}}"
-      }
+      },
+      "RESET_TWO_FACTOR": "2FAをリセット",
+      "RESET_TWO_FACTOR_CONFIRM": "このユーザーの二要素認証を無効にし、すべての端末からサインアウトします。",
+      "RESET_TWO_FACTOR_SUCCESS": "二要素認証をリセットしました"
     }
   },
   "ABOUT": {

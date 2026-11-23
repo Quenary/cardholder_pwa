@@ -11,6 +11,10 @@ export const selectAuthTokenResponse = createSelector(
   _selectAuth,
   (state) => state.tokenResponse,
 );
+export const selectAuthTwoFactorChallenge = createSelector(
+  _selectAuth,
+  (state) => state.twoFactorChallenge,
+);
 export const selectAuthIsAuthorized = createSelector(
   _selectAuth,
   (state) => !!state.tokenResponse,

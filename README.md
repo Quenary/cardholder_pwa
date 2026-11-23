@@ -24,6 +24,7 @@ It's powered by free providers and can be suspended, which will lead to a long i
 
 - PWA - you can install it on device from browser and use even offline (read-only)
 - Scan a card with the camera (torch, front/rear camera), or type the code and its type
+- Most 2D and 1D codes are supported
 - Logos on cards, a grid or large cards, favorites, search, sorting and filters
 - Full-screen code with color inversion, to show at the checkout
 - Multi-user support with owner, admin, and member roles
@@ -31,42 +32,33 @@ It's powered by free providers and can be suspended, which will lead to a long i
 - Light and dark theme, following the system
 - English, German, Spanish, French, Italian and Russian
 - Password recovery by email (when SMTP is configured)
+- Two-factor authentication with an authenticator app and one-time recovery codes
 - Easy to self-host
 - Open-source
 
+### Documentation
+
+- [Supported codes](/docs/CODES.md)
+- [Two-factor authentication](/docs/TWO_FACTOR.md)
+- [Encryption](/docs/ENCRYPTION.md)
+- [Account roles](/docs/ROLES.md)
+- [Shared cards](/docs/SHARED_CARDS.md)
+- [Contributing](/docs/CONTRIBUTING.md)
+- [Security](/docs/SECURITY.md)
+
 ### Screenshots
 
-| Cards | Code | Card editor | Sharing |
-| :---: | :---: | :---: | :---: |
+|                           Cards                            |                           Code                            |                        Card editor                        |                           Sharing                           |
+| :--------------------------------------------------------: | :-------------------------------------------------------: | :-------------------------------------------------------: | :---------------------------------------------------------: |
 | <img src="resources/screenshots/cards.webp" width="200" /> | <img src="resources/screenshots/code.webp" width="200" /> | <img src="resources/screenshots/edit.webp" width="200" /> | <img src="resources/screenshots/shared.webp" width="200" /> |
 
-| Sign in | Large cards | Admin | Dark theme |
-| :---: | :---: | :---: | :---: |
+|                          Sign in                           |                           Large cards                            |                              Admin                              |                           Dark theme                            |
+| :--------------------------------------------------------: | :--------------------------------------------------------------: | :-------------------------------------------------------------: | :-------------------------------------------------------------: |
 | <img src="resources/screenshots/login.webp" width="200" /> | <img src="resources/screenshots/cards-large.webp" width="200" /> | <img src="resources/screenshots/admin-user.webp" width="200" /> | <img src="resources/screenshots/cards-dark.webp" width="200" /> |
-
-### Core
-
-- Angular for frontend
-- Python with FastAPI and SQLAlchemy for backend
-
-### Supported codes
-
-- TL;DR these are the main 2D (e.g. QR) and 1D (e.g. barcode) types.
-- App relies on:
-  - [zxing-js/browser](https://github.com/zxing-js/browser) and [quagga2](https://github.com/ericblade/quagga2) for scanning codes.
-  - [tapirscan](https://github.com/kleinicke/tapirscan) for codes that are turned or seen at an angle. Its WebAssembly is downloaded when the scanner is first used, so on a first use without a connection only the other decoders work.
-  - [bwip-js](https://github.com/metafloor/bwip-js) for displaying codes.
-- Supported codes:
-  - [Types of `zxing-js`](https://github.com/zxing-js/library?tab=readme-ov-file#supported-formats)
-  - [Types of `quagga2`](https://github.com/ericblade/quagga2/tree/master/src/reader)
-  - [Types of `tapirscan`](https://github.com/kleinicke/tapirscan/blob/main/docs/FORMATS.md)
-  - [Types of `bwip-js`](https://github.com/metafloor/bwip-js/wiki/BWIPP-Barcode-Types)
-- You can enter value and type of the code manually - `bwip-js` will display the code, if it is supported.
-- I noticed that `zxing` has a hard time detecting light codes on dark backgrounds. Maybe other scanners are affected by this as well.
 
 ### Preparation
 
-- **Environment variables** are not required, but you can still define some. There is [.env.example](/.env.example) containing list of vars with description. I’d recommend setting up at least **SMTP** to enable password recovery.
+- **Environment variables** are not required, but you can still define some. There is [.env.example](/.env.example) containing list of vars with description. I’d recommend setting up at least **SMTP** to enable password recovery, and **MASTER_KEY** if you want two-factor authentication. See [Encryption](/docs/ENCRYPTION.md).
 - For **PWA** and **video-stream** code scanner functionality you need **HTTPS** access. I use a separate Nginx with Let's Encrypt certificate.
 
 ### Deploy
@@ -91,28 +83,3 @@ ghcr.io/quenary/cardholder_pwa:1
 # docker-compose.pg.yml | docker-compose.my.yml - for full-featured db (separate container in the app network by default)
 docker-compose -f <filename> up -d
 ```
-
-### Account roles
-
-- **The first registered account** (after deployment or migration from version 0.0.13) will be assigned to the **owner** role. For now this account cannot be deleted and owner role cannot be reassigned in a convenient way.
-- Might be an overkill, but just in case, i also added admin and member roles.
-- The **owner** can:
-  - Change some app settings from the UI
-  - Assign admin role to other members
-  - Delete admins or members accounts
-- The **admin** can:
-  - Change some app settings from the UI
-  - Delete members accounts
-
-### Shared cards
-
-See [docs/SHARED_CARDS.md](/docs/SHARED_CARDS.md).
-
-### Contributing
-
-See [docs/CONTRIBUTING.md](/docs/CONTRIBUTING.md).
-
-### Security
-
-See [docs/SECURITY.md](/docs/SECURITY.md).
-

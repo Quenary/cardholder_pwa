@@ -24,6 +24,7 @@ export const testAppState: ITestAppState = {
       'created_at': '2025-06-15T22:58:01.072197',
       'updated_at': '2025-06-27T01:02:28.642472',
       'role_code': EUserRole.OWNER,
+      'two_factor_enabled': false,
     },
     form: null,
     hasChanges: false,
@@ -39,6 +40,7 @@ export const testAppState: ITestAppState = {
     },
     init: true,
     isLoading: false,
+    twoFactorChallenge: null,
   },
   cards: {
     list: [
