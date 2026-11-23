@@ -31,17 +31,18 @@ Elles tournent chez des hébergeurs gratuits, qui peuvent suspendre les conteneu
 - Thème clair et sombre, selon le système
 - Anglais, allemand, espagnol, français, italien et russe
 - Récupération du mot de passe par e-mail (si SMTP est configuré)
+- Authentification à deux facteurs avec une application d'authentification et des codes de récupération à usage unique
 - Simple à auto-héberger
 - Open source
 
 ### Captures d'écran
 
-| Cartes | Code | Édition | Partage |
-| :---: | :---: | :---: | :---: |
+|                              Cartes                              |                              Code                               |                             Édition                             |                              Partage                              |
+| :--------------------------------------------------------------: | :-------------------------------------------------------------: | :-------------------------------------------------------------: | :---------------------------------------------------------------: |
 | <img src="../../resources/screenshots/cards.webp" width="200" /> | <img src="../../resources/screenshots/code.webp" width="200" /> | <img src="../../resources/screenshots/edit.webp" width="200" /> | <img src="../../resources/screenshots/shared.webp" width="200" /> |
 
-| Connexion | Grandes cartes | Admin | Thème sombre |
-| :---: | :---: | :---: | :---: |
+|                            Connexion                             |                             Grandes cartes                             |                                 Admin                                 |                             Thème sombre                              |
+| :--------------------------------------------------------------: | :--------------------------------------------------------------------: | :-------------------------------------------------------------------: | :-------------------------------------------------------------------: |
 | <img src="../../resources/screenshots/login.webp" width="200" /> | <img src="../../resources/screenshots/cards-large.webp" width="200" /> | <img src="../../resources/screenshots/admin-user.webp" width="200" /> | <img src="../../resources/screenshots/cards-dark.webp" width="200" /> |
 
 ### Technologies
@@ -64,8 +65,18 @@ Elles tournent chez des hébergeurs gratuits, qui peuvent suspendre les conteneu
 
 ### Préparation
 
-- Les **variables d'environnement** ne sont pas obligatoires, mais vous pouvez en définir. Le fichier [.env.example](/.env.example) les liste toutes avec leur description. Je recommande de configurer au moins **SMTP**, pour activer la récupération du mot de passe.
+- Les **variables d'environnement** ne sont pas obligatoires, mais vous pouvez en définir. Le fichier [.env.example](/.env.example) les liste toutes avec leur description. Je recommande de configurer au moins **SMTP**, pour activer la récupération du mot de passe, et **MASTER_KEY** si vous voulez l'authentification à deux facteurs.
+- **MASTER_KEY** est la clé générale des secrets stockés. Elle ne sert aujourd'hui qu'à l'authentification à deux facteurs : le secret TOTP et la clé qui calcule le HMAC des codes de récupération. Générez-la avec `openssl rand -base64 32` et conservez une copie ailleurs que dans la sauvegarde de la base. Sans elle, les utilisateurs ne peuvent pas activer la 2FA. La changer ou la perdre rend les secrets et les codes déjà enregistrés inutilisables ; un administrateur doit réinitialiser ces utilisateurs (ou le propriétaire peut utiliser le SQL ci-dessous). La rotation de la clé n'est pas encore prise en charge. Un outil ultérieur aura besoin du préfixe `v1:` du texte chiffré stocké.
 - Le fonctionnement de la **PWA** et du scanner par **flux vidéo** demande un accès en **HTTPS**. J'utilise un Nginx séparé avec un certificat Let's Encrypt.
+
+### Authentification à deux facteurs
+
+Sur la page utilisateur, choisissez **Activer la 2FA**, scannez le QR code avec une application d'authentification et confirmez avec votre mot de passe et un code à 6 chiffres. L'application affiche alors dix codes de récupération, une seule fois. Chaque code ne fonctionne qu'une fois si vous perdez l'authentificateur. Un administrateur ou le propriétaire peut réinitialiser la 2FA d'un autre utilisateur depuis le dialogue d'administration de cet utilisateur (pas la sienne, ni celle du propriétaire). Si le propriétaire perd l'authentificateur et tous les codes de récupération, le seul recours est du SQL sur la base :
+
+```sql
+UPDATE users SET two_factor_secret = NULL, two_factor_enabled_at = NULL, two_factor_last_step = NULL, two_factor_failed_attempts = 0, two_factor_locked_until = NULL WHERE username = '<name>';
+DELETE FROM two_factor_recovery_codes WHERE user_id = (SELECT id FROM users WHERE username = '<name>');
+```
 
 ### Déploiement
 

@@ -22,7 +22,13 @@ import { SnackService } from 'src/app/core/services/snack.service';
 import { selectAuthTokenResponse } from './auth.selectors';
 import { Store } from '@ngrx/store';
 import { UserActions } from '../../user/state/user.actions';
-import { ITokenResponse } from 'src/app/entities/auth/auth-interface';
+import {
+  isTwoFactorChallenge,
+  ITokenResponse,
+} from 'src/app/entities/auth/auth-interface';
+import { HttpErrorResponse } from '@angular/common/http';
+import { TranslateService } from '@ngx-translate/core';
+import { selectAuthTwoFactorChallenge } from './auth.selectors';
 import { refreshTokensOnce } from 'src/app/shared/functions/refresh-tokens-once.function';
 import { clearApiCache } from 'src/app/shared/functions/clear-api-cache.function';
 
@@ -33,23 +39,66 @@ export class AuthEffects {
   private readonly router = inject(Router);
   private readonly snackService = inject(SnackService);
   private readonly store = inject(Store);
+  private readonly translateService = inject(TranslateService);
 
-  token$ = createEffect(() =>
+  readonly token$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.token),
       switchMap((action) =>
         this.authApiService.token(action.body).pipe(
-          tap(() => {
-            this.router.navigate(['/cards']);
-          }),
-          map((tokenResponse) => AuthActions.tokenSuccess({ tokenResponse })),
+          map((response) =>
+            isTwoFactorChallenge(response)
+              ? AuthActions.tokenTwoFactorRequired({ challenge: response })
+              : AuthActions.tokenSuccess({ tokenResponse: response }),
+          ),
           catchError((error) => of(AuthActions.tokenError({ error }))),
         ),
       ),
     ),
   );
 
-  refreshToken$ = createEffect(() =>
+  /**
+   * Both the password step and the code step land here, and only here
+   * does a successful login leave the form.
+   */
+  readonly navigateAfterLogin$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.tokenSuccess),
+        tap(() => {
+          this.router.navigate(['/cards']);
+        }),
+      ),
+    { dispatch: false },
+  );
+
+  readonly tokenTwoFactor$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.tokenTwoFactor),
+      withLatestFrom(this.store.select(selectAuthTwoFactorChallenge)),
+      switchMap(([action, challenge]) =>
+        this.authApiService
+          .tokenTwoFactor({
+            challenge_token: challenge?.token ?? '',
+            code: action.code,
+          })
+          .pipe(
+            map((tokenResponse) => AuthActions.tokenSuccess({ tokenResponse })),
+            catchError((error: HttpErrorResponse) => {
+              if (this.isExpiredChallenge(error)) {
+                this.snackService.error(
+                  this.translateService.instant('AUTH.TWO_FACTOR.EXPIRED'),
+                );
+                return of(AuthActions.tokenTwoFactorCancel());
+              }
+              return of(AuthActions.tokenTwoFactorError({ error }));
+            }),
+          ),
+      ),
+    ),
+  );
+
+  readonly refreshToken$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.refreshToken),
       switchMap((action) =>
@@ -79,7 +128,7 @@ export class AuthEffects {
    * holds has been rotated and is no longer good. Only a tab that is logged
    * in follows, and only to newer tokens, never to a logout.
    */
-  syncTokens$ = createEffect(() =>
+  readonly syncTokens$ = createEffect(() =>
     fromEvent<StorageEvent>(window, 'storage').pipe(
       filter(
         (event) =>
@@ -101,7 +150,7 @@ export class AuthEffects {
     ),
   );
 
-  getUserInfo = createEffect(
+  readonly getUserInfo = createEffect(
     () =>
       this.actions$.pipe(
         ofType(AuthActions.tokenSuccess),
@@ -112,10 +161,14 @@ export class AuthEffects {
     { dispatch: false },
   );
 
-  saveTokens$ = createEffect(
+  readonly saveTokens$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AuthActions.tokenSuccess, AuthActions.refreshTokenSuccess),
+        ofType(
+          AuthActions.tokenSuccess,
+          AuthActions.refreshTokenSuccess,
+          AuthActions.tokensReplaced,
+        ),
         tap((action) => {
           localStorage.setItemJson(
             ELocalStorageKey.TOKEN_RESPONSE,
@@ -126,7 +179,7 @@ export class AuthEffects {
     { dispatch: false },
   );
 
-  logout$ = createEffect(() =>
+  readonly logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.logout),
       withLatestFrom(this.store.select(selectAuthTokenResponse)),
@@ -142,7 +195,7 @@ export class AuthEffects {
     ),
   );
 
-  $logoutSilent = createEffect(
+  readonly $logoutSilent = createEffect(
     () =>
       this.actions$.pipe(
         ofType(AuthActions.logoutSilent),
@@ -153,11 +206,12 @@ export class AuthEffects {
     { dispatch: false },
   );
 
-  showErrors$ = createEffect(
+  readonly showErrors$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(
           AuthActions.tokenError,
+          AuthActions.tokenTwoFactorError,
           AuthActions.refreshTokenError,
           AuthActions.logoutError,
         ),
@@ -177,5 +231,14 @@ export class AuthEffects {
     // Not awaited: leaving the account must not wait on the cache.
     void clearApiCache();
     this.router.navigate(['/auth']);
+  }
+
+  private isExpiredChallenge(error: HttpErrorResponse): boolean {
+    const detail = error.error?.detail;
+    return (
+      error.status === 401 &&
+      typeof detail === 'string' &&
+      detail.includes('two-factor challenge')
+    );
   }
 }

@@ -31,17 +31,18 @@ Sie laufen bei kostenlosen Anbietern, die Container aussetzen können. Der erste
 - Helles und dunkles Design, je nach System
 - Englisch, Deutsch, Spanisch, Französisch, Italienisch und Russisch
 - Passwort-Wiederherstellung per E-Mail (wenn SMTP eingerichtet ist)
+- Zwei-Faktor-Authentifizierung mit Authenticator-App und einmaligen Wiederherstellungscodes
 - Einfach selbst zu hosten
 - Open Source
 
 ### Screenshots
 
-| Karten | Code | Bearbeiten | Teilen |
-| :---: | :---: | :---: | :---: |
+|                              Karten                              |                              Code                               |                           Bearbeiten                            |                              Teilen                               |
+| :--------------------------------------------------------------: | :-------------------------------------------------------------: | :-------------------------------------------------------------: | :---------------------------------------------------------------: |
 | <img src="../../resources/screenshots/cards.webp" width="200" /> | <img src="../../resources/screenshots/code.webp" width="200" /> | <img src="../../resources/screenshots/edit.webp" width="200" /> | <img src="../../resources/screenshots/shared.webp" width="200" /> |
 
-| Anmeldung | Große Karten | Admin | Dunkles Design |
-| :---: | :---: | :---: | :---: |
+|                            Anmeldung                             |                              Große Karten                              |                                 Admin                                 |                            Dunkles Design                             |
+| :--------------------------------------------------------------: | :--------------------------------------------------------------------: | :-------------------------------------------------------------------: | :-------------------------------------------------------------------: |
 | <img src="../../resources/screenshots/login.webp" width="200" /> | <img src="../../resources/screenshots/cards-large.webp" width="200" /> | <img src="../../resources/screenshots/admin-user.webp" width="200" /> | <img src="../../resources/screenshots/cards-dark.webp" width="200" /> |
 
 ### Technik
@@ -64,8 +65,18 @@ Sie laufen bei kostenlosen Anbietern, die Container aussetzen können. Der erste
 
 ### Vorbereitung
 
-- **Umgebungsvariablen** sind nicht erforderlich, Sie können aber welche setzen. In [.env.example](/.env.example) sind alle mit Beschreibung aufgeführt. Ich empfehle, mindestens **SMTP** einzurichten, damit das Zurücksetzen des Passworts funktioniert.
+- **Umgebungsvariablen** sind nicht erforderlich, Sie können aber welche setzen. In [.env.example](/.env.example) sind alle mit Beschreibung aufgeführt. Ich empfehle, mindestens **SMTP** einzurichten, damit das Zurücksetzen des Passworts funktioniert, und **MASTER_KEY**, wenn Sie die Zwei-Faktor-Authentifizierung nutzen möchten.
+- **MASTER_KEY** ist der allgemeine Schlüssel für Geheimnisse, die gespeichert werden. Derzeit dient er nur der Zwei-Faktor-Authentifizierung: dem TOTP-Geheimnis und dem Schlüssel, mit dem die Wiederherstellungscodes per HMAC abgelegt werden. Erzeugen Sie ihn mit `openssl rand -base64 32` und bewahren Sie eine Kopie getrennt von der Datenbanksicherung auf. Ohne ihn können Benutzer die 2FA nicht einschalten. Ein Wechsel oder Verlust macht vorhandene 2FA-Geheimnisse und Wiederherstellungscodes unbrauchbar; ein Administrator muss diese Benutzer zurücksetzen (oder der Eigentümer nutzt das SQL unten). Eine Schlüsselrotation wird noch nicht unterstützt. Ein späteres Werkzeug braucht das Präfix `v1:` am gespeicherten Geheimtext.
 - Für die **PWA** und den Scanner über den **Videostream** ist ein Zugriff über **HTTPS** nötig. Ich verwende dafür ein eigenes Nginx mit einem Let's-Encrypt-Zertifikat.
+
+### Zwei-Faktor-Authentifizierung
+
+Auf der Benutzerseite **2FA aktivieren** wählen, den QR-Code mit einer Authenticator-App scannen und mit dem Passwort sowie einem 6-stelligen Code bestätigen. Die Anwendung zeigt danach einmal zehn Wiederherstellungscodes. Jeder Code gilt ein einziges Mal, wenn der Authenticator verloren geht. Ein Administrator oder der Eigentümer kann die 2FA eines anderen Benutzers in dessen Admin-Dialog zurücksetzen (nicht die eigene und nicht die des Eigentümers). Wenn der Eigentümer den Authenticator und alle Wiederherstellungscodes verliert, bleibt nur SQL in der Datenbank:
+
+```sql
+UPDATE users SET two_factor_secret = NULL, two_factor_enabled_at = NULL, two_factor_last_step = NULL, two_factor_failed_attempts = 0, two_factor_locked_until = NULL WHERE username = '<name>';
+DELETE FROM two_factor_recovery_codes WHERE user_id = (SELECT id FROM users WHERE username = '<name>');
+```
 
 ### Bereitstellung
 

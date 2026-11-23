@@ -2,7 +2,7 @@
 
 FastAPI app for the Cardholder PWA API (users, cards, sharing, settings, password recovery). Python `>=3.13`.
 
-Repo workflow and commits: [docs/CONTRIBUTING.md](../docs/CONTRIBUTING.md). How to run the app: [README.md](README.md).
+General rules (scope, tests, checks) are in the root [AGENTS.md](../AGENTS.md). Repo workflow and commits: [docs/CONTRIBUTING.md](../docs/CONTRIBUTING.md). How to run the app: [README.md](README.md).
 
 ## Layout
 
@@ -11,8 +11,8 @@ Repo workflow and commits: [docs/CONTRIBUTING.md](../docs/CONTRIBUTING.md). How 
 - `dev.py` — local entry: Alembic `upgrade head`, then uvicorn with reload.
 - `start.py` — production-style entry (used in Docker).
 - `db/` — `BaseModel`, async engine, `get_async_session`, `cleanup` loop, SQLAlchemy models under `db/models/`.
-- `api/` — one `*_api.py` per area with an `APIRouter` (`auth`, `user`, `card`, `card_share`, `password_recovery`, `public`, `admin`).
-- `core/` — `auth_core` (JWT, bcrypt, role dependencies), `hash_core` (sha256 of high-entropy tokens), `user_core`, `smtp_core`.
+- `api/` — one `*_api.py` per area with an `APIRouter` (`auth`, `user`, `two_factor`, `card`, `card_share`, `password_recovery`, `public`, `admin`).
+- `core/` — `auth_core` (JWT, bcrypt, role dependencies), `hash_core` (sha256 of high-entropy tokens), `user_core`, `smtp_core`, `two_factor_core` (TOTP and recovery codes), `secret_box` (AES-GCM at rest under `MASTER_KEY`).
 - `schemas/` — Pydantic request/response models; `validators.py` for shared validation.
 - `enums/`, `helpers/` — shared enums and helpers (e.g. logo storage, typed settings).
 - `alembic/` — migrations. `env.py` uses `BaseModel.metadata`; model modules are imported via `db/models/__init__.py` for autogenerate.
@@ -66,14 +66,13 @@ Router tests often call handler functions directly with mocked sessions, or use 
 
 Run from the repo root: `python -m pytest` or `uv run pytest`, optionally with a path such as `backend/test/api/test_card_api.py`.
 
-- Shared factories live in `backend/testing.py` (`mock_session`, `sqlite_db`). Fixtures live in `conftest.py`.
-- Parametrize near-duplicate cases. Do not add tests for trivial getters.
-- Type helpers where it stays simple. Match ruff and mypy.
+Shared factories live in `backend/testing.py` (`mock_session`, `sqlite_db`). Fixtures live in `conftest.py`.
 
-## Style
+## Python
 
-Ruff and mypy are configured in the repo root `pyproject.toml` (Ruff selects E, F, I, B, UP; mypy allows missing imports and unset optionals). Match the surrounding file.
+Ruff and mypy are configured in the repo root `pyproject.toml` (Ruff selects E, F, I, B, UP; mypy allows missing imports and `no_strict_optional`). Do not tighten mypy as a drive-by. Match the surrounding file.
 
-- Prefer `list[str]`, `str | None`, and `Final` over legacy `typing` aliases the codebase has already dropped.
-- Log with `logging`; use the module `__name__` logger. Do not add `print` outside `dev.py` / migration tooling.
-- Keep a change inside one area and its tests. A new SQLAlchemy model still needs the `db/models/__init__.py` import and a migration.
+- Prefer `list[str]`, `str | None`, and `Final`. Do not reintroduce `Optional`, `List`, or other legacy `typing` aliases the file has already dropped.
+- New code has no `Any`. At a boundary, use a concrete type, a union, or a `TypeGuard`. A `# type: ignore` needs a short reason.
+- Annotate arguments and return values on public functions where the surrounding file already does.
+- Log with `logging` and the module `__name__` logger. Do not add `print` outside `dev.py` and migration tooling.

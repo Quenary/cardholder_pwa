@@ -7,7 +7,7 @@ import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jwt import PyJWTError as JWTError
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.config import Config
@@ -50,7 +50,10 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     expire = now() + (
         expires_delta or timedelta(minutes=Config.ACCESS_TOKEN_LIFETIME_MIN)
     )
-    to_encode.update({"exp": expire})
+    # typ distinguishes an access token from a two-factor challenge. A token
+    # issued before this claim existed fails here and is replaced by a refresh
+    # within ACCESS_TOKEN_LIFETIME_MIN.
+    to_encode.update({"exp": expire, "typ": "access"})
     encoded_jwt = jwt.encode(
         to_encode,
         Config.JWT_SECRET_KEY,
@@ -59,8 +62,62 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt, expire
 
 
+def create_challenge_token(user_id: int) -> tuple[str, datetime]:
+    """Short-lived JWT that only /token/2fa accepts. Not single-use."""
+    expire = now() + timedelta(minutes=Config.TWO_FACTOR_CHALLENGE_LIFETIME_MIN)
+    token = jwt.encode(
+        {"sub": str(user_id), "typ": "2fa_challenge", "exp": expire},
+        Config.JWT_SECRET_KEY,
+        algorithm=Config.JWT_ALGORITHM,
+    )
+    return token, expire
+
+
+def decode_token(token: str, expected_typ: str) -> dict:
+    """Decode a JWT and require its typ claim. The only jwt.decode in the app."""
+    payload = jwt.decode(
+        token,
+        Config.JWT_SECRET_KEY,
+        algorithms=[Config.JWT_ALGORITHM],
+    )
+    if payload.get("typ") != expected_typ:
+        raise JWTError("Unexpected token type")
+    return payload
+
+
 def hash_refresh_token(token: str) -> str:
     return hash_token(token)
+
+
+async def lock_user_row(session: AsyncSession, user_id: int) -> None:
+    """Lock this user until the current transaction commits.
+
+    Issuing a refresh token and revoking them both take the lock, and the
+    new token is inserted before that transaction commits. Otherwise a
+    revoke can commit, and a login or refresh that already passed its check
+    inserts a token the revoke did not see. SQLite ignores FOR UPDATE, so
+    the lock is the update itself. Autoflush stays off: a stale in-memory
+    flag must not be written back over the row this lock just waited for.
+    """
+    with session.no_autoflush:
+        await session.execute(
+            update(UserModel)
+            .where(UserModel.id == user_id)
+            .values(two_factor_failed_attempts=UserModel.two_factor_failed_attempts)
+        )
+
+
+async def read_user_for_session(session: AsyncSession, user_id: int) -> UserModel:
+    """Lock the user and return the row as the database has it now."""
+    with session.no_autoflush:
+        await lock_user_row(session, user_id)
+        result = await session.execute(
+            select(UserModel)
+            .where(UserModel.id == user_id)
+            .limit(1)
+            .execution_options(populate_existing=True)
+        )
+    return result.scalar_one()
 
 
 async def create_refresh_token(
@@ -117,11 +174,7 @@ async def is_user(
     """
     credentials_exception = HTTPException(status_code=401, detail="Invalid token")
     try:
-        payload = jwt.decode(
-            token,
-            Config.JWT_SECRET_KEY,
-            algorithms=[Config.JWT_ALGORITHM],
-        )
+        payload = decode_token(token, "access")
         subject = cast(str | None, payload.get("sub"))
         # The subject is the user id: a username can be renamed, and a new
         # account taking the old name would otherwise accept the previous

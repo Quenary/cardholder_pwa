@@ -31,17 +31,18 @@ It's powered by free providers and can be suspended, which will lead to a long i
 - Light and dark theme, following the system
 - English, German, Spanish, French, Italian and Russian
 - Password recovery by email (when SMTP is configured)
+- Two-factor authentication with an authenticator app and one-time recovery codes
 - Easy to self-host
 - Open-source
 
 ### Screenshots
 
-| Cards | Code | Card editor | Sharing |
-| :---: | :---: | :---: | :---: |
+|                           Cards                            |                           Code                            |                        Card editor                        |                           Sharing                           |
+| :--------------------------------------------------------: | :-------------------------------------------------------: | :-------------------------------------------------------: | :---------------------------------------------------------: |
 | <img src="resources/screenshots/cards.webp" width="200" /> | <img src="resources/screenshots/code.webp" width="200" /> | <img src="resources/screenshots/edit.webp" width="200" /> | <img src="resources/screenshots/shared.webp" width="200" /> |
 
-| Sign in | Large cards | Admin | Dark theme |
-| :---: | :---: | :---: | :---: |
+|                          Sign in                           |                           Large cards                            |                              Admin                              |                           Dark theme                            |
+| :--------------------------------------------------------: | :--------------------------------------------------------------: | :-------------------------------------------------------------: | :-------------------------------------------------------------: |
 | <img src="resources/screenshots/login.webp" width="200" /> | <img src="resources/screenshots/cards-large.webp" width="200" /> | <img src="resources/screenshots/admin-user.webp" width="200" /> | <img src="resources/screenshots/cards-dark.webp" width="200" /> |
 
 ### Core
@@ -66,7 +67,18 @@ It's powered by free providers and can be suspended, which will lead to a long i
 
 ### Preparation
 
-- **Environment variables** are not required, but you can still define some. There is [.env.example](/.env.example) containing list of vars with description. I’d recommend setting up at least **SMTP** to enable password recovery.
+- **Environment variables** are not required, but you can still define some. There is [.env.example](/.env.example) containing list of vars with description. I’d recommend setting up at least **SMTP** to enable password recovery, and **MASTER_KEY** if you want two-factor authentication.
+- **MASTER_KEY** is the general key for secrets stored at rest. Today it is used only for two-factor authentication: the TOTP secret and the key that HMACs recovery codes. Generate one with `openssl rand -base64 32` and keep a copy somewhere other than the database backup. Without it, users cannot turn 2FA on. Changing or losing it makes existing 2FA secrets and recovery codes unusable; an admin has to reset those users (or the owner can use the SQL below). Rotating the key is not supported yet. A future tool will need the `v1:` prefix on the stored ciphertext.
+
+### Two-factor authentication
+
+On the user page, choose **Enable 2FA**, scan the QR code with an authenticator app, and confirm with your password and a 6-digit code. The app then shows ten recovery codes, once. Each code works a single time if you lose the authenticator. An admin or the owner can reset another user's 2FA from that user's admin dialog (not their own, and not the owner's). If the owner loses the authenticator and every recovery code, the only recovery is SQL on the database:
+
+```sql
+UPDATE users SET two_factor_secret = NULL, two_factor_enabled_at = NULL, two_factor_last_step = NULL, two_factor_failed_attempts = 0, two_factor_locked_until = NULL WHERE username = '<name>';
+DELETE FROM two_factor_recovery_codes WHERE user_id = (SELECT id FROM users WHERE username = '<name>');
+```
+
 - For **PWA** and **video-stream** code scanner functionality you need **HTTPS** access. I use a separate Nginx with Let's Encrypt certificate.
 
 ### Deploy
@@ -115,4 +127,3 @@ See [docs/CONTRIBUTING.md](/docs/CONTRIBUTING.md).
 ### Security
 
 See [docs/SECURITY.md](/docs/SECURITY.md).
-

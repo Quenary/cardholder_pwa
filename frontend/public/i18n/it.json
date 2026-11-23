@@ -38,7 +38,15 @@
     "SIGNUP": "Non hai un account?",
     "PASSWORD_RECOVERY": "Recupero della password",
     "REGISTRATION_DISABLED": "La registrazione è disattivata nelle impostazioni dell'applicazione",
-    "SMTP_DISABLED": "SMTP è disattivato nelle variabili d'ambiente"
+    "SMTP_DISABLED": "SMTP è disattivato nelle variabili d'ambiente",
+    "TWO_FACTOR": {
+      "TITLE": "Autenticazione a due fattori",
+      "HINT": "Inserisci il codice di 6 cifre dell'app di autenticazione oppure uno dei codici di recupero",
+      "CODE": "Codice",
+      "VERIFY": "Verifica",
+      "BACK": "Indietro",
+      "EXPIRED": "Questo passaggio di accesso è scaduto. Accedi di nuovo."
+    }
   },
   "REGISTER": {
     "NEW_ACCOUNT": "Nuovo account",
@@ -118,6 +126,34 @@
     "SUCCESS": {
       "UPDATE": "Dati dell'utente aggiornati",
       "DELETE": "Utente eliminato"
+    },
+    "TWO_FACTOR": {
+      "TITLE": "Autenticazione a due fattori",
+      "DESCRIPTION": "Proteggi l'account con un'app di autenticazione e codici di recupero usa e getta.",
+      "UNAVAILABLE": "L'autenticazione a due fattori non è disponibile su questo server: l'amministratore non ha impostato MASTER_KEY",
+      "ENABLE": "Attiva la 2FA",
+      "DISABLE": "Disattiva la 2FA",
+      "REGENERATE": "Rigenera i codici di backup",
+      "SETUP_INTRO": "Scansiona il codice QR con l'app di autenticazione oppure inserisci il segreto a mano. Poi conferma con la password e un codice dell'app.",
+      "SECRET": "Segreto",
+      "COPY": "Copia",
+      "COPIED": "Copiato",
+      "CODE": "Codice",
+      "RECOVERY_TITLE": "Codici di recupero",
+      "RECOVERY_DESCRIPTION": "Ogni codice funziona una sola volta. Vengono mostrati solo adesso, quindi conservali in un posto sicuro.",
+      "COPY_ALL": "Copia tutti",
+      "DOWNLOAD": "Scarica .txt",
+      "SAVED": "Ho salvato questi codici",
+      "DONE": "Fatto",
+      "CONFIRM_DISABLE_TITLE": "Disattiva l'autenticazione a due fattori",
+      "CONFIRM_REGENERATE_TITLE": "Rigenera i codici di backup",
+      "CONFIRM_HINT": "Inserisci la password attuale e un codice dell'app di autenticazione oppure un codice di recupero.",
+      "PASSWORD": "Password attuale",
+      "CONFIRM": "Conferma",
+      "CANCEL": "Annulla",
+      "ENABLE_SUCCESS": "L'autenticazione a due fattori è attiva",
+      "DISABLE_SUCCESS": "L'autenticazione a due fattori è disattivata",
+      "REGENERATE_SUCCESS": "I nuovi codici di recupero sono pronti"
     }
   },
   "ADMIN": {
@@ -152,7 +188,10 @@
         "TO_MEMBER": "Rendi membro",
         "CONFIRM": "Cambio di ruolo",
         "CONFIRM_SUBTITLE": "Conferma il cambio di ruolo dell'utente in: {{role}}"
-      }
+      },
+      "RESET_TWO_FACTOR": "Reimposta la 2FA",
+      "RESET_TWO_FACTOR_CONFIRM": "Questo disattiva l'autenticazione a due fattori di questo utente e lo disconnette da ogni dispositivo.",
+      "RESET_TWO_FACTOR_SUCCESS": "L'autenticazione a due fattori è stata reimpostata"
     }
   },
   "ABOUT": {

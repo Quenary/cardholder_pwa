@@ -1,0 +1,73 @@
+<h2 mat-dialog-title>{{ 'USER.TWO_FACTOR.TITLE' | translate }}</h2>
+<mat-dialog-content>
+  @if (codes(); as recoveryCodes) {
+    <app-two-factor-recovery-codes
+      [codes]="recoveryCodes"
+      (done)="done()" />
+  } @else {
+    <p>{{ 'USER.TWO_FACTOR.SETUP_INTRO' | translate }}</p>
+    @if (setup(); as pending) {
+      <app-qr-code [value]="pending.otpauth_uri" />
+      <p class="secret-label">{{ 'USER.TWO_FACTOR.SECRET' | translate }}</p>
+      <p class="secret">{{ groupedSecret() }}</p>
+      <button
+        mat-button
+        type="button"
+        (click)="copySecret()">
+        <mat-icon>content_copy</mat-icon>
+        {{ 'USER.TWO_FACTOR.COPY' | translate }}
+      </button>
+    }
+    <form
+      [formGroup]="form"
+      (ngSubmit)="enable()">
+      <mat-form-field>
+        <mat-label>{{ 'USER.TWO_FACTOR.PASSWORD' | translate }}</mat-label>
+        <input
+          matInput
+          [type]="hidePassword() ? 'password' : 'text'"
+          autocomplete="current-password"
+          formControlName="password" />
+        <mat-icon
+          matSuffix
+          (click)="hidePassword.set(!hidePassword())">
+          {{ hidePassword() ? 'visibility_off' : 'visibility' }}
+        </mat-icon>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'USER.TWO_FACTOR.CODE' | translate }}</mat-label>
+        <input
+          matInput
+          autocomplete="one-time-code"
+          maxlength="11"
+          formControlName="code" />
+        @if (form.controls.code.hasError('pattern')) {
+          <mat-error>{{ 'USER.TWO_FACTOR.CODE' | translate }}</mat-error>
+        }
+      </mat-form-field>
+    </form>
+  }
+</mat-dialog-content>
+@if (!codes()?.length) {
+  <mat-dialog-actions>
+    <button
+      mat-button
+      type="button"
+      [disabled]="isLoading()"
+      (click)="cancel()">
+      {{ 'USER.TWO_FACTOR.CANCEL' | translate }}
+    </button>
+    <button
+      mat-flat-button
+      type="button"
+      [disabled]="form.invalid || isLoading() || !setup()"
+      (click)="enable()">
+      {{ 'USER.TWO_FACTOR.ENABLE' | translate }}
+      @if (isLoading()) {
+        <mat-icon iconPositionEnd
+          ><mat-spinner [diameter]="15"></mat-spinner
+        ></mat-icon>
+      }
+    </button>
+  </mat-dialog-actions>
+}

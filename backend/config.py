@@ -1,3 +1,5 @@
+import base64
+import binascii
 import logging
 import os
 import secrets
@@ -6,6 +8,32 @@ from typing import ClassVar, Final, Literal
 from dotenv import load_dotenv
 
 SMTP_ENCRYPTION_TYPE = Literal["TLS", "STARTTLS", None]
+
+_MASTER_KEY_ERROR = (
+    "MASTER_KEY must be a base64 string (standard or URL-safe, padding "
+    "optional) that decodes to at least 32 bytes, for example the output "
+    "of `openssl rand -base64 32`"
+)
+
+
+def decode_master_key(raw: str) -> bytes:
+    """Decode MASTER_KEY. Raises ValueError when it is not usable.
+
+    Empty input is not handled here: the caller treats that as "not
+    configured" and never logs the value.
+    """
+    text = raw.strip()
+    padded = text + ("=" * ((-len(text)) % 4))
+    try:
+        try:
+            decoded = base64.b64decode(padded, validate=True)
+        except (binascii.Error, ValueError):
+            decoded = base64.urlsafe_b64decode(padded)
+    except (binascii.Error, ValueError) as exc:
+        raise ValueError(_MASTER_KEY_ERROR) from exc
+    if len(decoded) < 32:
+        raise ValueError(_MASTER_KEY_ERROR)
+    return decoded
 
 
 class Config:
@@ -18,6 +46,10 @@ class Config:
     ACCESS_TOKEN_LIFETIME_MIN: ClassVar[float]
     REFRESH_TOKEN_LIFETIME_MIN: ClassVar[float]
     PASSWORD_RECOVERY_CODE_LIFETIME_MIN: ClassVar[float]
+    # General key for secrets at rest. None means unset: 2FA is unavailable.
+    # Never log this value.
+    MASTER_KEY: ClassVar[bytes | None]
+    TWO_FACTOR_CHALLENGE_LIFETIME_MIN: ClassVar[float]
     DB_URL: ClassVar[str]
     LOGO_DIR: ClassVar[str]
     LOGO_MAX_UPLOAD_BYTES: ClassVar[int]
@@ -60,6 +92,16 @@ class Config:
             )
             cls.PASSWORD_RECOVERY_CODE_LIFETIME_MIN = float(
                 os.getenv("PASSWORD_RECOVERY_CODE_LIFETIME_MIN") or 15
+            )
+            cls.TWO_FACTOR_CHALLENGE_LIFETIME_MIN = float(
+                os.getenv("TWO_FACTOR_CHALLENGE_LIFETIME_MIN") or 5
+            )
+            raw_master_key = (os.getenv("MASTER_KEY") or "").strip()
+            # A malformed key must stop startup. Ignoring it would boot the
+            # app with 2FA silently disabled, or worse, unable to read
+            # secrets that are already stored.
+            cls.MASTER_KEY = (
+                decode_master_key(raw_master_key) if raw_master_key else None
             )
             cls.DB_URL = (
                 os.getenv("DB_URL")

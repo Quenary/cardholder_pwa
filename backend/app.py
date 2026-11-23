@@ -13,9 +13,11 @@ from backend.api import (
     card_share_router,
     password_recovery_router,
     public_router,
+    two_factor_router,
     user_router,
 )
 from backend.config import Config
+from backend.core.two_factor_core import warn_if_two_factor_key_unusable
 from backend.db.cleanup import cleanup
 
 logging.basicConfig(
@@ -30,6 +32,7 @@ uvicorn_logger.setLevel(Config.LOG_LEVEL)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await warn_if_two_factor_key_unusable()
     task = asyncio.create_task(cleanup())
 
     yield  # app runs
@@ -63,6 +66,7 @@ async def log_request_validation_error(request: Request, exc: RequestValidationE
 
 app.include_router(auth_router)
 app.include_router(user_router)
+app.include_router(two_factor_router)
 app.include_router(card_share_router)
 app.include_router(card_router)
 app.include_router(password_recovery_router)

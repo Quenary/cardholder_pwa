@@ -121,4 +121,31 @@ describe('getTokenInterceptor', () => {
       expect(status).toBe(401);
     });
   });
+
+  describe('/token/2fa', () => {
+    const url = '/api/token/2fa';
+
+    it('is sent without Authorization', () => {
+      httpClient.post(url, {}).subscribe();
+
+      const req = httpMock.expectOne(url);
+      expect(req.request.headers.has('Authorization')).toBe(false);
+      req.flush({});
+    });
+
+    it('does not refresh on 401', () => {
+      const dispatchSpy = vi.spyOn(storeMock, 'dispatch');
+      let status: number | undefined;
+      httpClient.post(url, {}).subscribe({
+        error: (err) => (status = err.status),
+      });
+
+      httpMock
+        .expectOne(url)
+        .flush(null, { status: 401, statusText: 'Unauthorized' });
+
+      expect(dispatchSpy).not.toHaveBeenCalled();
+      expect(status).toBe(401);
+    });
+  });
 });

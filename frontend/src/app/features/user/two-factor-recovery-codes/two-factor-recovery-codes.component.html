@@ -1,0 +1,35 @@
+<h3>{{ 'USER.TWO_FACTOR.RECOVERY_TITLE' | translate }}</h3>
+<p>{{ 'USER.TWO_FACTOR.RECOVERY_DESCRIPTION' | translate }}</p>
+<ul>
+  @for (code of codes(); track code) {
+    <li>
+      <code>{{ code }}</code>
+    </li>
+  }
+</ul>
+<section class="actions">
+  <button
+    mat-button
+    type="button"
+    (click)="copyAll()">
+    <mat-icon>content_copy</mat-icon>
+    {{ 'USER.TWO_FACTOR.COPY_ALL' | translate }}
+  </button>
+  <button
+    mat-button
+    type="button"
+    (click)="download()">
+    <mat-icon>download</mat-icon>
+    {{ 'USER.TWO_FACTOR.DOWNLOAD' | translate }}
+  </button>
+</section>
+<mat-checkbox (change)="saved.set($event.checked)">
+  {{ 'USER.TWO_FACTOR.SAVED' | translate }}
+</mat-checkbox>
+<button
+  mat-flat-button
+  type="button"
+  [disabled]="!saved()"
+  (click)="done.emit()">
+  {{ 'USER.TWO_FACTOR.DONE' | translate }}
+</button>

@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -6,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.auth_core import is_user_admin, is_user_owner
 from backend.core.smtp_core import EmailSender
+from backend.core.two_factor_core import clear_user_two_factor
 from backend.core.user_core import delete_user
 from backend.db.models.settings_model import SettingModel
 from backend.db.models.user_model import UserModel
@@ -19,6 +21,7 @@ from backend.schemas.settings_schema import (
 from backend.schemas.user_schema import UserSchema
 
 router = APIRouter(tags=["admin"], prefix="/admin")
+logger = logging.getLogger(__name__)
 
 
 @router.get("/users", response_model=list[UserSchema])
@@ -54,6 +57,47 @@ async def admin_delete_user(
         raise HTTPException(403, "Admin cannot delete admin.")
 
     return await delete_user(session, user)
+
+
+@router.delete("/users/{user_id}/2fa")
+async def admin_reset_two_factor(
+    user_id: int,
+    session: AsyncSession = Depends(get_async_session),
+    admin: UserModel = Depends(is_user_admin),
+):
+    """Clear another user's 2FA. Does not need a working MASTER_KEY."""
+    if user_id == admin.id:
+        raise HTTPException(
+            403,
+            "Admin cannot reset two-factor authentication on his own account "
+            "with this function.",
+        )
+
+    stmt = select(UserModel).where(UserModel.id == user_id).limit(1)
+    result = await session.execute(stmt)
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(404, "User not found")
+
+    if admin.role_code == EUserRole.ADMIN and user.role_code == EUserRole.ADMIN:
+        raise HTTPException(
+            403, "Admin cannot reset two-factor authentication for an admin."
+        )
+
+    if user.role_code == EUserRole.OWNER:
+        raise HTTPException(
+            403,
+            "Owner two-factor authentication cannot be reset through this function.",
+        )
+
+    await clear_user_two_factor(session, user)
+    logger.info(
+        "Two-factor authentication reset for user %s by user %s",
+        user.id,
+        admin.id,
+    )
+    return {"detail": "Two-factor authentication has been reset"}
 
 
 @router.put(

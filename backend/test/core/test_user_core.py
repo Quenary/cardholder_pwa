@@ -11,7 +11,12 @@ from sqlalchemy import func, select
 
 from backend.config import Config
 from backend.core.user_core import delete_user
-from backend.db.models import CardModel, CardShareModel, UserModel
+from backend.db.models import (
+    CardModel,
+    CardShareModel,
+    TwoFactorRecoveryCodeModel,
+    UserModel,
+)
 
 
 @pytest.fixture
@@ -107,3 +112,15 @@ async def test_the_next_account_inherits_nothing(db, logo_dir) -> None:
         .where(CardShareModel.shared_with_user_id == mallory.id)
     )
     assert visible.scalars().all() == []
+
+
+@pytest.mark.asyncio
+async def test_deleting_a_user_removes_recovery_codes(db, logo_dir) -> None:
+    alice, _, _ = await _seed(db)
+    db.add(TwoFactorRecoveryCodeModel(user_id=alice.id, code_hash="v1:" + "ab" * 32))
+    await db.commit()
+
+    await delete_user(db, alice)
+
+    left = await db.scalar(select(func.count()).select_from(TwoFactorRecoveryCodeModel))
+    assert left == 0

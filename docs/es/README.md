@@ -31,17 +31,18 @@ Están alojadas en proveedores gratuitos, que pueden suspender los contenedores.
 - Tema claro y oscuro, según el sistema
 - Inglés, alemán, español, francés, italiano y ruso
 - Recuperación de contraseña por correo (si SMTP está configurado)
+- Autenticación en dos pasos con una aplicación de autenticación y códigos de recuperación de un solo uso
 - Fácil de autoalojar
 - Código abierto
 
 ### Capturas de pantalla
 
-| Tarjetas | Código | Edición | Compartir |
-| :---: | :---: | :---: | :---: |
+|                             Tarjetas                             |                             Código                              |                             Edición                             |                             Compartir                             |
+| :--------------------------------------------------------------: | :-------------------------------------------------------------: | :-------------------------------------------------------------: | :---------------------------------------------------------------: |
 | <img src="../../resources/screenshots/cards.webp" width="200" /> | <img src="../../resources/screenshots/code.webp" width="200" /> | <img src="../../resources/screenshots/edit.webp" width="200" /> | <img src="../../resources/screenshots/shared.webp" width="200" /> |
 
-| Inicio de sesión | Tarjetas grandes | Admin | Tema oscuro |
-| :---: | :---: | :---: | :---: |
+|                         Inicio de sesión                         |                            Tarjetas grandes                            |                                 Admin                                 |                              Tema oscuro                              |
+| :--------------------------------------------------------------: | :--------------------------------------------------------------------: | :-------------------------------------------------------------------: | :-------------------------------------------------------------------: |
 | <img src="../../resources/screenshots/login.webp" width="200" /> | <img src="../../resources/screenshots/cards-large.webp" width="200" /> | <img src="../../resources/screenshots/admin-user.webp" width="200" /> | <img src="../../resources/screenshots/cards-dark.webp" width="200" /> |
 
 ### Tecnologías
@@ -64,8 +65,18 @@ Están alojadas en proveedores gratuitos, que pueden suspender los contenedores.
 
 ### Preparación
 
-- Las **variables de entorno** no son obligatorias, pero puedes definir algunas. El archivo [.env.example](/.env.example) las enumera todas con su descripción. Recomiendo configurar al menos **SMTP**, para habilitar la recuperación de contraseña.
+- Las **variables de entorno** no son obligatorias, pero puedes definir algunas. El archivo [.env.example](/.env.example) las enumera todas con su descripción. Recomiendo configurar al menos **SMTP**, para habilitar la recuperación de contraseña, y **MASTER_KEY** si quieres la autenticación en dos pasos.
+- **MASTER_KEY** es la clave general de los secretos que se guardan. Hoy solo se usa para la autenticación en dos pasos: el secreto TOTP y la clave con la que se calcula el HMAC de los códigos de recuperación. Genérala con `openssl rand -base64 32` y guarda una copia aparte de la copia de seguridad de la base de datos. Sin ella, los usuarios no pueden activar la 2FA. Cambiarla o perderla deja inservibles los secretos y los códigos ya guardados; un administrador tiene que restablecer a esos usuarios (o el propietario puede usar el SQL de abajo). Todavía no hay rotación de la clave. Una herramienta futura necesitará el prefijo `v1:` del texto cifrado guardado.
 - La **PWA** y el escáner por **flujo de vídeo** necesitan acceso por **HTTPS**. Yo uso un Nginx aparte con un certificado de Let's Encrypt.
+
+### Autenticación en dos pasos
+
+En la página de usuario, elige **Activar 2FA**, escanea el código QR con una aplicación de autenticación y confírmalo con tu contraseña y un código de 6 dígitos. La aplicación muestra entonces diez códigos de recuperación, una sola vez. Cada código sirve una vez si pierdes el autenticador. Un administrador o el propietario puede restablecer la 2FA de otro usuario desde el diálogo de administración de ese usuario (no la propia, ni la del propietario). Si el propietario pierde el autenticador y todos los códigos de recuperación, la única salida es SQL en la base de datos:
+
+```sql
+UPDATE users SET two_factor_secret = NULL, two_factor_enabled_at = NULL, two_factor_last_step = NULL, two_factor_failed_attempts = 0, two_factor_locked_until = NULL WHERE username = '<name>';
+DELETE FROM two_factor_recovery_codes WHERE user_id = (SELECT id FROM users WHERE username = '<name>');
+```
 
 ### Despliegue
 

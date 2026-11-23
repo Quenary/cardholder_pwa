@@ -124,4 +124,36 @@
       </button>
     </section>
   </form>
+  <section class="user-component-two-factor">
+    <h2>{{ 'USER.TWO_FACTOR.TITLE' | translate }}</h2>
+    <p>{{ 'USER.TWO_FACTOR.DESCRIPTION' | translate }}</p>
+    @if (!twoFactorAvailable()) {
+      <p>{{ 'USER.TWO_FACTOR.UNAVAILABLE' | translate }}</p>
+    }
+    @if (!userInfo()?.two_factor_enabled) {
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="!twoFactorAvailable() || isLoading()"
+        (click)="openTwoFactorSetup()">
+        {{ 'USER.TWO_FACTOR.ENABLE' | translate }}
+      </button>
+    } @else {
+      <button
+        mat-button
+        type="button"
+        [disabled]="isLoading()"
+        (click)="openTwoFactorRegenerate()">
+        {{ 'USER.TWO_FACTOR.REGENERATE' | translate }}
+      </button>
+      <button
+        class="warn-color"
+        mat-button
+        type="button"
+        [disabled]="isLoading()"
+        (click)="openTwoFactorDisable()">
+        {{ 'USER.TWO_FACTOR.DISABLE' | translate }}
+      </button>
+    }
+  </section>
 </div>

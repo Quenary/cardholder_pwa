@@ -5,6 +5,7 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.config import Config
+from backend.core.secret_box import is_master_key_configured
 from backend.db.models.settings_model import SettingModel
 from backend.db.session import get_async_session
 from backend.enums.settings_enum import ESettingKey
@@ -63,4 +64,7 @@ async def settings(
     for pk in public_keys:
         value = getattr(Config, pk) if hasattr(Config, pk) else None
         result_list.append({"key": pk, "value": value})
+    result_list.append(
+        {"key": "TWO_FACTOR_AVAILABLE", "value": is_master_key_configured()}
+    )
     return result_list

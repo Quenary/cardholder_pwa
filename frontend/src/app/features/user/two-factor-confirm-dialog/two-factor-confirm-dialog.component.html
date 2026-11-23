@@ -1,0 +1,64 @@
+<h2 mat-dialog-title>
+  {{
+    (data.action === 'disable'
+      ? 'USER.TWO_FACTOR.CONFIRM_DISABLE_TITLE'
+      : 'USER.TWO_FACTOR.CONFIRM_REGENERATE_TITLE'
+    ) | translate
+  }}
+</h2>
+<mat-dialog-content>
+  @if (data.action === 'regenerate' && codes(); as recoveryCodes) {
+    <app-two-factor-recovery-codes
+      [codes]="recoveryCodes"
+      (done)="done()" />
+  } @else {
+    <p>{{ 'USER.TWO_FACTOR.CONFIRM_HINT' | translate }}</p>
+    <form [formGroup]="form">
+      <mat-form-field>
+        <mat-label>{{ 'USER.TWO_FACTOR.PASSWORD' | translate }}</mat-label>
+        <input
+          matInput
+          [type]="hidePassword() ? 'password' : 'text'"
+          autocomplete="current-password"
+          formControlName="password" />
+        <mat-icon
+          matSuffix
+          (click)="hidePassword.set(!hidePassword())">
+          {{ hidePassword() ? 'visibility_off' : 'visibility' }}
+        </mat-icon>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'USER.TWO_FACTOR.CODE' | translate }}</mat-label>
+        <input
+          matInput
+          autocomplete="one-time-code"
+          maxlength="32"
+          formControlName="code" />
+      </mat-form-field>
+    </form>
+  }
+</mat-dialog-content>
+@if (data.action !== 'regenerate' || !codes()?.length) {
+  <mat-dialog-actions>
+    <button
+      mat-button
+      type="button"
+      [disabled]="isLoading()"
+      (click)="cancel()">
+      {{ 'USER.TWO_FACTOR.CANCEL' | translate }}
+    </button>
+    <button
+      mat-flat-button
+      type="button"
+      [class.warn-color]="data.action === 'disable'"
+      [disabled]="form.invalid || isLoading()"
+      (click)="confirm()">
+      {{ 'USER.TWO_FACTOR.CONFIRM' | translate }}
+      @if (isLoading()) {
+        <mat-icon iconPositionEnd
+          ><mat-spinner [diameter]="15"></mat-spinner
+        ></mat-icon>
+      }
+    </button>
+  </mat-dialog-actions>
+}

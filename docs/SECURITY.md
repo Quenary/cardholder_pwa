@@ -82,6 +82,12 @@ database stay valid. Set a stable secret in production.
 
 Password recovery codes, like refresh tokens, are stored only as sha256 hashes.
 
+### MASTER_KEY and two-factor authentication
+
+`MASTER_KEY` is the key for secrets at rest. It is not derived from `JWT_SECRET_KEY`, which is random on every start when unset. TOTP secrets are sealed with AES-256-GCM. The key is HKDF-SHA256 of `MASTER_KEY`, and the ciphertext is bound to the user id so it cannot be copied onto another account. Recovery codes are 50 bits, so a plain hash of a code could be guessed from a database dump. They are stored as HMAC-SHA256 under a second HKDF key, and the database alone is not enough to recover them.
+
+Access tokens carry `typ: "access"`. A two-factor login challenge is a different JWT, `typ: "2fa_challenge"`, and it is not accepted as a session. An accepted TOTP step is stored and will not be accepted again. Five wrong codes lock that user for 15 minutes. Changing or losing `MASTER_KEY` makes existing secrets and recovery codes unusable. Reset those users in the admin UI, or, for the owner, with the SQL in the README. Key rotation is not supported yet; stored values keep a `v1:` prefix so a later tool can tell them apart.
+
 ### Logos
 
 Uploaded logos are size-capped, SVG is rasterised in a child process with a
@@ -102,7 +108,7 @@ CVSS will be scored against this threat model.
 - Cross-user card access and auth/recovery bypass are treated as High
 - Privilege escalation across owner / admin / member is in scope
 - **PR:H** when only an authenticated owner or admin can trigger the issue
-  *and* the impact is something that role is already meant to do
+  _and_ the impact is something that role is already meant to do
 - Compromising the host or volume is outside the app's threat model
 
 ## Reporting

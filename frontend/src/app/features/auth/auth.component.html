@@ -1,71 +1,118 @@
-<form
-  class="auth-form"
-  autocomplete="on"
-  [formGroup]="form"
-  (submit)="onSubmit()">
-  <h1>{{ 'AUTH.WELCOME' | translate }}</h1>
-  <mat-form-field class="auth-form-field">
-    <mat-label aria-required="true">{{
+@if (challenge()) {
+  <form
+    class="auth-form"
+    autocomplete="off"
+    [formGroup]="codeForm"
+    (submit)="onVerify()">
+    <h1>{{ 'AUTH.TWO_FACTOR.TITLE' | translate }}</h1>
+    <p class="auth-form-hint">{{ 'AUTH.TWO_FACTOR.HINT' | translate }}</p>
+    <mat-form-field class="auth-form-field">
+      <mat-label aria-required="true">{{
+        'AUTH.TWO_FACTOR.CODE' | translate
+      }}</mat-label>
+      <input
+        matInput
+        type="text"
+        id="two_factor_code"
+        name="two_factor_code"
+        #codeInput
+        autocomplete="one-time-code"
+        maxlength="32"
+        formControlName="code" />
+    </mat-form-field>
+    <section class="auth-form-buttons">
+      <button
+        mat-flat-button
+        [disabled]="isLoading() || codeForm.invalid"
+        type="submit">
+        <mat-icon>verified_user</mat-icon>
+        {{ 'AUTH.TWO_FACTOR.VERIFY' | translate }}
+        @if (isLoading()) {
+          <mat-icon iconPositionEnd
+            ><mat-spinner [diameter]="15"></mat-spinner
+          ></mat-icon>
+        }
+      </button>
+      <button
+        mat-button
+        type="button"
+        [disabled]="isLoading()"
+        (click)="onBack()">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'AUTH.TWO_FACTOR.BACK' | translate }}
+      </button>
+    </section>
+  </form>
+} @else {
+  <form
+    class="auth-form"
+    autocomplete="on"
+    [formGroup]="form"
+    (submit)="onSubmit()">
+    <h1>{{ 'AUTH.WELCOME' | translate }}</h1>
+    <mat-form-field class="auth-form-field">
+      <mat-label aria-required="true">{{
       'AUTH.USERNAME' | translate
-    }}</mat-label>
-    <input
-      matInput
-      type="text"
-      id="login_username"
-      name="login_username"
-      autocomplete="username"
-      formControlName="username" />
-  </mat-form-field>
-  <mat-form-field class="auth-form-field">
-    <mat-label aria-required="true">{{
+      }}</mat-label>
+      <input
+        matInput
+        type="text"
+        id="login_username"
+        name="login_username"
+        autocomplete="username"
+        formControlName="username" />
+    </mat-form-field>
+    <mat-form-field class="auth-form-field">
+      <mat-label aria-required="true">{{
       'AUTH.PASSWORD' | translate
-    }}</mat-label>
-    <input
-      matInput
-      type="password"
-      id="password"
-      name="password"
-      autocomplete="current-password"
-      formControlName="password" />
-  </mat-form-field>
+      }}</mat-label>
+      <input
+        matInput
+        type="password"
+        id="password"
+        name="password"
+        autocomplete="current-password"
+        formControlName="password" />
+    </mat-form-field>
 
-  <section class="auth-form-buttons">
-    <button
-      mat-flat-button
-      [disabled]="isLoading()"
-      type="submit">
-      <mat-icon>login</mat-icon>
-      {{ 'AUTH.SIGNIN' | translate }}
-      @if (isLoading()) {
-        <mat-icon iconPositionEnd
-          ><mat-spinner [diameter]="15"></mat-spinner
-        ></mat-icon>
-      }
-    </button>
-    <div
-      [matTooltip]="'AUTH.REGISTRATION_DISABLED' | translate"
-      [matTooltipDisabled]="allowRegistration()">
+    <section class="auth-form-buttons">
       <button
-        mat-button
-        routerLink="/register"
-        [disabled]="isLoading() || !allowRegistration()"
-        type="button">
-        <mat-icon>person_add</mat-icon>
-        {{ 'AUTH.SIGNUP' | translate }}
+        mat-flat-button
+        [disabled]="isLoading()"
+        type="submit">
+        <mat-icon>login</mat-icon>
+        {{ 'AUTH.SIGNIN' | translate }}
+        @if (isLoading()) {
+          <mat-icon iconPositionEnd
+            ><mat-spinner [diameter]="15"></mat-spinner
+          ></mat-icon>
+        }
       </button>
-    </div>
+      <div
+        [matTooltip]="'AUTH.REGISTRATION_DISABLED' | translate"
+        [matTooltipDisabled]="allowRegistration()">
+        <button
+          mat-button
+          routerLink="/register"
+          [disabled]="isLoading() || !allowRegistration()"
+          type="button">
+          <mat-icon>person_add</mat-icon>
+          {{ 'AUTH.SIGNUP' | translate }}
+        </button>
+      </div>
 
-    <div
-      [matTooltip]="'AUTH.SMTP_DISABLED' | translate"
-      [matTooltipDisabled]="!smtpDisabled()">
-      <button
-        mat-button
-        routerLink="/password-recovery/request"
-        [disabled]="isLoading() || smtpDisabled()"
-        type="button">
-        <mat-icon>error</mat-icon>
-        {{ 'AUTH.PASSWORD_RECOVERY' | translate }}
-      </button>
-    </div>
-  </section>
-</form>
+      <div
+        [matTooltip]="'AUTH.SMTP_DISABLED' | translate"
+        [matTooltipDisabled]="!smtpDisabled()">
+        <button
+          mat-button
+          routerLink="/password-recovery/request"
+          [disabled]="isLoading() || smtpDisabled()"
+          type="button">
+          <mat-icon>error</mat-icon>
+          {{ 'AUTH.PASSWORD_RECOVERY' | translate }}
+        </button>
+      </div>
+    </section>
+  </form>
+}

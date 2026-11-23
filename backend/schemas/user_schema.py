@@ -79,5 +79,7 @@ class UserSchema(BaseModel):
     created_at: datetime
     updated_at: datetime
     role_code: EUserRole
+    # True only once two_factor_enabled_at is set. The secret stays on the row.
+    two_factor_enabled: bool
 
     model_config = ConfigDict(from_attributes=True)

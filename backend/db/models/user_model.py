@@ -25,6 +25,7 @@ if TYPE_CHECKING:
         PasswordRecoveryCodeModel,
     )
     from .refresh_token_model import RefreshTokenModel
+    from .two_factor_recovery_code_model import TwoFactorRecoveryCodeModel
     from .user_role_model import UserRoleModel
 
 
@@ -57,6 +58,22 @@ class UserModel(BaseModel):
         default=EUserRole.MEMBER,
         nullable=False,
     )
+    # Encrypted v1:... token. The raw Base32 secret is never stored.
+    two_factor_secret: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    two_factor_enabled_at: Mapped[datetime | None] = mapped_column(
+        DateTime, nullable=True
+    )
+    two_factor_last_step: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    two_factor_failed_attempts: Mapped[int] = mapped_column(
+        Integer, server_default=text("0"), default=0, nullable=False
+    )
+    two_factor_locked_until: Mapped[datetime | None] = mapped_column(
+        DateTime, nullable=True
+    )
+
+    @property
+    def two_factor_enabled(self) -> bool:
+        return self.two_factor_enabled_at is not None
 
     cards: Mapped[list["CardModel"]] = relationship("CardModel", back_populates="user")
     refresh_tokens: Mapped[list["RefreshTokenModel"]] = relationship(
@@ -64,6 +81,9 @@ class UserModel(BaseModel):
     )
     password_recovery_codes: Mapped[list["PasswordRecoveryCodeModel"]] = relationship(
         "PasswordRecoveryCodeModel", back_populates="user"
+    )
+    two_factor_recovery_codes: Mapped[list["TwoFactorRecoveryCodeModel"]] = (
+        relationship("TwoFactorRecoveryCodeModel", back_populates="user")
     )
     role: Mapped["UserRoleModel"] = relationship(
         "UserRoleModel", back_populates="users"
