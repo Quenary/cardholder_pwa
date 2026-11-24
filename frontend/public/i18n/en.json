@@ -107,7 +107,16 @@
     "VIEWER": {
       "INVERT": "Invert colors"
     },
-    "SHARED_WITH_YOU": "Shared with you"
+    "SHARED_WITH_YOU": "Shared with you",
+    "IMPORT": {
+      "BUTTON": "Import cards from CSV",
+      "TITLE": "Import cards",
+      "CONFIRM_HINT": "The following cards were found in the CSV file. Do you want to import them?",
+      "CONFIRM": "Import",
+      "SUCCESS": "Cards successfully imported",
+      "NO_CARDS": "No valid cards found in the selected file",
+      "ERROR": "Failed to import cards"
+    }
   },
   "USER": {
     "USERNAME": "Username",

@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>
+  {{ 'CARDS.IMPORT.TITLE' | translate }} ({{ cards().length }})
+</h2>
+
+<mat-dialog-content class="import-dialog-content">
+  <p class="import-dialog-hint">
+    {{ 'CARDS.IMPORT.CONFIRM_HINT' | translate }}
+  </p>
+
+  <div class="import-cards-list">
+    @for (card of cards(); track card.id) {
+      <div class="import-card-item">
+        <app-card-preview
+          class="import-card-preview"
+          [card]="card"
+          [interactive]="false">
+        </app-card-preview>
+        <div class="import-card-name">{{ card.name }}</div>
+      </div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button
+    mat-button
+    (click)="cancel()">
+    {{ 'GENERAL.CANCEL' | translate }}
+  </button>
+  <button
+    mat-flat-button
+    class="accent-color"
+    (click)="confirm()">
+    {{ 'CARDS.IMPORT.CONFIRM' | translate }}
+  </button>
+</mat-dialog-actions>

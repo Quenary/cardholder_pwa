@@ -8,6 +8,8 @@ export function createCardApiServiceMock(): Mocked<CardApiService> {
       .fn()
       .mockReturnValue(of(new Blob([''], { type: 'image/png' }))),
     list: vi.fn().mockReturnValue(of([])),
+    create: vi.fn(),
+    bulkCreate: vi.fn().mockReturnValue(of([])),
   };
   return mock as Mocked<CardApiService>;
 }

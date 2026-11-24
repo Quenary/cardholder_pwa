@@ -107,7 +107,16 @@
     "VIEWER": {
       "INVERT": "Inverti i colori"
     },
-    "SHARED_WITH_YOU": "Condivise con te"
+    "SHARED_WITH_YOU": "Condivise con te",
+    "IMPORT": {
+      "BUTTON": "Importa carte da CSV",
+      "TITLE": "Importa carte",
+      "CONFIRM_HINT": "Le seguenti carte sono state trovate nel file CSV. Vuoi importarle?",
+      "CONFIRM": "Importa",
+      "SUCCESS": "Carte importate con successo",
+      "NO_CARDS": "Nessuna carta valida trovata nel file selezionato",
+      "ERROR": "Impossibile importare le carte"
+    }
   },
   "USER": {
     "USERNAME": "Nome utente",

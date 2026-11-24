@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
 
 from backend.api.card_api import (
+    bulk_create_cards,
     create_card,
     delete_card,
     delete_card_logo,
@@ -75,6 +76,25 @@ async def test_create_card_belongs_to_the_caller() -> None:
     assert card.user_id == 1
     assert card.name == "Shop"
     session.add.assert_called_once()
+    session.commit.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_bulk_create_cards_belongs_to_the_caller() -> None:
+    session = mock_session()
+    bodies = [
+        CardCreateSchema(code="123", code_type="ean13", name="Shop 1"),
+        CardCreateSchema(code="456", code_type="code128", name="Shop 2"),
+    ]
+
+    cards = await bulk_create_cards(bodies, session=session, user=_user())
+
+    assert len(cards) == 2
+    assert cards[0].user_id == 1
+    assert cards[0].name == "Shop 1"
+    assert cards[1].user_id == 1
+    assert cards[1].name == "Shop 2"
+    session.add_all.assert_called_once()
     session.commit.assert_awaited_once()
 
 

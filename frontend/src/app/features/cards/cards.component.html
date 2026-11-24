@@ -50,6 +50,21 @@
       <mat-icon>filter_list</mat-icon>
     </button>
 
+    <input
+      #fileInput
+      type="file"
+      accept=".csv,text/csv"
+      style="display: none"
+      (change)="onFileSelected($event)" />
+
+    <button
+      mat-fab
+      [matTooltip]="'CARDS.IMPORT.BUTTON' | translate"
+      [attr.aria-label]="'CARDS.IMPORT.BUTTON' | translate"
+      (click)="fileInput.click()">
+      <mat-icon>file_upload</mat-icon>
+    </button>
+
     <button
       class="accent-color"
       mat-fab
